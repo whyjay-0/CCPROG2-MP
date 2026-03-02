@@ -32,14 +32,14 @@ typedef struct {
 @param userCount - amount of users in the array users[]
 @return int - returns 1 or 0
 */
-int registerUser (User users[], int *userCount);
+int registerUser (User *users, int *userCount);
 /* Login a user; returns pointer to User struct if successful, NULL otherwise
 
 @param users[] - contains the list of users
 @param userCount - amount of users in the array users[]
 @return User* - address of the user containing their ID, role, etc
 */
-User* loginUser (User users[], int userCount);
+User* loginUser (User *users, int userCount);
 /* // Hash a password for storage; basic hash I found online "djb2", this is only temporary maybe depending how robust ung hash tignan
 
 @param password - input password as str
@@ -58,25 +58,26 @@ int loadUsersFromFile (Users users[], cost char *filename);
 */
 void forgotPassword ();
 
-// PATIENT MANAGEMENT
-
-// Set patient ID, name, age, contact
-
+// PATIENT LOGGING
+// Input patient details
+void inputPatient ();
+// Set patient ID, name, age, contact in a new log
+void addPatient (Patient *newpatient, const char *name, const int age, const char *contact);
 // Diagnose a patient
-
+void diagnosePatient (Patient *patient);
 // Calculate BMI
-
+void calculateBMI (Patient *patient);
 // Calculate Risk
-
-// Print Recommendations (Weight, based on risk level)
+void calculateRisk (Patient *patient);
+// Print Recommendations (Weight, based on risk level) (This should be inside diagnose patient already maybe)
 
 // Save patient to file
-
+int savePatientToFile (const Patient *patient, const char *filename);
 // Load patient to file
-
+int loadPatientsFromFile (Patient *patients, const char *filename);
 // Edit patient ID, name, age, contact
-
+void editPatient (Patient *patient);
 // Edit patient health metric
-
+void editPatientHealth (Patient *patient);
 // Delete patient
-
+void deletePatient (Patient *patient);

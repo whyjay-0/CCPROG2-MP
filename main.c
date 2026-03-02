@@ -4,8 +4,7 @@ int main () {
 	User users[MAX_USERS];
 	Patient patients[MAX_USERS];
 	int userCount = loadUserFromFile(users, "users.txt");
-	int exit = 0;
-	int i=0
+	int exit=0, i=0;
 	
 	do{
 		for (i=0;i<userCount;i++){
