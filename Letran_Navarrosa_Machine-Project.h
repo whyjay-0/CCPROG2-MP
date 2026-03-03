@@ -12,7 +12,6 @@ typedef struct {
     char role[30];   // "GP", "Specialist", "Patient"
 } User;
 typedef struct {
-	int patientID;
 	int userID;
 	char name[101];
 	int age;
@@ -50,7 +49,7 @@ void hashPassword (const char *password, unsigned long *outputHash);
 // Save user to TXT file, return 1 if success, 0 otherwise
 int saveUserToFile (const User *user, const char *filename);
 // Load user from TXT file, return count of users
-int loadUsersFromFile (Users users[], cost char *filename);
+int loadUsersFromFile (User *users, const char *filename);
 // Forgot password / Password recovery
 /* Allows user to reset passwords. Uses username for validity check before user can change password
 
@@ -60,9 +59,9 @@ void forgotPassword ();
 
 // PATIENT LOGGING
 // Input patient details
-void inputPatient ();
+void inputPatient (User *users, int userCount);
 // Set patient ID, name, age, contact in a new log
-void addPatient (Patient *newpatient, const char *name, const int age, const char *contact);
+void addPatient (Patient *newpatient);
 // Diagnose a patient
 void diagnosePatient (Patient *patient);
 // Calculate BMI

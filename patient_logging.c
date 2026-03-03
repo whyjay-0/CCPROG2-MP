@@ -2,13 +2,53 @@
 
 // Patient logging
 // Input patient details
-void inputPatient (){
+/*
+For GP to add new patients.
+returns Patient* - for saving to the TXT file?
+*/
+Patient* addPatient (){
+	Patient *newPatient = NULL;
+	int complete=0;
+	float weight,height;
+	char strInput[101];
+	do{
+		// input name
+		
+		
+		// input age
+		printf("Input age: ");
+		do{
+			scanf("%d",&newPatient.age);
+			if (newPatient.age<=0){
+				printf("Invalid age. Enter valid age: \n");
+			}
+		} while (newPatient.age<=0)
+		
+		// input contact details
+		
+		
+		// input weight and height then place into struct bmi
+		printf("Input weight (in kg): ");
+		scanf("%f", &weight);
+		printf("Input height (in meters): ");
+		scanf("%f", &height);
+		calculateBMI(newPatient,weight,height);
+		
+		// input bp details, if none input 0 = will be for diagnosis
+		if (strInput[0]=='0'){
+			
+		}
+		
+		// input blood sugar, if unknown input 0 = will be for diagnosis
+		if (strInput[0]=='0'){
+			
+		}
+		
+		// Ask for previous blood test results, 1 or 0
+		// calculate for cardio risk with inputs from blood tests (cholesterol, HDL, LDL, triglycerides)
+	} while (complete==0);
 	
-}
-
-// Set patient ID, name, age, contact
-void addPatient (Patient *newpatient, const char *name, const int age, const char *contact){
-	
+	return newPatient;
 }
 
 // Diagnose a patient
@@ -17,8 +57,9 @@ void diagnosePatient (Patient *patient){
 }
 
 // Calculate BMI
-void calculateBMI (Patient *patient){
-	
+void calculateBMI (Patient *patient, const float weight, const float height){
+	float bmi = weight / (height * height);
+	patient->bmi = bmi;
 }
 
 // Calculate Risk
