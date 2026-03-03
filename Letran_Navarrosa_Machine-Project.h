@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #define MAX_USERS 100
 // STRUCTS
@@ -14,21 +15,22 @@ typedef struct {
 typedef struct {
 	char name[101];
 	int age;
+	char gender;
 	char contact[17];
 	float bmi;
-	char bp[16];
+	char bp[16]; // sys/dia mmHg
 	float bloodSugar;
 	double cardioRisk; 
 	// will have 4 levels of risk, 1-4, 1-low risk, 2-moderate risk, 3-high risk, 4-very high 
-	// variables: age, sex, race, blood pressure, cholesterol levels, smoking status
+	// variables: age, sex, blood pressure, cholesterol levels, smoking status
 	// needs to have never had a heart problem, not certain as it is based off group averages
 	// Framingham Risk Score:
 	// https://pmc.ncbi.nlm.nih.gov/articles/PMC3673738/
 	// Reference calc
-	// https://www.mdcalc.com/calc/38/framingham-risk-score-hard-coronary-heart-disease
+	// https://www.mdcalc.com/calc/38/framingham-risk-score-hard-coronary-heart-disease#evidence
 	double ascvdRisk;
 	// ascvd - atherosclerotic cardiovascular disease
-	// var: age, sex, race, BP, chol, and diabetes and smoking
+	// var: age, sex, BP, chol, and diabetes and smoking
 	// needs to have never had a heart problem, not certain as it is based off group averages
 	// ASCVD ACC Risk estimator:
 	// https://tools.acc.org/ascvd-risk-estimator/default.aspx

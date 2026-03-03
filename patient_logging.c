@@ -38,6 +38,18 @@ Patient addPatient (){
 			}
 		} while (valid==0);
 		
+		// input gender
+		printf("Enter your gender at birth (M/F): ");
+		do{
+			scanf("%c",&newPatient.gender);
+			if (newPatient.gender!='M' || newPatient.gender!='F'){
+				printf("Invalid gender. Enter valid gender: \n");
+			}
+			else {
+				valid=1;
+			}
+		} while (valid==0);
+		
 		// input contact details
 		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
 		do{
@@ -126,7 +138,7 @@ variables needed age, sex, race, BP, chol, and diabetes and smoking
 // Diagnose a patient, will give suggestions and risk level based on the details that 
 // will be input here and from the addPatient function
 void diagnosePatient (Patient *patient){
-	// Ask for previous blood test results, 1 or 0
+	// Ask for gender, previous blood test results, 1 or 0
 	// calculate for cardio risk with inputs from blood tests (cholesterol, HDL, LDL, triglycerides)
 	// calculateCardioRisk
 	// calculateASCVDRisk
@@ -140,13 +152,111 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 }
 
 // Calculate Risk using Framingham Risk Score to estimate probability of developing CVD within 10 years
-void calculateCardioRisk (Patient *patient){
+/*
+
+
+@param totalChol - an int representing total cholesterol of patient
+@param hdlChol - an int representing HDL cholesterol of patient
+@param bpTreat - should be Y or N, representing whether patient has been treated for BP problems
+@param smoking - should be Y or N, representing whether patient is regularly smoking
+@param diabetes - should be Y or N, representing whether patient has ever had or currently experiencing diabetes
+*/
+void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlChol, const char bpTreat, const char smoking, const char diabetes){
+	double cardioRisk=0.0, L=0.0;
+	int sysBP=0, i;
+	double ageLog = log(patient->age);
+	double totalCholLog = log(totalChol);
+	double hdlCholLog = log(hdlChol);
+	double sysBPLog;
 	
+	// beta coefficients gathered from https://www.mdcalc.com/calc/38/framingham-risk-score-hard-coronary-heart-disease#evidence
+	// Men
+	double betaAgeMen = 52.00961;
+	double betaTotalCholMen = 20.014077;
+	double betaHDLCholMen = -0.905964;
+	double betaSysBPMen = 1.305784;
+	double betaBPTMen = 0.241549;
+	double betaSmokeMen = 12.096316;
+	double betaAgeCholMen = -4.605038;
+	double betaAgeSmokeMen = -2.84367;
+	double betaAgeAgeMen = -2.93323;
+	// Women
+	double betaAgeWomen = 31.764001;
+	double betaTotalCholWomen = 22.465206;
+	double betaHDLCholWomen = -1.187731;
+	double betaSysBPWomen = 2.552905;
+	double betaBPTWomen = 0.420251;
+	double betaSmokeWomen = 13.07543;
+	double betaAgeCholWomen = -5.060998;
+	double betaAgeSmokeWomen = -2.996945;
+	
+	// parse sysBP and log
+	for (i=0;i<15 && patient->bp[i]!='/';i++){
+		if (patient->bp[i]>='0' && patient->bp[i]<='9'){
+			sysBP = sysBP * 10 + (patient->bp[i] - '0');
+		}
+	}
+	sysBPLog = log(sysBP);
+	
+	// convert bpTreat, smoking, and diabetes
+	int bpT=0;
+	int smoke;
+	int diab;
+	if (bpTreat=='Y'){
+		bpT=1;
+	}
+	if (smoking=='Y'){
+		smoke=1;
+	}
+	if (diabetes=='Y'){
+		diab=1;
+	}
+	
+	// risk based on gender
+	if (patient->gender=='M'){
+		if (patient->age > 70){
+			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
+				betaBPTMen * bpt + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * log(70) * smoke +
+				betaAgeAgeMen * ageLog * ageLog - 172.300168;
+		}
+		else {
+			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
+				betaBPTMen * bpt + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * ageLog * smoke +
+				betaAgeAgeMen * ageLog * ageLog - 172.300168;
+		}
+		cardioRisk = 1 - pow(0.9402,exp(L));
+	}
+	else if (gender == 'F'){
+		if (patient->age > 78){
+			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
+				betaBPTWomen * bpt + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * log(78) * smoke 
+				- 146.5933061;
+		}
+		else {
+			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
+				betaBPTWomen * bpt + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * ageLog * smoke 
+				- 146.5933061;
+		}
+		cardioRisk = 1 - pow(0.98767,exp(L));
+	}
+	
+	patient->cardioRisk=cardioRisk;
 }
 
-// Calculates risk of getting ASCVD-subset of diseases under the CVDs
+// Calculates risk of getting ASCVD-subset of diseases under the CVDs,, uses ACC ASCVD Risk Estimation
 void calculateASCVDRisk (Patient *patient){
+	double ascvdRisk;
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	patient->ascvdRisk=ascvdRisk;
 }
 
 // Print Recommendations (Weight, based on risk level) (Print reco should be in diagnose patient directly)
