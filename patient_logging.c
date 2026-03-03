@@ -6,8 +6,8 @@
 For patient to set their details.
 returns Patient* - for saving to the TXT file?
 */
-Patient* addPatient (){
-	Patient *newPatient = NULL;
+Patient addPatient (){
+	Patient newPatient;
 	int complete=0,valid=0;
 	float weight,height;
 	char strInput[101];
@@ -16,7 +16,7 @@ Patient* addPatient (){
 		printf("Enter your full name ([First name] [Middle initial] [Last name]):\n");
 		do{
 			scanf("%100[^\n]",strInput);
-			if (strlen(strInput)>sizeof(newPatient.name)){
+			if (strlen(strInput)>100){
 				printf("Invalid name. Enter name again:\n");
 			}
 			else{
@@ -33,13 +33,16 @@ Patient* addPatient (){
 			if (newPatient.age<=0){
 				printf("Invalid age. Enter valid age: \n");
 			}
-		} while (newPatient.age<=0)
+			else {
+				valid=1;
+			}
+		} while (valid==0);
 		
 		// input contact details
 		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
 		do{
 			scanf("%100[^\n]",strInput);
-			if (strlen(strInput)>sizeof(newPatient.contact)){
+			if (strlen(strInput)>16){
 				printf("Invalid details. Enter details again:\n");
 			}
 			else {
@@ -49,7 +52,7 @@ Patient* addPatient (){
 		} while(valid==0);
 		valid=0;
 		
-		// input weight and height then place into struct bmi
+		// input weight and height then calc bmi into patient struct
 		printf("Input weight (in kg): ");
 		do{
 			scanf("%f",&weight);
@@ -73,20 +76,21 @@ Patient* addPatient (){
 			}
 		} while(valid==0);
 		
-		calculateBMI(newPatient,weight,height);
+		calculateBMI(&newPatient,weight,height);
 		
 		// input bp details, if none input 0 = will be for diagnosis
 		printf("Enter Blood Pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
 		do{
 			scanf("%16[^\n]",strInput);
-			if (strlen(strInput)>sizeof(newPatient.bp)){
+			if (strlen(strInput)>15){
 				printf("Invalid input. Enter again:\n");
 			}
 			else if(strInput[0]=='0'){
 				printf("A General Practitioner will diagnose this later on.\n");
+				valid=1;
 			}
 			else {
-				strcpy(newPatient.contact,strInput);
+				strcpy(newPatient.bp,strInput);
 				valid=1;
 			}
 		} while(valid==0);
@@ -102,6 +106,7 @@ Patient* addPatient (){
 			}
 			else if (newPatient.bloodSugar==0){
 				printf("A General Practitioner will diagnose this later on.\n");
+				valid=1;
 			}
 			else {
 				valid=1;
@@ -154,7 +159,7 @@ int savePatientToFile (const Patient *patient, const char *filename){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "%d, %s, %d, %s, %f, %s, %f, %lf , %lf", patient->userID, patient->name, patient->age, patient->contact, patient->bmi, patient->bp, patient->bloodSugar, patient->cardioRisk, patient->ascvdRisk);
+		fprintf(fp, "%s, %d, %s, %f, %s, %f, %lf , %lf", patient->name, patient->age, patient->contact, patient->bmi, patient->bp, patient->bloodSugar, patient->cardioRisk, patient->ascvdRisk);
 		flag=1;
 	}
 	
@@ -165,14 +170,13 @@ int savePatientToFile (const Patient *patient, const char *filename){
 // Load patient to file
 int loadPatientsFromFile (Patient *patients, const char *filename){
 	FILE *fp;
-	int count = 0;
+	int count = 0, flag=1;
 	
 	if ((fp=fopen(filename, "r"))==NULL){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		while (count < MAX_USERS){
-			int userID;
+		while (flag){
 			char name[101];
 			int age;
 			char contact[101];
@@ -181,10 +185,9 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 			float bloodSugar;
 			double cardioRisk;
 			double ascvdRisk;
-			int result = fscanf(fp, "%d, %s, %d, %s, %f, %s, %f, %lf , %lf", &userID, name, &age, contact, &bmi, bp, &bloodSugar, &cardioRisk, &ascvdRisk);
+			int result = fscanf(fp, "%s, %d, %s, %f, %s, %f, %lf , %lf", name, &age, contact, &bmi, bp, &bloodSugar, &cardioRisk, &ascvdRisk);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==9){
-				patients[count].userID = userID; // patients[i].patientID = patientID etc
+			if (result==8){
 				if (strlen(name)>sizeof(patients[count].name)){ // validity check for each detail
 					printf("Invalid name");
 				}
@@ -209,9 +212,10 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 				patients[count].cardioRisk = cardioRisk;
 				patients[count].ascvdRisk = ascvdRisk;
 				count++;
+				}
 			}
 			else {
-				count = MAX_USERS;
+				flag=0;
 			}
 		}
 		fclose(fp);
@@ -224,7 +228,7 @@ void editPatient (Patient *patient, ){
 	
 }
 
-// Edit patient health metric
+// Edit patient health metric (similar to diagnose, might not be needed)
 void editPatientHealth (Patient *patient, ){
 	
 }

@@ -88,7 +88,7 @@ int registerUser (User *users, int *userCount){
 @return User* - address of the user containing their ID, role, etc
 */
 User* loginUser (User *users, int userCount){
-	User *user = NULL;
+	User *user;
 	int i, validUser=0,validPass=0;
 	unsigned long inputHash;
 	char username[101],password[101];
@@ -183,13 +183,13 @@ int saveUserToFile (const User *user, const char *filename){
 // Load user from TXT file, return count of users
 int loadUsersFromFile (User *users, const char *filename){
 	FILE *fp;
-	int count = 0;
+	int count = 0, flag=1;
 	
 	if ((fp=fopen(filename, "r"))==NULL){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		while (count < MAX_USERS){
+		while (flag){
 			int ID;
 			char username[101];
 			char role[30];
@@ -215,7 +215,7 @@ int loadUsersFromFile (User *users, const char *filename){
 				count++;
 			}
 			else {
-				count = MAX_USERS;
+				flag=0;
 			}
 		}
 		fclose(fp);

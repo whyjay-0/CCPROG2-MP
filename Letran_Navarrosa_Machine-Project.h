@@ -12,7 +12,6 @@ typedef struct {
     char role[30];   // "GP", "Specialist", "Patient"
 } User;
 typedef struct {
-	int userID;
 	char name[101];
 	int age;
 	char contact[17];
