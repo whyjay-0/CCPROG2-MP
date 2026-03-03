@@ -15,11 +15,24 @@ typedef struct {
 	int userID;
 	char name[101];
 	int age;
-	char contact[101];
+	char contact[17];
 	float bmi;
-	char bp[21];
+	char bp[16];
 	float bloodSugar;
-	int cardioRisk;
+	double cardioRisk; 
+	// will have 4 levels of risk, 1-4, 1-low risk, 2-moderate risk, 3-high risk, 4-very high 
+	// variables: age, sex, race, blood pressure, cholesterol levels, smoking status
+	// needs to have never had a heart problem, not certain as it is based off group averages
+	// Framingham Risk Score:
+	// https://pmc.ncbi.nlm.nih.gov/articles/PMC3673738/
+	// Reference calc
+	// https://www.mdcalc.com/calc/38/framingham-risk-score-hard-coronary-heart-disease
+	double ascvdRisk;
+	// ascvd - atherosclerotic cardiovascular disease
+	// var: age, sex, race, BP, chol, and diabetes and smoking
+	// needs to have never had a heart problem, not certain as it is based off group averages
+	// ASCVD ACC Risk estimator:
+	// https://tools.acc.org/ascvd-risk-estimator/default.aspx
 } Patient;
 
 // LOGIN
@@ -58,8 +71,6 @@ int loadUsersFromFile (User *users, const char *filename);
 void forgotPassword ();
 
 // PATIENT LOGGING
-// Input patient details
-void inputPatient (User *users, int userCount);
 // Set patient ID, name, age, contact in a new log
 void addPatient (Patient *newpatient);
 // Diagnose a patient
@@ -67,7 +78,8 @@ void diagnosePatient (Patient *patient);
 // Calculate BMI
 void calculateBMI (Patient *patient);
 // Calculate Risk
-void calculateRisk (Patient *patient);
+void calculateCardioRisk (Patient *patient);
+void calculateASCVDRisk (Patient *patient);
 // Print Recommendations (Weight, based on risk level) (This should be inside diagnose patient already maybe)
 
 // Save patient to file

@@ -89,12 +89,14 @@ int registerUser (User *users, int *userCount){
 */
 User* loginUser (User *users, int userCount){
 	User *user = NULL;
-	int i=0,validUser=0,validPass=0;
+	int i, validUser=0,validPass=0;
 	unsigned long inputHash;
 	char username[101],password[101];
 	char cInput;
 	do{
 		printf("Input username: ");
+		scanf("%100[^\n]",username); // read until 100 char or until newline is read
+		/* per character scanning
 		do{
 			scanf("%c", &cInput); // check each character and place them into each address of the array
 			if (cInput=='\n'){
@@ -104,7 +106,7 @@ User* loginUser (User *users, int userCount){
 				username[i]=cInput;
 			}
 			i++; // move to next address
-		} while (cInput!='\n');
+		} while (cInput!='\n');*/
 		if (strlen(username)>100){
 			printf("Invalid input\n");
 			i=0;
@@ -112,51 +114,27 @@ User* loginUser (User *users, int userCount){
 		else {
 			validUser=1;
 		}
-	} while (validUser==0);
-	i=0;
+	} while (validUser==0); 
 	do{
 		printf("Input password (If forgot password, input '0'): ");
-		do{
-			scanf("%c", &cInput); // check each character and place them into each address of the array
-			if (cInput=='\n'){
-				password[i]='\0';
+		scanf("%100[^\n]",password);
+		if (password[0]=='0'){
+			if (forgotPassword(users,userCount,username)==0){
+				printf("Invalid Username\n");
 			}
-			else if(cInput=='0' && i==0){
-				if (forgotPassword(users,userCount,username)==0){
-					printf("Invalid Username\n");
-				}
-				else {
-					i=0;
-					do{
-						printf("Input password again: ");
-						do{
-							scanf("%c", &cInput); // check each character and place them into each address of the array
-							if (cInput=='\n'){
-								password[i]='\0';
-							}
-							else{
-								password[i]=cInput;
-							}
-							i++;
-						} while (cInput !='\n');
-						if (strlen(password)>100){
-							printf("Invalid input\n");
-							i=0;
-						}
-						else {
-							validPass=1;
-						}
-					} while (validPass==0);
-				}
+			else {
+				printf("Confirm password again: ");
+				scanf("%100[^\n]",password);
 			}
-			else if (i<100){
-				password[i]=cInput;
+			if (strlen(password)>100){
+				printf("Invalid input\n");
 			}
-			i++; // move to next address
-		} while (cInput!='\n');
-		if (strlen(password)>100){
+			else {
+				validPass=1;
+			}
+		}
+		else if (strlen(password)>100){
 			printf("Invalid input\n");
-			i=0;
 		}
 		else {
 			validPass=1;

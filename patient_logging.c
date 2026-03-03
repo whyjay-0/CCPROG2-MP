@@ -3,20 +3,31 @@
 // Patient logging
 // Input patient details
 /*
-For GP to add new patients.
+For patient to set their details.
 returns Patient* - for saving to the TXT file?
 */
 Patient* addPatient (){
 	Patient *newPatient = NULL;
-	int complete=0;
+	int complete=0,valid=0;
 	float weight,height;
 	char strInput[101];
 	do{
 		// input name
-		
+		printf("Enter your full name ([First name] [Middle initial] [Last name]):\n");
+		do{
+			scanf("%100[^\n]",strInput);
+			if (strlen(strInput)>sizeof(newPatient.name)){
+				printf("Invalid name. Enter name again:\n");
+			}
+			else{
+				strcpy(newPatient.name,strInput);
+				valid=1;
+			}
+		} while(valid==0);
+		valid=0;
 		
 		// input age
-		printf("Input age: ");
+		printf("Enter your age: ");
 		do{
 			scanf("%d",&newPatient.age);
 			if (newPatient.age<=0){
@@ -25,35 +36,96 @@ Patient* addPatient (){
 		} while (newPatient.age<=0)
 		
 		// input contact details
-		
+		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
+		do{
+			scanf("%100[^\n]",strInput);
+			if (strlen(strInput)>sizeof(newPatient.contact)){
+				printf("Invalid details. Enter details again:\n");
+			}
+			else {
+				strcpy(newPatient.contact,strInput);
+				valid=1;
+			}
+		} while(valid==0);
+		valid=0;
 		
 		// input weight and height then place into struct bmi
 		printf("Input weight (in kg): ");
-		scanf("%f", &weight);
-		printf("Input height (in meters): ");
-		scanf("%f", &height);
+		do{
+			scanf("%f",&weight);
+			if (weight<0){
+				printf("Invalid measurement. Enter again.");
+			}
+			else {
+				valid=1;
+			}
+		} while(valid==0);
+		valid=0;
+		
+		printf("Input height (in m): ");
+		do{
+			scanf("%f",&height);
+			if (height<0){
+				printf("Invalid measurement. Enter again.");
+			}
+			else {
+				valid=1;
+			}
+		} while(valid==0);
+		
 		calculateBMI(newPatient,weight,height);
 		
 		// input bp details, if none input 0 = will be for diagnosis
-		if (strInput[0]=='0'){
-			
-		}
+		printf("Enter Blood Pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
+		do{
+			scanf("%16[^\n]",strInput);
+			if (strlen(strInput)>sizeof(newPatient.bp)){
+				printf("Invalid input. Enter again:\n");
+			}
+			else if(strInput[0]=='0'){
+				printf("A General Practitioner will diagnose this later on.\n");
+			}
+			else {
+				strcpy(newPatient.contact,strInput);
+				valid=1;
+			}
+		} while(valid==0);
+		valid=0;
 		
+		// NEED VALIDITY CHECK AND RANGES FOR MEASUREMENTS
 		// input blood sugar, if unknown input 0 = will be for diagnosis
-		if (strInput[0]=='0'){
-			
-		}
-		
-		// Ask for previous blood test results, 1 or 0
-		// calculate for cardio risk with inputs from blood tests (cholesterol, HDL, LDL, triglycerides)
+		printf("Enter Blood Sugar, in mg/dL. If unknown input 0.\n");
+		do{
+			scanf("%f",&newPatient.bloodSugar);
+			if (newPatient.bloodSugar<0){
+				printf("Invalid measurement. Enter again.");
+			}
+			else if (newPatient.bloodSugar==0){
+				printf("A General Practitioner will diagnose this later on.\n");
+			}
+			else {
+				valid=1;
+			}
+		} while(valid==0);
+		complete=1;
 	} while (complete==0);
 	
 	return newPatient;
 }
+/*
+For GP to diagnose existing patients.
+edits cardiorisk ascdv risk
 
-// Diagnose a patient
+variables needed age, sex, race, BP, chol, and diabetes and smoking
+*/
+// Diagnose a patient, will give suggestions and risk level based on the details that 
+// will be input here and from the addPatient function
 void diagnosePatient (Patient *patient){
-	
+	// Ask for previous blood test results, 1 or 0
+	// calculate for cardio risk with inputs from blood tests (cholesterol, HDL, LDL, triglycerides)
+	// calculateCardioRisk
+	// calculateASCVDRisk
+	// give suggestions
 }
 
 // Calculate BMI
@@ -62,8 +134,13 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 	patient->bmi = bmi;
 }
 
-// Calculate Risk
-void calculateRisk (Patient *patient){
+// Calculate Risk using Framingham Risk Score to estimate probability of developing CVD within 10 years
+void calculateCardioRisk (Patient *patient){
+	
+}
+
+// Calculates risk of getting ASCVD-subset of diseases under the CVDs
+void calculateASCVDRisk (Patient *patient){
 	
 }
 
@@ -77,7 +154,7 @@ int savePatientToFile (const Patient *patient, const char *filename){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "", patient->;
+		fprintf(fp, "%d, %s, %d, %s, %f, %s, %f, %lf , %lf", patient->userID, patient->name, patient->age, patient->contact, patient->bmi, patient->bp, patient->bloodSugar, patient->cardioRisk, patient->ascvdRisk);
 		flag=1;
 	}
 	
@@ -86,7 +163,6 @@ int savePatientToFile (const Patient *patient, const char *filename){
 }
 
 // Load patient to file
-/*
 int loadPatientsFromFile (Patient *patients, const char *filename){
 	FILE *fp;
 	int count = 0;
@@ -96,25 +172,42 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 	}
 	else {
 		while (count < MAX_USERS){
-			// place the types inside the struct here
-			
-			int result = fscanf(fp, "%d, %s, %lu, %s", ); //what should be scanned and where the scan will be saved here
+			int userID;
+			char name[101];
+			int age;
+			char contact[101];
+			float bmi;
+			char bp[21];
+			float bloodSugar;
+			double cardioRisk;
+			double ascvdRisk;
+			int result = fscanf(fp, "%d, %s, %d, %s, %f, %s, %f, %lf , %lf", &userID, name, &age, contact, &bmi, bp, &bloodSugar, &cardioRisk, &ascvdRisk);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==4){
-				users[count].userID = ID; // patients[i].patientID = patientID etc
-				if (strlen(username)>sizeof(users[count].username)){ // validity check for each detail
-					printf("Invalid username");
+			if (result==9){
+				patients[count].userID = userID; // patients[i].patientID = patientID etc
+				if (strlen(name)>sizeof(patients[count].name)){ // validity check for each detail
+					printf("Invalid name");
 				}
 				else {
-					strcpy(users[count].username, username); //strcpy
+					strcpy(patients[count].name, name); //strcpy
 				}
-				users[count].passwordHash = hash;
-				if (strlen(role)>sizeof(users[count].role)){
-					printf("Invalid role");
+				patients[count].age = age;
+				if (strlen(contact)>sizeof(patients[count].contact)){
+					printf("Invalid contact");
 				}
 				else {
-					strcpy(users[count].role,role);
+					strcpy(patients[count].contact,contact);
 				}
+				patients[count].bmi = bmi;
+				if (strlen(bp)>sizeof(patients[count].bp)){
+					printf("Invalid bp");
+				}
+				else {
+					strcpy(patients[count].bp,bp);
+				}
+				patients[count].bloodSugar = bloodSugar;
+				patients[count].cardioRisk = cardioRisk;
+				patients[count].ascvdRisk = ascvdRisk;
 				count++;
 			}
 			else {
@@ -124,7 +217,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 		fclose(fp);
 	}
 	return count;
-}*/
+}
 
 // Edit patient ID, name, age, contact
 void editPatient (Patient *patient, ){
