@@ -21,6 +21,7 @@ typedef struct {
 	char gender;
 	char contact[17];
 	float bmi;
+	char bmiCat[12];
 	char bp[16]; // sys/dia mmHg
 	float bloodSugar;
 	double cardioRisk; 
