@@ -5,21 +5,23 @@ int main () {
 	User *currentUser;
 	Patient patients[MAX_USERS];
 	Patient currentPatient;
-	int userCount = loadUserFromFile(users, "users.txt");
+	int userCount = loadUsersFromFile(users, "users.txt");
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
-	int exit=0, i=0, choice=0, gp=0, specialist=0, patient=0;
+	int exit=0, choice=0, gp=0, specialist=0, patient=0;
+	int newUser;
 		
 	do{
 		printf("Input choice: ");
 		scanf("%d",&choice);
-		i=0;
 		switch (choice){
 			case 1: // Registration
-				if (registerUser(users,&userCount)){
-					if (saveUserToFile(&users[userCount],"users.txt")){
+				newUser = registerUser(users, &userCount);
+				if (newUser != -1){
+					if (saveUserToFile(&users[newUser],"users.txt")){
 						printf("User saved successfully");
 					}
 				}
+				exit=1;
 				break;
 			case 2: // Login and dashboard
 				currentUser = loginUser(users,userCount);
@@ -28,10 +30,10 @@ int main () {
 					do{
 						// Dashboard function for each user
 						// Function call for adding a patient
-						/*
+						
 						Patient newPatient = addPatient();
 						savePatientToFile(&newPatient, "patients.txt");
-						*/
+						
 					} while(gp!=0); // 0 is exit, 1 is main menu, 2 is add patient, 
 									//3 is list patient -> then they can diagnose after selecting from the list
 				}
@@ -65,7 +67,12 @@ int main () {
 }
 
 /* // registerUser function test
-	
+	newUser = registerUser(users, &userCount);
+	if (newUser != -1){
+		if (saveUserToFile(&users[newUser],"users.txt")){
+			printf("User saved successfully");
+		}
+	}
 */
 	
 /* // hashPassword function test

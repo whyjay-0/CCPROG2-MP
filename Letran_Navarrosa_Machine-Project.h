@@ -1,3 +1,6 @@
+#ifndef HEADER_H
+#define HEADER_H
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -69,17 +72,17 @@ int loadUsersFromFile (User *users, const char *filename);
 
 @return 0 or 1 if success or not
 */
-void forgotPassword ();
+int forgotPassword ();
 
 // PATIENT LOGGING
 // Set patient ID, name, age, contact in a new log
-void addPatient (Patient *newpatient);
+Patient addPatient ();
 // Diagnose a patient
 void diagnosePatient (Patient *patient);
 // Calculate BMI
-void calculateBMI (Patient *patient);
+void calculateBMI (Patient *patient, const float weight, const float height);
 // Calculate Risk
-void calculateCardioRisk (Patient *patient);
+void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlChol, const char bpTreat, const char smoking, const char diabetes);
 void calculateASCVDRisk (Patient *patient);
 // Print Recommendations (Weight, based on risk level) (This should be inside diagnose patient already maybe)
 
@@ -93,3 +96,5 @@ void editPatient (Patient *patient);
 void editPatientHealth (Patient *patient);
 // Delete patient
 void deletePatient (Patient *patient);
+
+#endif

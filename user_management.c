@@ -5,13 +5,13 @@
 
 @param users[] - contains the list of users
 @param userCount - amount of users in the array users[]
-@return int - returns 1 or 0
+@return int - index of newUser
 */
 int registerUser (User *users, int *userCount){
-	int flag = 0,i,similar=0;
+	int i,similar=0;
 	User newUser;
 	char input[101];
-	int choice, complete=0, validUser=0, validChoice=0;
+	int choice, complete=0, validUser=0, validChoice=0, index;
 	
 	if (*userCount >= MAX_USERS){
 		printf("Max User Limit reached.");
@@ -20,8 +20,8 @@ int registerUser (User *users, int *userCount){
 		while (complete!=1){
 			do{
 				validUser=0;
-				printf("Please enter desired username (100 Characters): ");
-				scanf("%100s", input);
+				printf("Please enter desired username (100 Characters): \n");
+				scanf(" %100[^\n]", input);
 				if (strlen(input)>100){
 					printf("Invalid input\n");
 				}
@@ -42,8 +42,8 @@ int registerUser (User *users, int *userCount){
 				}
 			} while (validUser==0);
 			
-			printf("Please enter password: ");
-			scanf("%100s", input);
+			printf("Please enter password: \n");
+			scanf(" %100[^\n]", input);
 			hashPassword(input, &newUser.passwordHash);
 			
 			do{
@@ -75,10 +75,10 @@ int registerUser (User *users, int *userCount){
 		}
 		newUser.userID = *userCount + 1; // set the userID of new user to old usercount + 1
 		users[*userCount] = newUser; //set the array of struct at index *userCount to the newUser made
+		index = *userCount; //the index of the user before it is incremented
 		(*userCount)++; // increase amount of users
-		flag = 1;
 	}
-	return flag; // success or not
+	return index; // index of the user
 }
 
 /* Login a user; returns pointer to User struct if successful, NULL otherwise
@@ -92,7 +92,6 @@ User* loginUser (User *users, int userCount){
 	int i, validUser=0,validPass=0;
 	unsigned long inputHash;
 	char username[101],password[101];
-	char cInput;
 	do{
 		printf("Input username: ");
 		scanf("%100[^\n]",username); // read until 100 char or until newline is read
@@ -119,7 +118,7 @@ User* loginUser (User *users, int userCount){
 		printf("Input password (If forgot password, input '0'): ");
 		scanf("%100[^\n]",password);
 		if (password[0]=='0'){
-			if (forgotPassword(users,userCount,username)==0){
+			if (forgotPassword(&users,userCount,username)==0){
 				printf("Invalid Username\n");
 			}
 			else {
@@ -161,7 +160,7 @@ void hashPassword (const char *password, unsigned long *outputHash){
 	int c;
 	*outputHash = 5381;
 	// djb2 algorithm, hash is in integer; needs to be converted to output
-	while (c = *password++){
+	while ((c = *password++)){
 		*outputHash = ((*outputHash << 5) + *outputHash) + c; //bitwise left shift by 5 (<< 5)
 	}
 }
@@ -233,7 +232,7 @@ int forgotPassword (User *users, int userCount, const char *username){
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
 			printf("Please enter password: ");
-			scanf("%100s", newPass);
+			scanf("%100[^\n]", newPass);
 			hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
 			printf("Successfully Changed Password!");
 			flag = 1;

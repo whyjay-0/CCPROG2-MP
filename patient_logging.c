@@ -15,7 +15,7 @@ Patient addPatient (){
 		// input name
 		printf("Enter your full name ([First name] [Middle initial] [Last name]):\n");
 		do{
-			scanf("%100[^\n]",strInput);
+			scanf(" %100[^\n]",strInput);
 			if (strlen(strInput)>100){
 				printf("Invalid name. Enter name again:\n");
 			}
@@ -53,7 +53,7 @@ Patient addPatient (){
 		// input contact details
 		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
 		do{
-			scanf("%100[^\n]",strInput);
+			scanf(" %17[^\n]",strInput);
 			if (strlen(strInput)>16){
 				printf("Invalid details. Enter details again:\n");
 			}
@@ -93,7 +93,7 @@ Patient addPatient (){
 		// input bp details, if none input 0 = will be for diagnosis
 		printf("Enter Blood Pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
 		do{
-			scanf("%16[^\n]",strInput);
+			scanf(" %16[^\n]",strInput);
 			if (strlen(strInput)>15){
 				printf("Invalid input. Enter again:\n");
 			}
@@ -153,13 +153,12 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 
 // Calculate Risk using Framingham Risk Score to estimate probability of developing CVD within 10 years
 /*
-
+Estimates 10-year risk of heart attack in patients 30-79 years with no history of CHD or diabetes.
 
 @param totalChol - an int representing total cholesterol of patient
 @param hdlChol - an int representing HDL cholesterol of patient
 @param bpTreat - should be Y or N, representing whether patient has been treated for BP problems
 @param smoking - should be Y or N, representing whether patient is regularly smoking
-@param diabetes - should be Y or N, representing whether patient has ever had or currently experiencing diabetes
 */
 void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlChol, const char bpTreat, const char smoking, const char diabetes){
 	double cardioRisk=0.0, L=0.0;
@@ -198,43 +197,39 @@ void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlCh
 	}
 	sysBPLog = log(sysBP);
 	
-	// convert bpTreat, smoking, and diabetes
+	// convert bpTreat and smoking
 	int bpT=0;
 	int smoke;
-	int diab;
 	if (bpTreat=='Y'){
 		bpT=1;
 	}
 	if (smoking=='Y'){
 		smoke=1;
 	}
-	if (diabetes=='Y'){
-		diab=1;
-	}
 	
 	// risk based on gender
-	if (patient->gender=='M'){
+	if (patient->gender == 'M'){
 		if (patient->age > 70){
 			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
-				betaBPTMen * bpt + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * log(70) * smoke +
+				betaBPTMen * bpT + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * log(70) * smoke +
 				betaAgeAgeMen * ageLog * ageLog - 172.300168;
 		}
 		else {
 			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
-				betaBPTMen * bpt + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * ageLog * smoke +
+				betaBPTMen * bpT + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * ageLog * smoke +
 				betaAgeAgeMen * ageLog * ageLog - 172.300168;
 		}
 		cardioRisk = 1 - pow(0.9402,exp(L));
 	}
-	else if (gender == 'F'){
+	else if (patient->gender == 'F'){
 		if (patient->age > 78){
 			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
-				betaBPTWomen * bpt + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * log(78) * smoke 
+				betaBPTWomen * bpT + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * log(78) * smoke 
 				- 146.5933061;
 		}
 		else {
 			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
-				betaBPTWomen * bpt + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * ageLog * smoke 
+				betaBPTWomen * bpT + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * ageLog * smoke 
 				- 146.5933061;
 		}
 		cardioRisk = 1 - pow(0.98767,exp(L));
@@ -243,7 +238,8 @@ void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlCh
 	patient->cardioRisk=cardioRisk;
 }
 
-// Calculates risk of getting ASCVD-subset of diseases under the CVDs,, uses ACC ASCVD Risk Estimation
+// Calculates risk of getting ASCVD-subset of diseases under the CVDs,, uses ACC ASCVD Risk Estimation 
+/*
 void calculateASCVDRisk (Patient *patient){
 	double ascvdRisk;
 	
@@ -257,7 +253,7 @@ void calculateASCVDRisk (Patient *patient){
 	
 	
 	patient->ascvdRisk=ascvdRisk;
-}
+} */
 
 // Print Recommendations (Weight, based on risk level) (Print reco should be in diagnose patient directly)
 
@@ -323,7 +319,6 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 				patients[count].ascvdRisk = ascvdRisk;
 				count++;
 				}
-			}
 			else {
 				flag=0;
 			}
@@ -332,7 +327,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 	}
 	return count;
 }
-
+/*
 // Edit patient ID, name, age, contact
 void editPatient (Patient *patient, ){
 	
@@ -347,3 +342,9 @@ void editPatientHealth (Patient *patient, ){
 void deletePatient (Patient *patient, ){
 	
 }
+
+// Print patient list
+void showPatients (Patient *patient, ){
+	
+}
+*/
