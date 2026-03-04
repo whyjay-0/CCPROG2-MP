@@ -37,24 +37,26 @@ Patient addPatient (){
 				valid=1;
 			}
 		} while (valid==0);
+		valid=0;
 		
 		// input gender
 		printf("Enter your gender at birth (M/F): ");
 		do{
-			scanf("%c",&newPatient.gender);
-			if (newPatient.gender!='M' || newPatient.gender!='F'){
+			scanf(" %c",&newPatient.gender);
+			if (newPatient.gender!='M' && newPatient.gender!='F'){
 				printf("Invalid gender. Enter valid gender: \n");
 			}
 			else {
 				valid=1;
 			}
 		} while (valid==0);
+		valid=0;
 		
 		// input contact details
 		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
 		do{
 			scanf(" %17[^\n]",strInput);
-			if (strlen(strInput)>16){
+			if (strlen(strInput)!=16){
 				printf("Invalid details. Enter details again:\n");
 			}
 			else {
@@ -87,6 +89,7 @@ Patient addPatient (){
 				valid=1;
 			}
 		} while(valid==0);
+		valid=0;
 		
 		calculateBMI(&newPatient,weight,height);
 		
@@ -143,12 +146,76 @@ void diagnosePatient (Patient *patient){
 	// calculateCardioRisk
 	// calculateASCVDRisk
 	// give suggestions
+	int totalChol, hdlChol;
+	char bpTreat, smoking, diabetes;
+
+	printf("----- Diagnosing Patient: %s -----\n", patient->name);
+
+	// Ask user for needed info
+	// Cholesterol values
+	printf("Enter Total Cholesterol (mg/dL): ");
+	scanf("%d", &totalChol);
+	printf("Enter HDL Cholesterol (mg/dL): ");
+	scanf("%d", &hdlChol);
+
+	// BP Treatment
+	printf("Is patient being treated for blood pressure? (Y/N): ");
+	scanf(" %c", &bpTreat);
+
+	//Smoking
+	printf("Is patient a regular smoker? (Y/N): ");
+	scanf(" %c", &smoking);
+
+	// Diabetes
+	printf("Does patient have diabetes? (Y/N): ");
+	scanf(" %c", &diabetes);
+
+	// Calculate Cardio Risk
+	calculateCardioRisk(patient, totalChol, hdlChol, bpTreat, smoking, diabetes);
+
+	// Calculate ASCVD Risk
+	//calculateASCVDRisk(patient);
+
+	printf("---------- DIAGNOSIS REPORT ----------");
+	// Cardio Risk
+	printf("10-Year Cardiovasular Risk: %.2lf%%\n", patient->cardioRisk * 100);
+	// Risk Level Classification
+	if(patient->cardioRisk < 0.10)
+		printf("   Risk Level: Low Risk\n");
+	else if(patient->cardioRisk < 0.20)
+		printf("   Risk Level: Moderate Risk\n");
+	else if(patient->cardioRisk < 0.30)
+		printf("   Risk Level: High Risk\n");
+	else
+		printf("Risk Level: Very High Risk\n");
+
+	// ASCVD Risk
+	printf("10-Year Atherosclerotic Cardiovascular Disease Risk: %.2lf%%\n", patient->ascvdRisk * 100);
+	// Risk Level Classification
+	if(patient->ascvdRisk < 0.05)
+		printf("   Risk Level: Low Risk\n");
+	else if(patient->ascvdRisk < 0.075)
+		printf("   Risk Level: Borderline Risk\n");
+	else if(patient->ascvdRisk < 0.20)
+		printf("   Risk Level: Intermediate Risk\n");
+	else
+		printf("Risk Level: High Risk\n");
+
 }
 
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height){
 	float bmi = weight / (height * height);
 	patient->bmi = bmi;
+
+	if(bmi<18.5)
+		strcpy(patient->bmiCat, "Underweight");
+	else if(bmi<25.0)
+		strcpy(patient->bmiCat, "  Healthy  ");
+	else if(bmi<30.0)
+		strcpy(patient->bmiCat, "Overweight ");
+	else 
+		strcpy(patient->bmiCat, "   Obese   ");
 }
 
 // Calculate Risk using Framingham Risk Score to estimate probability of developing CVD within 10 years
@@ -199,7 +266,7 @@ void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlCh
 	
 	// convert bpTreat and smoking
 	int bpT=0;
-	int smoke;
+	int smoke=0;
 	if (bpTreat=='Y'){
 		bpT=1;
 	}
@@ -265,7 +332,7 @@ int savePatientToFile (const Patient *patient, const char *filename){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "%s, %d, %s, %f, %s, %f, %lf , %lf", patient->name, patient->age, patient->contact, patient->bmi, patient->bp, patient->bloodSugar, patient->cardioRisk, patient->ascvdRisk);
+		fprintf(fp, "%s, %d, %s, %f, %s, %f, %lf , %lf\n", patient->name, patient->age, patient->contact, patient->bmi, patient->bp, patient->bloodSugar, patient->cardioRisk, patient->ascvdRisk);
 		flag=1;
 	}
 	
@@ -291,24 +358,24 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 			float bloodSugar;
 			double cardioRisk;
 			double ascvdRisk;
-			int result = fscanf(fp, "%s, %d, %s, %f, %s, %f, %lf , %lf", name, &age, contact, &bmi, bp, &bloodSugar, &cardioRisk, &ascvdRisk);
+			int result = fscanf(fp, "%100[^,], %d, %16[^,], %f, %15[^,], %f, %lf , %lf", name, &age, contact, &bmi, bp, &bloodSugar, &cardioRisk, &ascvdRisk);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
 			if (result==8){
-				if (strlen(name)>sizeof(patients[count].name)){ // validity check for each detail
+				if (strlen(name)>=sizeof(patients[count].name)){ // validity check for each detail
 					printf("Invalid name");
 				}
 				else {
 					strcpy(patients[count].name, name); //strcpy
 				}
 				patients[count].age = age;
-				if (strlen(contact)>sizeof(patients[count].contact)){
+				if (strlen(contact)>=sizeof(patients[count].contact)){
 					printf("Invalid contact");
 				}
 				else {
 					strcpy(patients[count].contact,contact);
 				}
 				patients[count].bmi = bmi;
-				if (strlen(bp)>sizeof(patients[count].bp)){
+				if (strlen(bp)>=sizeof(patients[count].bp)){
 					printf("Invalid bp");
 				}
 				else {
@@ -327,24 +394,134 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 	}
 	return count;
 }
-/*
+
 // Edit patient ID, name, age, contact
-void editPatient (Patient *patient, ){
-	
+void editPatient (Patient *patient, int count){
+	char searchName[101];
+	int found = 0;
+	char strInput[101];
+	int valid = 0;
+
+	printf("Enter patient name to edit: ");
+	scanf(" %100[^\n]", searchName);
+
+	for(int i=0; i<count; i++) {
+		if(strcmp(patient[i].name,searchName) == 0) {
+			// input name
+			printf("Enter new name:\n");
+			do{
+				scanf(" %100[^\n]",strInput);
+				if (strlen(strInput)>100){
+					printf("Invalid name. Enter name again:\n");
+				}
+				else{
+					strcpy(patient[i].name,strInput);
+					valid=1;
+				}
+			} while(valid==0);
+			valid=0;
+		
+			// input age
+			printf("Enter new age: ");
+			do{
+				scanf("%d",&patient[i].age);
+				if (patient[i].age<=0){
+					printf("Invalid age. Enter valid age: \n");
+				}
+				else {
+					valid=1;
+				}
+			} while (valid==0);
+			valid=0;
+		
+			// input contact details
+			printf("Enter new phone number (+63 xxx-xxx-xxxx): ");
+			do{
+				scanf(" %17[^\n]",strInput);
+				if (strlen(strInput)!=16){
+					printf("Invalid details. Enter details again:\n");
+				}
+				else {
+					strcpy(patient[i].contact,strInput);
+					valid=1;
+				}
+			} while(valid==0);
+			found=1;
+			break;
+		}	
+	}	
+	if(!found)
+		printf("Patient not found.\n"); //maglloop ba dapat to like babalik sa mageenter ng name to edit,,,
 }
 
-// Edit patient health metric (similar to diagnose, might not be needed)
+/*// Edit patient health metric (similar to diagnose, might not be needed)
 void editPatientHealth (Patient *patient, ){
 	
-}
+}*/
 
 // Delete patient
-void deletePatient (Patient *patient, ){
-	
+void deletePatient (Patient *patient, int *count){
+	char searchName[101];
+	int found=0;
+
+	printf("Enter patient name to delete: ");
+	scanf(" %100[^\n]", searchName);
+
+	for(int i=0; i < *count; i++) {
+		if(strcmp(patient[i].name,searchName) == 0) {
+			// Shift patients to the left
+			for(int j=i; j < *count-1; j++) 
+				patient[j] = patient[j+1];
+
+			(*count)--; //reduce total patient count
+			found=1;
+
+			printf("Patient deleted successfully.\n");
+			break;
+		}	
+	}	
+	if(!found)
+		printf("Patient not found.\n");
 }
 
 // Print patient list
-void showPatients (Patient *patient, ){
-	
-}
-*/
+void showPatients (Patient *patient, int count){
+	if(count==0)
+		printf("No patients found.\n");
+	else {
+		printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("------------\n");
+    	printf("PATIENT LIST");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("------------\n");
+    	printf("| %3s | %15s%10s | %3s | %6s | %11s%5s | %7s%4s | %7s%5s | %5s | %11s | %10s |\n",
+    	       "No.", "Name", "", "Age", "Gender", "Contact", "", "BMI", "", "BP", "", "Sugar", "Cardio Risk", "ASCVD Risk");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("------------\n");
+    
+    	for(int i=0; i<count; i++) {
+        	printf("| %03d | %-25s | %-3d | %3c%3s | %16s | %11s | %-12s | %.2f |   %.2lf%%    |   %.2lf%%   |\n",
+           		i+1, 
+            	patient[i].name,
+            	patient[i].age,
+            	patient[i].gender, "",
+            	patient[i].contact,
+            	patient[i].bmiCat,
+            	patient[i].bp,
+            	patient[i].bloodSugar,
+            	patient[i].cardioRisk * 100,
+            	patient[i].ascvdRisk * 100);
+    	}	
+    
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("----------------------------------------");
+    	printf("------------\n");
+	}
+}	
