@@ -24,20 +24,19 @@ typedef struct {
 	char bmiCat[12];
 	char bp[16]; // sys/dia mmHg
 	float bloodSugar;
+	float totalChol;
+	float hdlChol;
+	int eGFR;
+	char htMed;
+	char statins;
+	char smoking;
+	char diabetes;
+	float creatinine;
+	char cvdFamily;
+	char diet;
+	char exercise;
+	char alcohol;
 	double cardioRisk; 
-	// will have 4 levels of risk, 1-4, 1-low risk, 2-moderate risk, 3-high risk, 4-very high 
-	// variables: age, sex, blood pressure, cholesterol levels, smoking status
-	// needs to have never had a heart problem, not certain as it is based off group averages
-	// Framingham Risk Score:
-	// https://pmc.ncbi.nlm.nih.gov/articles/PMC3673738/
-	// Reference calc
-	// https://www.mdcalc.com/calc/38/framingham-risk-score-hard-coronary-heart-disease#evidence
-	double ascvdRisk;
-	// ascvd - atherosclerotic cardiovascular disease
-	// var: age, sex, BP, chol, and diabetes and smoking
-	// needs to have never had a heart problem, not certain as it is based off group averages
-	// ASCVD ACC Risk estimator:
-	// https://tools.acc.org/ascvd-risk-estimator/default.aspx
 } Patient;
 
 // LOGIN
@@ -83,9 +82,7 @@ void diagnosePatient (Patient *patient);
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height);
 // Calculate Risk
-void calculateCardioRisk (Patient *patient, const int totalChol, const int hdlChol, const char bpTreat, const char smoking, const char diabetes);
-void calculateASCVDRisk (Patient *patient);
-// Print Recommendations (Weight, based on risk level) (This should be inside diagnose patient already maybe)
+calculateCardioRisk(Patient *patient, const float totalChol, const float hdlChol, const int eGFR,  const char htMed, const char statins, const char smoking, const char diabetes);
 
 // Save patient to file
 int savePatientToFile (const Patient *patient, const char *filename);
