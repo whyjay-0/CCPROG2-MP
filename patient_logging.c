@@ -207,17 +207,17 @@ void diagnosePatient (Patient *patient){
 	printf("Age: %d\nGender: %c\n", patient->age, patient->gender);
 	printf("BMI: %f\n\n", patient->bmi);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
-	/* Interpretations. Changes will be done here once calculateCardioRisk is finished
+	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	if (patient->age>=30 && patient->age<=79){
 		// Cardio Risk
 		printf("10-Year Cardiovasular Risk: %.2lf%%\n", patient->cardioRisk * 100);
 		// Risk Level Classification
-		if(patient->cardioRisk < 0.10)
+		if(patient->cardioRisk < 0.05)
 			printf("   Risk Level: Low Risk\n\n");
-		else if(patient->cardioRisk < 0.20)
-			printf("   Risk Level: Moderate Risk\n\n");
-		else if(patient->cardioRisk < 0.30)
-			printf("   Risk Level: High Risk\n\n");
+		else if(patient->cardioRisk >= 0.05 && patient->cardioRisk <= 0.074)
+			printf("   Risk Level: Borderline Risk\n\n");
+		else if(patient->cardioRisk >= 0.075 && patient->cardioRisk <= 0.199)
+			printf("   Risk Level: Intermediate Risk\n\n");
 		else
 			printf("   Risk Level: Very High Risk\n\n");
 	}
@@ -253,15 +253,20 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 		strcpy(patient->bmiCat, "   Obese   ");
 }
 
-// Calculate Risk using PREVENT Equations. Access to the PREVENT Equations was authorized by the AHA after we agreeing on the PREVENT (TM) License Agreement.
-// https://professional.heart.org/en/guidelines-and-statements/prevent-calculator
-/*
-@param totalChol - an int representing total cholesterol of patient
-@param hdlChol - an int representing HDL cholesterol of patient
-@param hpTreat - using anti hypertension drugs, Y or N
-@param statins - using statins, Y or N
-@param smoking - representing whether patient is regularly smoking, Y or N
-@param diabetes - currently experiencing Diabetes, Y or N
+/* Calculate Risk using Predicting Risk of Cardiovascular Disease Events (PREVENT) Equations
+   https://professional.heart.org/en/guidelines-and-statements/prevent-calculator
+Source code calculation document for the PREVENT Equation is provided by the American Heart Association or AHA
+and has been authorized for use after agreeing on their Terms and Conditions and License Agreement.
+
+This function calculates the 10 year risk of total cardiovascular disease for adults in the ages 30-79. 
+It utilizes the Cox proportional hazards model to calculate absolute risk based on these factors of the patient:
+Age, HDL Cholesterol [Blood Test], Systolic Blood Pressure, estimated Glomerular Filtration Rate [Blood Test],
+Diabetes, Lifestyle, and Medications.
+
+Currently as of 03/06/2026, AHA has not yet sent source code, this function will use the following as reference:
+https://www.mdcalc.com/calc/10491/predicting-risk-cardiovascular-disease-events-prevent#evidence
+
+@param - Patient *patient, the details of the patient whose CVD risk will be measured.
 */
 void calculateCardioRisk(Patient *patient){
 	// TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY
@@ -278,11 +283,11 @@ void calculateCardioRisk(Patient *patient){
 		}
 	}
 	// SBP
-	double cSBP = (min(SBP,110));
-	double cSBP2 = (max(SBP,110)-130)/20;
+	double cSBP = (fmin(SBP,110));
+	double cSBP2 = (fmax(SBP,110)-130)/20;
 	// eGFR
-	double ceGFR = (min(patient->eGFR,60)-60)/-15;
-	double ceGFR2 = (max(patient->eGFR,60)-90)/-15;
+	double ceGFR = (fmin(patient->eGFR,60)-60)/-15;
+	double ceGFR2 = (fmax(patient->eGFR,60)-90)/-15;
 	// Booleans
 	int nDiabetes = 0;
 	int nSmoking = 0;
@@ -309,40 +314,80 @@ void calculateCardioRisk(Patient *patient){
 	double AgexDiabetes = cAge*nDiabetes;
 	double AgexSmoking = cAge*nSmoking;
 	double AgexeGFR = cAge*ceGFR;
+	// coefficients
+	double bAge, bcnHDL, bcHDL, bcSBP, bcSBP2, bDiab, bSmoke, beGFR, beGFR2;
+	double bHTMed, bStatin, bcSBPxHT, bcnHDLxStatin, bAgeHDL, bAgecHDL;
+	double bAgeSBP, bAgeDiab, bAgeSmoke, bAgeeGFR, constant;
 	
-	
-	
-	
-	
-	/*
-	// risk based on gender
-	if (patient->gender == 'M'){
-		if (patient->age > 70){
-			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
-				betaBPTMen * bpT + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * log(70) * smoke +
-				betaAgeAgeMen * ageLog * ageLog - 172.300168;
-		}
-		else {
-			L = betaAgeMen * ageLog + betaTotalCholMen * totalCholLog + betaHDLCholMen * hdlCholLog + betaSysBPMen * sysBPLog + 
-				betaBPTMen * bpT + betaSmokeMen * smoke + betaAgeCholMen * ageLog * totalCholLog + betaAgeSmokeMen * ageLog * smoke +
-				betaAgeAgeMen * ageLog * ageLog - 172.300168;
-		}
-		cardioRisk = 1 - pow(0.9402,exp(L));
+	if (patient->gender=='F'){
+		bAge = 0.7939;
+		bcnHDL = 0.0305;
+		bcHDL = -0.1607;
+		bcSBP = -0.2394;
+		bcSBP2 = 0.36;
+		bDiab = 0.8668;
+		bSmoke = 0.5361;
+		beGFR = 0.6046;
+		beGFR2 = 0.0434;
+		bHTMed = 0.3152;
+		bStatin = -0.1478;
+		bcSBPxHT = -0.0664;
+		bcnHDLxStatin = 0.1198;
+		bAgeHDL = -0.082;
+		bAgecHDL = 0.0307;
+		bAgeSBP = -0.0946;
+		bAgeDiab = -0.2706;
+		bAgeSmoke = -0.0787;
+		bAgeeGFR = -0.1638;
+		constant = -3.3077;
+	} 
+	else {
+		bAge = 0.7689;
+		bcnHDL = 0.0736;
+		bcHDL = -0.0954;
+		bcSBP = -0.4347;
+		bcSBP2 = 0.3363;
+		bDiab = 0.7693;
+		bSmoke = 0.4387;
+		beGFR = 0.5379;
+		beGFR2 = 0.0165;
+		bHTMed = 0.2889;
+		bStatin = -0.1337;
+		bcSBPxHT = -0.0476;
+		bcnHDLxStatin = 0.1503;
+		bAgeHDL = -0.0518;
+		bAgecHDL = 0.0191;
+		bAgeSBP = -0.1049;
+		bAgeDiab = -0.2252;
+		bAgeSmoke = -0.0895;
+		bAgeeGFR = -0.1543;
+		constant = -3.0312;
 	}
-	else if (patient->gender == 'F'){
-		if (patient->age > 78){
-			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
-				betaBPTWomen * bpT + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * log(78) * smoke 
-				- 146.5933061;
-		}
-		else {
-			L = betaAgeWomen * ageLog + betaTotalCholWomen * totalCholLog + betaHDLCholWomen * hdlCholLog + betaSysBPWomen * sysBPLog + 
-				betaBPTWomen * bpT + betaSmokeWomen * smoke + betaAgeCholWomen * ageLog * totalCholLog + betaAgeSmokeWomen * ageLog * smoke 
-				- 146.5933061;
-		}
-		cardioRisk = 1 - pow(0.98767,exp(L));
-	}
-	*/
+	// computing summation of x = (beta * transformed var) within Risk = (e^x) / (1 + e^x)
+	double x = 0.0;
+	x += bAge * cAge;
+	x += bcnHDL * cnHDL;
+	x += bcHDL * cHDL;
+	x += bcSBP * cSBP;
+	x += bcSBP2 * cSBP2;
+	x += bDiab * nDiabetes;
+	x += bSmoke * nSmoking;
+	x += beGFR * ceGFR;
+	x += beGFR2 * ceGFR2;
+	x += bHTMed * nHTMed;
+	x += bStatin * nStatin;
+	x += bcSBPxHT * SBPxHTMed;
+	x += bcnHDLxStatin * HDLxStatin;
+	x += bAgeHDL * AgexnHDL;
+	x += bAgecHDL * AgexHDL;
+	x += bAgeSBP * AgexSBP;
+	x += bAgeDiab * AgexDiabetes;
+	x += bAgeSmoke * AgexSmoking;
+	x += bAgeeGFR * AgexeGFR;
+	x += constant;
+	
+	cardioRisk = (exp(x)) / (1 + exp(x)); // outputted in decimal form, needs to * 100 to get % chance
+	
 	patient->cardioRisk=cardioRisk;
 }
 
