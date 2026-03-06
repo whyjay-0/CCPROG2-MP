@@ -88,66 +88,79 @@ int registerUser (User *users, int *userCount){
 @return User* - address of the user containing their ID, role, etc
 */
 User* loginUser (User *users, int userCount){
-	User *user;
-	int i, validUser=0,validPass=0;
-	unsigned long inputHash;
+	User *user=NULL;
+	int i, validUser=0,validPass=0, found=0, matching=0, passChange=0;
+	unsigned long inputHash=0;
 	char username[101],password[101];
 	do{
-		printf("Input username: ");
-		scanf("%100[^\n]",username); // read until 100 char or until newline is read
-		/* per character scanning
 		do{
-			scanf("%c", &cInput); // check each character and place them into each address of the array
-			if (cInput=='\n'){
-				username[i]='\0';
+			printf("Enter your username: ");
+			scanf(" %100[^\n]", username);
+			for (i=0;i<userCount;i++){
+				if (strcmp(users[i].username,username)==0)
+					found=1;
 			}
-			else if (i<100){
-				username[i]=cInput;
-			}
-			i++; // move to next address
-		} while (cInput!='\n');*/
-		if (strlen(username)>100){
-			printf("Invalid input\n");
-			i=0;
-		}
-		else {
-			validUser=1;
-		}
-	} while (validUser==0); 
-	do{
-		printf("Input password (If forgot password, input '0'): ");
-		scanf("%100[^\n]",password);
-		if (password[0]=='0'){
-			if (forgotPassword(&users,userCount,username)==0){
-				printf("Invalid Username\n");
+			if (strlen(username)==0 || strlen(username)>100)
+				printf("Invalid input.\n");
+			else if (found==0){
+				printf("Username not found.\n");
 			}
 			else {
-				printf("Confirm password again: ");
-				scanf("%100[^\n]",password);
+				validUser=1;
 			}
-			if (strlen(password)>100){
-				printf("Invalid input\n");
+		} while (validUser==0);
+		do{
+			printf("Enter your password. If you have forgotten, input 0.\n");
+			scanf(" %100[^\n]",password);
+			
+			if ((strlen(password)==0 || strlen(password)>100) && password[0]!='0')
+				printf("Invalid input.\n");
+			hashPassword(password,&inputHash);
+			printf("%lu\n",inputHash);
+			for (i=0;i<userCount;i++){
+				if (users[i].passwordHash == inputHash)
+					matching=1;
+			}
+			
+			if (password[0]=='0'){
+				if (forgotPassword(users, userCount, username)==0){
+					printf("Invalid username.\n");
+				}
+				else {
+					do{
+						printf("Confirm password again: ");
+							scanf(" %100[^\n]",password);
+							if (strlen(password)==0 || strlen(password)>100)
+								printf("Invalid input.\n");
+							else{
+								passChange=1; // password changed flag
+								hashPassword(password,&inputHash);
+								validPass=1; // end loop
+							}
+					} while (validPass==0);
+				}
+			}
+			else if (matching==0){
+				printf("Invalid password.\n");
 			}
 			else {
 				validPass=1;
 			}
-		}
-		else if (strlen(password)>100){
-			printf("Invalid input\n");
-		}
-		else {
-			validPass=1;
-		}
-	} while (validPass==0);
-	hashPassword(password, &inputHash);
+		} while (validPass==0);
+	} while (validUser == 0 && validPass == 0);
 	
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0 && users[i].passwordHash == inputHash){
-			//valid login
+			//valid login, finding index of that user.
 			user = &users[i];
-			i=userCount;
+			// save new password to file if changed
+			if (passChange){
+				hashPassword(password,&user->passwordHash);
+			}
+			i=userCount; // end loop
 		}
 	}
+	
 	return user;
 }
 /* // Hash a password for storage; basic hash I found online "djb2", this is only temporary maybe depending how robust ung hash tignan
@@ -161,14 +174,14 @@ void hashPassword (const char *password, unsigned long *outputHash){
 	*outputHash = 5381;
 	// djb2 algorithm, hash is in integer; needs to be converted to output
 	while ((c = *password++)){
-		*outputHash = ((*outputHash << 5) + *outputHash) + c; //bitwise left shift by 5 (<< 5)
+		*outputHash = ((*outputHash << 5) + *outputHash + c); //bitwise left shift by 5 (<< 5)
 	}
 }
 // Save user to TXT file, return 1 if success, 0 otherwise
 int saveUserToFile (const User *user, const char *filename){
 	FILE *fp;
 	int flag = 0;
-	if ((fp=fopen(filename, "a"))==NULL){
+	if ((fp=fopen(filename, "w"))==NULL){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
@@ -194,7 +207,7 @@ int loadUsersFromFile (User *users, const char *filename){
 			char role[30];
 			unsigned long hash;
 			
-			int result = fscanf(fp, "%d, %s, %lu, %s", &ID, username, &hash, role);
+			int result = fscanf(fp, "%d, %100[^,], %lu, %100[^\n]", &ID, username, &hash, role);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
 			if (result==4){
 				users[count].userID = ID;
@@ -232,9 +245,9 @@ int forgotPassword (User *users, int userCount, const char *username){
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
 			printf("Please enter password: ");
-			scanf("%100[^\n]", newPass);
+			scanf(" %100[^\n]", newPass);
 			hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
-			printf("Successfully Changed Password!");
+			printf("Successfully Changed Password!\n");
 			flag = 1;
 		}
 	}

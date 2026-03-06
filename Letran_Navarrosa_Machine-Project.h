@@ -89,8 +89,8 @@ int savePatientToFile (const Patient *patient, const char *filename);
 // Load patient to file
 int loadPatientsFromFile (Patient *patients, const char *filename);
 // Edit patient ID, name, age, contact
-void editPatient (Patient *patient);
-// Edit patient health metric
-void editPatientHealth (Patient *patient);
+void editPatient (Patient *patient, int count);
 // Delete patient
-void deletePatient (Patient *patient);
+void deletePatient (Patient *patient, int *count);
+// Shows list of patients
+void showPatients (Patient *patient, int count);

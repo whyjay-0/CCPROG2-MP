@@ -225,7 +225,6 @@ void diagnosePatient (Patient *patient){
 		else
 			printf("   Risk Level: Very High Risk\n\n");
 	}
-	*/
 	// Other data and suggestions
 	printf("Data and Suggestions:\n");
 	if (patient->bmi>30)
@@ -257,7 +256,7 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 		strcpy(patient->bmiCat, "   Obese   ");
 }
 
-double mmol_conv (double mgdl){
+double mmol_conv(double mgdl){
 	return mgdl / 38.67;
 }
 
@@ -327,49 +326,49 @@ void calculateCardioRisk(Patient *patient){
 	if (patient->gender=='F' && flag==1){
 		logor_10yr_CVD = -3.307728 +
         				 0.7939329*(patient->age - 55)/10 +
-        				 0.0305239*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
-        				 0.1606857*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
-        				 0.2394003*(min(SBP, 110) - 110)/20 +
-        				 0.360078*(max(SBP, 110) - 130)/20 +
+        				 0.0305239*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.1606857*(mmol_conv(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.2394003*(fmin(SBP, 110) - 110)/20 +
+        				 0.360078*(fmax(SBP, 110) - 130)/20 +
         				 0.8667604*(nDiabetes) +
         				 0.5360739*(nSmoking) +
-        				 0.6045917*(min(patient->eGFR, 60) - 60)/(-15) +
-        				 0.0433769*(max(patient->eGFR, 60) - 90)/(-15) +
+        				 0.6045917*(fmin(patient->eGFR, 60) - 60)/(-15) +
+        				 0.0433769*(fmax(patient->eGFR, 60) - 90)/(-15) +
         				 0.3151672*(nHTMed) -
         				 0.1477655*(nStatin) -
-        				 0.0663612*(nHTMed)*(max(SBP, 110) - 130)/20 +
-        				 0.1197879*(nStatin)*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
-        				 0.0819715*(patient->age - 55)/10*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) +
-        				 0.0306769*(patient->age - 55)/10*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
-        				 0.0946348*(patient->age - 55)/10*(max(SBP, 110) - 130)/20 -
+        				 0.0663612*(nHTMed)*(fmax(SBP, 110) - 130)/20 +
+        				 0.1197879*(nStatin)*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0819715*(patient->age - 55)/10*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) +
+        				 0.0306769*(patient->age - 55)/10*(mmol_conv(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.0946348*(patient->age - 55)/10*(fmax(SBP, 110) - 130)/20 -
         				 0.27057*(patient->age - 55)/10*(nDiabetes) -
         				 0.078715*(patient->age - 55)/10*(nSmoking) -
-        				 0.1637806*(patient->age - 55)/10*(min(patient->eGFR, 60) - 60)/(-15);
+        				 0.1637806*(patient->age - 55)/10*(fmin(patient->eGFR, 60) - 60)/(-15);
 	} 
 	else if (patient->gender=='M' && flag==1){
 		logor_10yr_CVD = -3.031168 +
         				 0.7688528*(patient->age - 55)/10 +
-        				 0.0736174*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
-        				 0.0954431*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
-        				 0.4347345*(min(SBP, 110) - 110)/20 +
-        				 0.3362658*(max(SBP, 110) - 130)/20 +
+        				 0.0736174*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0954431*(mmol_conv(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.4347345*(fmin(SBP, 110) - 110)/20 +
+        				 0.3362658*(fmax(SBP, 110) - 130)/20 +
         				 0.7692857*(nDiabetes) +
         				 0.4386871*(nSmoking) +
-        				 0.5378979*(min(patient->eGFR, 60) - 60)/(-15) +
-        				 0.0164827*(max(patient->eGFR, 60) - 90)/(-15) +
+        				 0.5378979*(fmin(patient->eGFR, 60) - 60)/(-15) +
+        				 0.0164827*(fmax(patient->eGFR, 60) - 90)/(-15) +
         				 0.288879*(nHTMed) -
         				 0.1337349*(nStatin) -
-        				 0.0475924*(nHTMed)*(max(SBP, 110) - 130)/20 +
-        				 0.150273*(nStatin)*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
-        				 0.0517874*(patient->age - 55)/10*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) +
-        				 0.0191169*(patient->age - 55)/10*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
-        				 0.1049477*(patient->age - 55)/10*(max(SBP, 110) - 130)/20 -
+        				 0.0475924*(nHTMed)*(fmax(SBP, 110) - 130)/20 +
+        				 0.150273*(nStatin)*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0517874*(patient->age - 55)/10*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) +
+        				 0.0191169*(patient->age - 55)/10*(mmol_conv(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.1049477*(patient->age - 55)/10*(fmax(SBP, 110) - 130)/20 -
         				 0.2251948*(patient->age - 55)/10*(nDiabetes) -
         				 0.0895067*(patient->age - 55)/10*(nSmoking) -
-        				 0.1543702*(patient->age - 55)/10*(min(patient->eGFR, 60) - 60)/(-15)
+        				 0.1543702*(patient->age - 55)/10*(fmin(patient->eGFR, 60) - 60)/(-15);
 	}
 	// computing summation of x = (beta * transformed var) within Risk = (e^x) / (1 + e^x)
-	cardioRisk = (exp(logor_10yr_CVD)) / (1 + exp(logor_10yr_CVD)); // outputted in decimal form, needs to * 100 to get % chance
+	double cardioRisk = (exp(logor_10yr_CVD)) / (1 + exp(logor_10yr_CVD)); // outputted in decimal form, needs to * 100 to get % chance
 	if (flag==0)
 		cardioRisk=-1;
 	patient->cardioRisk=cardioRisk;
@@ -379,7 +378,7 @@ void calculateCardioRisk(Patient *patient){
 int savePatientToFile (const Patient *patient, const char *filename){
 	FILE *fp;
 	int flag = 0;
-	if ((fp=fopen(filename, "a"))==NULL){
+	if ((fp=fopen(filename, "w"))==NULL){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {

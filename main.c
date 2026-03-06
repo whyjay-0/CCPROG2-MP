@@ -4,12 +4,13 @@ int main () {
 	User users[MAX_USERS];
 	User *currentUser;
 	Patient patients[MAX_USERS];
-	Patient currentPatient;
+	// Patient currentPatient;
 	int userCount = loadUsersFromFile(users, "users.txt");
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
 	int exit=0, choice=0, gp=0, specialist=0, patient=0;
 	int newUser;
-		
+	int i;
+	printf("User count: %d\n", userCount);
 	do{
 		printf("Input choice: ");
 		scanf("%d",&choice);
@@ -18,19 +19,22 @@ int main () {
 				newUser = registerUser(users, &userCount);
 				if (newUser != -1){
 					if (saveUserToFile(&users[newUser],"users.txt")){
-						printf("User saved successfully");
+						printf("User saved successfully!\n");
 					}
 				}
-				exit=1;
 				break;
 			case 2: // Login and dashboard
 				currentUser = loginUser(users,userCount);
+				// save all users to save any changes to password if forgotten
+				for(i=0;i<userCount;i++){
+					saveUserToFile(&users[i],"users.txt");
+				}
 				if (strcmp(currentUser->role,"GP")==0){
 					gp=1;
 					do{
 						// Dashboard function for each user
 						// Function call for adding a patient
-						
+						showPatients(patients,patientCount);
 						Patient newPatient = addPatient();
 						savePatientToFile(&newPatient, "patients.txt");
 						
