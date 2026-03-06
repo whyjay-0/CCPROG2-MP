@@ -1,6 +1,3 @@
-#ifndef HEADER_H
-#define HEADER_H
-
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -12,31 +9,32 @@
 typedef struct {
     int userID;
     char username[101];
-    unsigned long passwordHash;
+    unsigned long passwordHash; // When placed into TXT it will be a long + integer
     char role[30];   // "GP", "Specialist", "Patient"
 } User;
 typedef struct {
 	char name[101];
-	int age;
-	char gender;
+	int age; // if age 30-79 cvdRisk is calculated
+	char gender; // M or F, used for cvdRisk
 	char contact[17];
 	float bmi;
 	char bmiCat[12];
-	char bp[16]; // sys/dia mmHg
+	char bp[16]; // sys/dia mmHg, systolic blood pressure is parsed within calccvdRisk range: 90-200 mmHg
 	float bloodSugar;
-	float totalChol;
-	float hdlChol;
-	int eGFR;
-	char htMed;
-	char statins;
-	char smoking;
-	char diabetes;
-	float creatinine;
-	char cvdFamily;
-	char diet;
-	char exercise;
-	char alcohol;
-	double cardioRisk; 
+	char currentCVD; // Shows if patient currently has CVD, cvdRisk can only be calculated when patient has no known CVD
+	float totalChol; // 130-320 mg/dL range, must conv to mmol to use for cvdRisk
+	float hdlChol; // High density lipoprotein cholesterol 20-100 mg/dL, must conv to mmol to use for cvdRisk
+	int eGFR; // Estimated glomerular filtration rate >0 mL/min/1.73m^2
+	char htMed; // Y or N, when used for cvdRisk it is conv to 1 or 0
+	char statins; // Y or N, when used for cvdRisk it is conv to 1 or 0
+	char smoking; // Y or N, when used for cvdRisk it is conv to 1 or 0
+	char diabetes; // Y or N, when used for cvdRisk it is conv to 1 or 0
+	float creatinine; // For other information in diagnosis report
+	char cvdFamily; // For other information in diagnosis report
+	char diet; // For other information in diagnosis report
+	char exercise; // For other information in diagnosis report
+	char alcohol; // For other information in diagnosis report
+	double cardioRisk;  // For cvdRisk
 } Patient;
 
 // LOGIN
@@ -81,8 +79,10 @@ Patient addPatient ();
 void diagnosePatient (Patient *patient);
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height);
+// Convert mg/dL to mmol
+double mmol_conv (double mgdl);
 // Calculate Risk
-calculateCardioRisk(Patient *patient, const float totalChol, const float hdlChol, const int eGFR,  const char htMed, const char statins, const char smoking, const char diabetes);
+void calculateCardioRisk(Patient *patient);
 
 // Save patient to file
 int savePatientToFile (const Patient *patient, const char *filename);
@@ -94,5 +94,3 @@ void editPatient (Patient *patient);
 void editPatientHealth (Patient *patient);
 // Delete patient
 void deletePatient (Patient *patient);
-
-#endif

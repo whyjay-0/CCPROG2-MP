@@ -159,6 +159,10 @@ void diagnosePatient (Patient *patient){
 	printf("Is patient using anti-hypertensive medication? (Y/N): ");
 	scanf(" %c", &patient->htMed);
 	
+	// CVD
+	printf("Does patient have any known cardiovascular disease? (Y/N): ");
+	scanf(" %c", &patient->currentCVD);
+	
 	// Blood sugar
 	if (patient->bloodSugar==0){
 		printf("Enter blood sugar (mg/dL): ");
@@ -196,7 +200,7 @@ void diagnosePatient (Patient *patient){
 	scanf(" %c", &patient->alcohol);
 
 	// Calculate Cardio Risk,, Can only be done on adults ages 30-79 without past CVD (This is assumed to be true).
-	if (patient->age>=30 && patient->age<=79)
+	if (patient->age>=30 && patient->age<=79 && patient->currentCVD=='N')
 		calculateCardioRisk(patient);
 	else
 		patient->cardioRisk = -1.0; // This should mean invalid since outside of age range
@@ -208,7 +212,7 @@ void diagnosePatient (Patient *patient){
 	printf("BMI: %f\n\n", patient->bmi);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
-	if (patient->age>=30 && patient->age<=79){
+	if (patient->age>=30 && patient->age<=79 && patient->currentCVD=='N'){
 		// Cardio Risk
 		printf("10-Year Cardiovasular Risk: %.2lf%%\n", patient->cardioRisk * 100);
 		// Risk Level Classification
@@ -253,6 +257,10 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 		strcpy(patient->bmiCat, "   Obese   ");
 }
 
+double mmol_conv (double mgdl){
+	return mgdl / 38.67;
+}
+
 /* Calculate Risk using Predicting Risk of Cardiovascular Disease Events (PREVENT) Equations
    https://professional.heart.org/en/guidelines-and-statements/prevent-calculator
 Source code calculation document for the PREVENT Equation is provided by the American Heart Association or AHA
@@ -263,31 +271,17 @@ It utilizes the Cox proportional hazards model to calculate absolute risk based 
 Age, HDL Cholesterol [Blood Test], Systolic Blood Pressure, estimated Glomerular Filtration Rate [Blood Test],
 Diabetes, Lifestyle, and Medications.
 
-Currently as of 03/06/2026, AHA has not yet sent source code, this function will use the following as reference:
-https://www.mdcalc.com/calc/10491/predicting-risk-cardiovascular-disease-events-prevent#evidence
-
 @param - Patient *patient, the details of the patient whose CVD risk will be measured.
 */
 void calculateCardioRisk(Patient *patient){
-	// TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY TEMPORARY
-	double cardioRisk=0.0;
-	double cAge = (patient->age-55.0)/10.0;
-	// HDL
-	double cnHDL = patient->totalChol - patient->hdlChol - 3.5;
-	double cHDL = (patient->hdlChol - 1.3)/0.3;
+	double logor_10yr_CVD;
 	// parse SBP
-	int SBP;
+	int SBP=0,i;
 	for (i=0;i<15 && patient->bp[i]!='/';i++){
 		if (patient->bp[i]>='0' && patient->bp[i]<='9'){
 			SBP = SBP * 10 + (patient->bp[i] - '0');
 		}
 	}
-	// SBP
-	double cSBP = (fmin(SBP,110));
-	double cSBP2 = (fmax(SBP,110)-130)/20;
-	// eGFR
-	double ceGFR = (fmin(patient->eGFR,60)-60)/-15;
-	double ceGFR2 = (fmax(patient->eGFR,60)-90)/-15;
 	// Booleans
 	int nDiabetes = 0;
 	int nSmoking = 0;
@@ -305,89 +299,79 @@ void calculateCardioRisk(Patient *patient){
 	if (patient->statins=='Y'){
 		nStatin = 1;
 	}
-	// Relationships
-	double SBPxHTMed = cSBP2*nHTMed;
-	double HDLxStatin = cnHDL*nStatin;
-	double AgexnHDL = cAge*cnHDL;
-	double AgexHDL = cAge*cHDL;
-	double AgexSBP = cAge*cSBP2;
-	double AgexDiabetes = cAge*nDiabetes;
-	double AgexSmoking = cAge*nSmoking;
-	double AgexeGFR = cAge*ceGFR;
-	// coefficients
-	double bAge, bcnHDL, bcHDL, bcSBP, bcSBP2, bDiab, bSmoke, beGFR, beGFR2;
-	double bHTMed, bStatin, bcSBPxHT, bcnHDLxStatin, bAgeHDL, bAgecHDL;
-	double bAgeSBP, bAgeDiab, bAgeSmoke, bAgeeGFR, constant;
+	int flag=1;
+	// Input validation
+	if (patient->currentCVD=='Y')
+		flag=0;
+	if (!(patient->gender=='M'||patient->gender=='F'))
+		flag=0;
+	if (patient->age < 30 || patient->age > 79)
+		flag=0;
+	if (patient->totalChol<130 || patient->totalChol>320)
+		flag=0;
+	if (patient->hdlChol < 20 || patient->hdlChol > 100)
+		flag=0;
+	if (SBP < 90 || SBP > 200)
+		flag=0;
+	if (!(nDiabetes==0 || nDiabetes==1))
+		flag=0;
+	if (!(nSmoking==0 || nSmoking==1))
+		flag=0;
+	if (patient->eGFR<=0)
+		flag=0;
+	if (!(nHTMed==0 || nHTMed==1))
+		flag=0;
+	if (!(nStatin==0 || nStatin==1))
+		flag=0;
 	
-	if (patient->gender=='F'){
-		bAge = 0.7939;
-		bcnHDL = 0.0305;
-		bcHDL = -0.1607;
-		bcSBP = -0.2394;
-		bcSBP2 = 0.36;
-		bDiab = 0.8668;
-		bSmoke = 0.5361;
-		beGFR = 0.6046;
-		beGFR2 = 0.0434;
-		bHTMed = 0.3152;
-		bStatin = -0.1478;
-		bcSBPxHT = -0.0664;
-		bcnHDLxStatin = 0.1198;
-		bAgeHDL = -0.082;
-		bAgecHDL = 0.0307;
-		bAgeSBP = -0.0946;
-		bAgeDiab = -0.2706;
-		bAgeSmoke = -0.0787;
-		bAgeeGFR = -0.1638;
-		constant = -3.3077;
+	if (patient->gender=='F' && flag==1){
+		logor_10yr_CVD = -3.307728 +
+        				 0.7939329*(patient->age - 55)/10 +
+        				 0.0305239*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.1606857*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.2394003*(min(SBP, 110) - 110)/20 +
+        				 0.360078*(max(SBP, 110) - 130)/20 +
+        				 0.8667604*(nDiabetes) +
+        				 0.5360739*(nSmoking) +
+        				 0.6045917*(min(patient->eGFR, 60) - 60)/(-15) +
+        				 0.0433769*(max(patient->eGFR, 60) - 90)/(-15) +
+        				 0.3151672*(nHTMed) -
+        				 0.1477655*(nStatin) -
+        				 0.0663612*(nHTMed)*(max(SBP, 110) - 130)/20 +
+        				 0.1197879*(nStatin)*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0819715*(patient->age - 55)/10*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) +
+        				 0.0306769*(patient->age - 55)/10*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.0946348*(patient->age - 55)/10*(max(SBP, 110) - 130)/20 -
+        				 0.27057*(patient->age - 55)/10*(nDiabetes) -
+        				 0.078715*(patient->age - 55)/10*(nSmoking) -
+        				 0.1637806*(patient->age - 55)/10*(min(patient->eGFR, 60) - 60)/(-15);
 	} 
-	else {
-		bAge = 0.7689;
-		bcnHDL = 0.0736;
-		bcHDL = -0.0954;
-		bcSBP = -0.4347;
-		bcSBP2 = 0.3363;
-		bDiab = 0.7693;
-		bSmoke = 0.4387;
-		beGFR = 0.5379;
-		beGFR2 = 0.0165;
-		bHTMed = 0.2889;
-		bStatin = -0.1337;
-		bcSBPxHT = -0.0476;
-		bcnHDLxStatin = 0.1503;
-		bAgeHDL = -0.0518;
-		bAgecHDL = 0.0191;
-		bAgeSBP = -0.1049;
-		bAgeDiab = -0.2252;
-		bAgeSmoke = -0.0895;
-		bAgeeGFR = -0.1543;
-		constant = -3.0312;
+	else if (patient->gender=='M' && flag==1){
+		logor_10yr_CVD = -3.031168 +
+        				 0.7688528*(patient->age - 55)/10 +
+        				 0.0736174*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0954431*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.4347345*(min(SBP, 110) - 110)/20 +
+        				 0.3362658*(max(SBP, 110) - 130)/20 +
+        				 0.7692857*(nDiabetes) +
+        				 0.4386871*(nSmoking) +
+        				 0.5378979*(min(patient->eGFR, 60) - 60)/(-15) +
+        				 0.0164827*(max(patient->eGFR, 60) - 90)/(-15) +
+        				 0.288879*(nHTMed) -
+        				 0.1337349*(nStatin) -
+        				 0.0475924*(nHTMed)*(max(SBP, 110) - 130)/20 +
+        				 0.150273*(nStatin)*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) -
+        				 0.0517874*(patient->age - 55)/10*(mmol_conversion(patient->totalChol - patient->hdlChol) - 3.5) +
+        				 0.0191169*(patient->age - 55)/10*(mmol_conversion(patient->hdlChol) - 1.3)/(0.3) -
+        				 0.1049477*(patient->age - 55)/10*(max(SBP, 110) - 130)/20 -
+        				 0.2251948*(patient->age - 55)/10*(nDiabetes) -
+        				 0.0895067*(patient->age - 55)/10*(nSmoking) -
+        				 0.1543702*(patient->age - 55)/10*(min(patient->eGFR, 60) - 60)/(-15)
 	}
 	// computing summation of x = (beta * transformed var) within Risk = (e^x) / (1 + e^x)
-	double x = 0.0;
-	x += bAge * cAge;
-	x += bcnHDL * cnHDL;
-	x += bcHDL * cHDL;
-	x += bcSBP * cSBP;
-	x += bcSBP2 * cSBP2;
-	x += bDiab * nDiabetes;
-	x += bSmoke * nSmoking;
-	x += beGFR * ceGFR;
-	x += beGFR2 * ceGFR2;
-	x += bHTMed * nHTMed;
-	x += bStatin * nStatin;
-	x += bcSBPxHT * SBPxHTMed;
-	x += bcnHDLxStatin * HDLxStatin;
-	x += bAgeHDL * AgexnHDL;
-	x += bAgecHDL * AgexHDL;
-	x += bAgeSBP * AgexSBP;
-	x += bAgeDiab * AgexDiabetes;
-	x += bAgeSmoke * AgexSmoking;
-	x += bAgeeGFR * AgexeGFR;
-	x += constant;
-	
-	cardioRisk = (exp(x)) / (1 + exp(x)); // outputted in decimal form, needs to * 100 to get % chance
-	
+	cardioRisk = (exp(logor_10yr_CVD)) / (1 + exp(logor_10yr_CVD)); // outputted in decimal form, needs to * 100 to get % chance
+	if (flag==0)
+		cardioRisk=-1;
 	patient->cardioRisk=cardioRisk;
 }
 
@@ -399,7 +383,7 @@ int savePatientToFile (const Patient *patient, const char *filename){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "%s,%d,%c,%s,%.2f,%s,%s,%.2f,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf\n",
+		fprintf(fp, "%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf\n",
 				patient->name,
                 patient->age,
                 patient->gender,
@@ -408,6 +392,7 @@ int savePatientToFile (const Patient *patient, const char *filename){
                 patient->bmiCat,
                 patient->bp,
                 patient->bloodSugar,
+                patient->currentCVD,
                 patient->totalChol,
                 patient->hdlChol,
                 patient->eGFR,
@@ -440,7 +425,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 		while (flag){
 			Patient temp;
 			int result = fscanf(fp,
-								"%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n",
+								"%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n",
 								temp.name,
     							&temp.age,
     							&temp.gender,
@@ -449,6 +434,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							temp.bmiCat,
     							temp.bp,
     							&temp.bloodSugar,
+    							&temp.currentCVD,
     							&temp.totalChol,
     							&temp.hdlChol,
     							&temp.eGFR,
@@ -463,7 +449,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							&temp.alcohol,
     							&temp.cardioRisk);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==21){
+			if (result==22){
 				patients[count] = temp;
 				count++;
 			}
