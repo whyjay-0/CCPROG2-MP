@@ -11,6 +11,7 @@ typedef struct {
     char username[101];
     unsigned long passwordHash; // When placed into TXT it will be a long + integer
     char role[30];   // "GP", "Specialist", "Patient"
+    char name[101]; // Full name
 } User;
 typedef struct {
 	char name[101];
@@ -35,7 +36,16 @@ typedef struct {
 	char exercise; // For other information in diagnosis report
 	char alcohol; // For other information in diagnosis report
 	double cardioRisk;  // For cvdRisk
+	char isDiagnosed; // Will show if patient has been diagnosed or not
 } Patient;
+typedef struct {
+	int GPID; // GP user ID
+	int PatientID; // Patient user ID
+	int SpecialistID; // Specialist user ID
+	char status[31]; // "Pending" "Accepted" "Completed" "Rejected"
+	// maybe date?? pero we'll need to remake most to include date too for it to make sense T~T
+	// reason for referral maybe wag na mas simple na referral system kahit medyo di nagmamake sense
+} Referral;
 
 // LOGIN
 
@@ -76,7 +86,7 @@ int forgotPassword ();
 // Set patient ID, name, age, contact in a new log
 Patient addPatient ();
 // Diagnose a patient
-void diagnosePatient (Patient *patient);
+void diagnosePatient (Patient *patients,patientCount);
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height);
 // Convert mg/dL to mmol

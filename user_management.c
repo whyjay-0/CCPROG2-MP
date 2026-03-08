@@ -11,7 +11,7 @@ int registerUser (User *users, int *userCount){
 	int i,similar=0;
 	User newUser;
 	char input[101];
-	int choice, complete=0, validUser=0, validChoice=0, index;
+	int choice, complete=0, validUser=0, validName=0, validChoice=0, index;
 	
 	if (*userCount >= MAX_USERS){
 		printf("Max User Limit reached.");
@@ -20,7 +20,7 @@ int registerUser (User *users, int *userCount){
 		while (complete!=1){
 			do{
 				validUser=0;
-				printf("Please enter desired username (100 Characters): \n");
+				printf("\nPlease enter desired username (100 Characters): \n");
 				scanf(" %100[^\n]", input);
 				if (strlen(input)>100){
 					printf("Invalid input\n");
@@ -42,13 +42,26 @@ int registerUser (User *users, int *userCount){
 				}
 			} while (validUser==0);
 			
-			printf("Please enter password: \n");
+			do{
+				validName=0;
+				printf("\nPlease enter your full name (100 Characters): \n");
+				scanf(" %100[^\n]", input);
+				if (strlen(input)>100){
+					printf("Invalid input\n");
+				}
+				else {
+					strcpy(newUser.username, input);
+					validName=1;
+				}
+			} while (validName==0);
+			
+			printf("\nPlease enter password: \n");
 			scanf(" %100[^\n]", input);
 			hashPassword(input, &newUser.passwordHash);
 			
 			do{
 				validChoice=0;
-				printf("Indicate your role:\n1 - Patient\n2 - General Practitioner\n3 - Specialist\nChoice: ");
+				printf("\nIndicate your role:\n1 - Patient\n2 - General Practitioner\n3 - Specialist\nChoice: ");
 				scanf("%d", &choice);
 					
 				switch (choice){
@@ -185,7 +198,7 @@ int saveUserToFile (const User *user, const char *filename){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "%d, %s, %lu, %s\n", user->userID, user->username, user->passwordHash, user->role);
+		fprintf(fp, "%d, %s, %lu, %s, %s\n", user->userID, user->username, user->passwordHash, user->role, user->name);
 		flag=1;
 	}
 	
@@ -202,28 +215,12 @@ int loadUsersFromFile (User *users, const char *filename){
 	}
 	else {
 		while (flag){
-			int ID;
-			char username[101];
-			char role[30];
-			unsigned long hash;
+			User temp;
 			
-			int result = fscanf(fp, "%d, %100[^,], %lu, %100[^\n]", &ID, username, &hash, role);
+			int result = fscanf(fp, "%d, %100[^,], %lu, %100[^,], %100[^\n]", &ID, username, &hash, role, name);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==4){
-				users[count].userID = ID;
-				if (strlen(username)>sizeof(users[count].username)){
-					printf("Invalid username");
-				}
-				else {
-					strcpy(users[count].username, username);
-				}
-				users[count].passwordHash = hash;
-				if (strlen(role)>sizeof(users[count].role)){
-					printf("Invalid role");
-				}
-				else {
-					strcpy(users[count].role,role);
-				}
+			if (result==5){
+				users[count]=temp;
 				count++;
 			}
 			else {
