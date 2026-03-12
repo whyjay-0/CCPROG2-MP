@@ -4,13 +4,14 @@
 // Input patient details
 /*
 For patient to set their details.
-returns Patient* - for saving to the TXT file?
+returns Patient* - for saving to the TXT file
 */
 Patient addPatient (){
 	Patient newPatient;
 	int complete=0,valid=0;
 	float weight,height;
 	char strInput[101];
+	initPatient(&newPatient);
 	do{
 		// input name
 		printf("Enter your full name:\n");
@@ -131,6 +132,24 @@ Patient addPatient (){
 	
 	return newPatient;
 }
+
+void initPatient (Patient *patient){
+	patient->currentCVD='N';
+	patient->totalChol=0.0;
+	patient->hdlChol=0.0;
+	patient->eGFR=0;
+	patient->htMed='N';
+	patient->statins='N';
+	patient->smoking='N';
+	patient->diabetes='N';
+	patient->creatinine=0.0;
+	patient->cvdFamily='N';
+	patient->diet='N';
+	patient->exercise='N';
+	patient->alcohol='N';
+	patient->cardioRisk=0.0;
+	patient->isDiagnosed'N';
+}
 /*
 For GP to diagnose existing patients.
 */
@@ -167,7 +186,7 @@ void diagnosePatient (Patient *patients,patientCount){
 		scanf("%d", &currentPatient->eGFR);
 	
 		// BP Treatment and Values
-		if (strcmp(currentPatient->bp,"")==0){
+		if (strcmp(currentPatient->bp,"0")==0){
 			printf("Enter blood pressure (SYS/DIA mmHg): ");
 			scanf(" %16[^\n]",currentPatient->bp);
 		}
@@ -255,8 +274,53 @@ void diagnosePatient (Patient *patients,patientCount){
 			printf("   - Continue regular physical activity\n");
 		if (currentPatient->alcohol=='Y')
 			printf("   - Limit alcohol intake to reduce cardiovascular risk.\n");
+		currentPatient->isDiagnosed='Y';
 	}
 	return currentPatient;
+}
+
+// printing diagnosis report
+void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
+	if (currentPatient->isDiagnosed=='Y'){
+		printf("---------- DIAGNOSIS REPORT ----------\n\n");
+		// Details
+		printf("Patient: %s\n", currentPatient->name);
+		printf("Age: %d\nGender: %c\n", currentPatient->age, currentPatient->gender);
+		printf("BMI: %f\n\n", currentPatient->bmi);
+		// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
+		// Temporary interpretations Changes might be made once AHA provides proper source code.
+		if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
+			// Cardio Risk
+			printf("10-Year Cardiovasular Risk: %.2lf%%\n", currentPatient->cardioRisk * 100);
+			// Risk Level Classification
+			if(currentPatient->cardioRisk < 0.05)
+				printf("   Risk Level: Low Risk\n\n");
+			else if(currentPatient->cardioRisk >= 0.05 && currentPatient->cardioRisk <= 0.074)
+			printf("   Risk Level: Borderline Risk\n\n");
+			else if(currentPatient->cardioRisk >= 0.075 && currentPatient->cardioRisk <= 0.199)
+				printf("   Risk Level: Intermediate Risk\n\n");
+			else
+				printf("   Risk Level: Very High Risk\n\n");
+		}
+		// Other data and suggestions
+		printf("Data and Suggestions:\n");
+		if (currentPatient->bmi>30)
+			printf("   - Suggestion: Consider weight loss through diet and exercise.\n");
+		if (currentPatient->creatinine>1.2)
+			printf("   - Kidney Function is decreased. Consider further renal evaluation.\n");
+		if (currentPatient->cvdFamily=='Y')
+			printf("   - Increased risk of cardiovascular disease due to family history.\n");
+		if (currentPatient->diet=='Y')
+			printf("   - Modify diet to lower fat and sugar intake\n");
+		if (currentPatient->exercise=='Y')
+			printf("   - Continue regular physical activity\n");
+		if (currentPatient->alcohol=='Y')
+			printf("   - Limit alcohol intake to reduce cardiovascular risk.\n");
+	}
+	else {
+		printf("Current patient is not diagnosed.\n");
+	}
+	
 }
 
 // Calculate BMI
@@ -274,7 +338,7 @@ void calculateBMI (Patient *patient, const float weight, const float height){
 		strcpy(patient->bmiCat, "   Obese   ");
 }
 
-double mmol_conv(double mgdl){
+double mmol_conv (double mgdl){
 	return mgdl / 38.67;
 }
 
@@ -290,7 +354,7 @@ Diabetes, Lifestyle, and Medications.
 
 @param - Patient *patient, the details of the patient whose CVD risk will be measured.
 */
-void calculateCardioRisk(Patient *patient){
+void calculateCardioRisk (Patient *patient){
 	double logor_10yr_CVD;
 	// parse SBP
 	int SBP=0,i;

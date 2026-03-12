@@ -15,6 +15,7 @@ int registerUser (User *users, int *userCount){
 	
 	if (*userCount >= MAX_USERS){
 		printf("Max User Limit reached.");
+		index=-1;
 	}
 	else {
 		while (complete!=1){

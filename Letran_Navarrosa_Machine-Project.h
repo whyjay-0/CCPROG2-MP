@@ -39,8 +39,9 @@ typedef struct {
 	char isDiagnosed; // Will show if patient has been diagnosed or not
 } Patient;
 typedef struct {
+	int ReferralID; // Referral ID
 	int GPID; // GP user ID
-	int PatientID; // Patient user ID
+	char PatientName[101]; // Patient Name
 	int SpecialistID; // Specialist user ID
 	char status[31]; // "Pending" "Accepted" "Completed" "Rejected"
 	// maybe date?? pero we'll need to remake most to include date too for it to make sense T~T
@@ -85,15 +86,18 @@ int forgotPassword ();
 // PATIENT LOGGING
 // Set patient ID, name, age, contact in a new log
 Patient addPatient ();
+// to initialize values for new patient
+void initPatient (Patient *patient)
 // Diagnose a patient
 void diagnosePatient (Patient *patients,patientCount);
+// Show past diagnosis report
+void showDiagnosisReport (Patient *currentPatient);
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height);
 // Convert mg/dL to mmol
 double mmol_conv (double mgdl);
 // Calculate Risk
 void calculateCardioRisk(Patient *patient);
-
 // Save patient to file
 int savePatientToFile (const Patient *patient, const char *filename);
 // Load patient to file
@@ -104,3 +108,15 @@ void editPatient (Patient *patient, int count);
 void deletePatient (Patient *patient, int *count);
 // Shows list of patients
 void showPatients (Patient *patient, int count);
+
+// REFERRAL MANAGEMENT
+// create referral
+void createReferral (Referral *referrals, const User users, const Patient patients, const User currentUser, const int patientCount, const int userCount, int *referralCount);
+void showReferrals (User *currentUser, Referral *referrals, Patient *patients, User *users);
+void editReferral (Referral *referral, User *currentUser);
+void deleteReferral (Referral *referral);
+void selectReferral (int referralID);
+User findUserByName (char *name);
+User findUserByID (int userID);
+int saveReferralToFile (const Referral referral, const char *filename);
+int loadReferralsFromFile (const Referral referrals, const char *filename);

@@ -67,12 +67,12 @@ int main () {
 											currentPatient=diagnosePatient(patients,patientCount);
 											break;
 										case 4:
-											// refer patient
+											createReferral
 											break;
 										default:
 											printf("Invalid input. Try again: ");
 									}
-								} while (crudEnd==0);
+								} while (crudEnd!=0);
 								break;
 							default:
 								printf("Invalid input. Try again: ");
@@ -86,6 +86,7 @@ int main () {
 					do{
 						// Dashboard function for each user
 						// they will be able to see list of referrals and patients connected to referral
+						// after selecting a patient, they will be able to see their diagnosis report
 					} while(specialist!=0); // 0 is exit, 1 is main menu, 2 is patient list can search and sort in patient list
 					                        // and after selecting, print patient details
 				}
