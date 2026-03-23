@@ -1,5 +1,7 @@
+#include "Letran_Navarrosa_Machine-Project.h"
+
 // Referral management
-void createReferral (Referral *referrals, User users, Patient patients, User currentUser, int patientCount, int userCount, int *referralCount){ 
+void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount){ 
 	// GP access only, currentpatient is patient being referred, user is GP
 	// select patient by entering name,,, would search by strcmp name and strcmp role
 	// select specialist by entering name,,, would search by strcmp name and strcmp role
@@ -42,7 +44,7 @@ void createReferral (Referral *referrals, User users, Patient patients, User cur
 				printf("Specialist not found.\n");
 		}
 		newReferral.SpecialistID = specialist.userID; // found specialist
-		newReferral.GPID = currentUser->userID; // assumed current user is GP
+		newReferral.GPID = currentUser.userID; // assumed current user is GP
 		
 		strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
 		
@@ -52,7 +54,7 @@ void createReferral (Referral *referrals, User users, Patient patients, User cur
 		// index = *userCount; // can be used if we want to return ID of the new referral
 		(*referralCount)++; // increase amount of referrals
 		
-		saveReferralToFile(newReferral,"referrals.txt");
+		saveAllReferralsToFile(referrals, *referralCount, "referrals.txt");
 	}
 	else {
 		printf("Patient is not yet diagnosed.\n");
@@ -85,7 +87,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
             }
         }
         else if (strcmp(currentUser->role,"Patient")==0){
-        	if (strcmp(referrals[i].PatientName,currentUser.name) == 0){
+        	if (strcmp(referrals[i].PatientName,currentUser->name) == 0){
         		for (j=0;j<MAX_USERS;j++){ // search name by userID GP
         			if (referrals[i].GPID == users[j].userID){
         				temp = users[j];
@@ -164,7 +166,7 @@ void deleteReferral (Referral *referrals, int *count){
     }
 }
 
-int saveAllReferralsToFile (Referral *referrals, int referralCount const char *filename){
+int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename){
     FILE *fp;
     int flag = 0, i;
 
@@ -219,20 +221,22 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
 }
 
 // utility funcs, sorting and searching of diff types by diff means
+/*
 User findUserByName (){ //this function would search for the user that matches the search you made by name
 	// would find the specific user that matches the role searching for,,, 
 	// will be used for createReferral so its easier to find IDs for the referral struct
+	printf("temp\n");
 }
 
 User findUserByID (int userID){ // returns User being searched for
-	
+	printf("temp\n");
 } // can be used when printing records of referrals, binary search maybe
 // we need search and sort functions also, but the sort should only be visual, it will not change any of their data
 // So it could be sort by userID, by name, or by role
 // we could apply it sa specialist? maybe they could see all users? or better if may admin acc
 // we could also apply to list of patients within patient_management.c
 // and referral list,,, this is where referral date might be good
-
+*/
 void sortPatientsByName(Patient *patients, int count) { //uses selection sort
     Patient tempArr[100];
     int i, j, minIndex;

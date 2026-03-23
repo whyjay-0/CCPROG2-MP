@@ -4,17 +4,16 @@ int main () {
 	User users[MAX_USERS];
 	User *currentUser;
 	Patient patients[MAX_USERS];
-	Patient currentPatient;
 	Referral referrals[MAX_USERS];
 	int userCount = loadUsersFromFile(users, "users.txt");
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
 	int referralCount = loadReferralsFromFile(referrals, "referrals.txt");
-	int exit=0, choice=0, gp=0, specialist=0, patient=0, crudEnd=0, found=0;
+	int exit=0, choice=0, gp=0, specialist=0, patient=0, crudEnd=0;
 	int newUser;
-	int i;
-	char cInput;
-	char nameInput[101];
-	float riskBMI[MAX_USERS][2];
+	// int i;
+	// char cInput;
+	// char nameInput[101];
+	// float riskBMI[MAX_USERS][2];
 	// 2D array here, for bmi and risk computation, averages.
 	// need func to find avg bmi and risk, array needs to keep updating based on the patients.
 	printf("User count: %d\n", userCount);
@@ -69,10 +68,10 @@ int main () {
 												deletePatient(patients, &patientCount);
 												break;
 											case 3:
-												currentPatient=diagnosePatient(patients,patientCount);
+												diagnosePatient(patients,patientCount);
 												break;
 											case 4:
-												createReferral(referrals, users, patients, currentUser, patientCount, userCount, &referralCount);
+												createReferral(referrals, users, patients, *currentUser, patientCount, userCount, &referralCount);
 												break;
 											default:
 												printf("Invalid input. Try again: ");

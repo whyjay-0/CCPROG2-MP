@@ -89,7 +89,7 @@ Patient addPatient ();
 // to initialize values for new patient
 void initPatient (Patient *patient);
 // Diagnose a patient
-Patient diagnosePatient (Patient *patients, int patientCount);
+void diagnosePatient (Patient *patients, int patientCount);
 // Show past diagnosis report
 void showDiagnosisReport (Patient *currentPatient);
 // Calculate BMI
@@ -99,7 +99,7 @@ double mmol_conv (double mgdl);
 // Calculate Risk
 void calculateCardioRisk(Patient *patient);
 // Save patient to file
-int savePatientToFile (const Patient *patient, const char *filename);
+int saveAllPatientsToFile (Patient *patients, int patientCount, const char *filename);
 // Load patient to file
 int loadPatientsFromFile (Patient *patients, const char *filename);
 // Edit patient ID, name, age, contact
@@ -111,12 +111,15 @@ void showPatients (Patient *patient, int count);
 
 // REFERRAL MANAGEMENT
 // create referral
-void createReferral (Referral *referrals, const User *users, const Patient *patients, const User *currentUser, const int patientCount, const int userCount, int *referralCount);
-void showReferrals (User *currentUser, Referral *referrals, Patient *patients, User *users);
-void editReferral (Referral *referral, User *currentUser);
-void deleteReferral (Referral *referral);
+void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount);
+void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
+void editReferral (Referral *referrals, int referralCount);
+void deleteReferral (Referral *referrals, int *count);
 void selectReferral (int referralID);
-User* findUserByName (User *users, int userCount, const char *name);
-User* findUserByID (User *users, int userCount, int userID);
-int saveReferralToFile (const Referral *referral, const char *filename);
+int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
 int loadReferralsFromFile (Referral *referrals, const char *filename);
+
+// UTILITIES SORTING SEARCHING
+// User findUserByName ();
+// User findUserByID (int userID);
+void sortPatientsByName(Patient *patients, int count);

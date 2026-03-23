@@ -8,7 +8,7 @@ returns Patient* - for saving to the TXT file
 */
 Patient addPatient (){
 	Patient newPatient;
-	int complete=0,valid=0;
+	int valid=0;
 	float weight,height;
 	char strInput[101];
 	initPatient(&newPatient);
@@ -145,7 +145,7 @@ void initPatient (Patient *patient){
 	patient->diet='N';
 	patient->exercise='N';
 	patient->alcohol='N';
-	patient->cardioRisk=0.0;
+	patient->cardioRisk=-1.0;
 	patient->isDiagnosed='N';
 }
 /*
@@ -153,7 +153,7 @@ For GP to diagnose existing patients.
 */
 // Diagnose a patient, will give suggestions and risk level based on the details that 
 // will be input here and from the addPatient function
-Patient diagnosePatient (Patient *patients, int patientCount){
+void diagnosePatient (Patient *patients, int patientCount){
 	char nameInput[101];
 	int found=0, i;
 	Patient currentPatient;
@@ -185,7 +185,7 @@ Patient diagnosePatient (Patient *patients, int patientCount){
 		scanf("%d", &currentPatient.eGFR);
 	
 		// BP Treatment and Values
-		if (strcmp(currentPatient->bp,"0")==0){
+		if (strcmp(currentPatient.bp,"0")==0){
 			printf("Enter blood pressure (SYS/DIA mmHg): ");
 			scanf(" %16[^\n]",currentPatient.bp);
 		}
@@ -198,7 +198,7 @@ Patient diagnosePatient (Patient *patients, int patientCount){
 		scanf(" %c", &currentPatient.currentCVD);
 		
 		// Blood sugar
-		if (currentPatient->bloodSugar==0){
+		if (currentPatient.bloodSugar==0){
 			printf("Enter blood sugar (mg/dL): ");
 			scanf("%f", &currentPatient.bloodSugar);
 		}
@@ -275,7 +275,6 @@ Patient diagnosePatient (Patient *patients, int patientCount){
 			printf("   - Limit alcohol intake to reduce cardiovascular risk.\n");
 		currentPatient.isDiagnosed='Y';
 	}
-	return currentPatient;
 }
 
 // printing diagnosis report
