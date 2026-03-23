@@ -12,123 +12,121 @@ Patient addPatient (){
 	float weight,height;
 	char strInput[101];
 	initPatient(&newPatient);
+	
+	printf("Enter patient's full name:\n");
 	do{
-		// input name
-		printf("Enter your full name:\n");
-		do{
-			scanf(" %100[^\n]",strInput);
-			if (strlen(strInput)>100){
-				printf("Invalid name. Enter name again:\n");
-			}
-			else{
-				strcpy(newPatient.name,strInput);
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
+		scanf(" %100[^\n]",strInput);
+		if (strlen(strInput)>100){
+			printf("Invalid name. Enter name again:\n");
+		}
+		else{
+			strcpy(newPatient.name,strInput);
+			valid=1;
+		}
+	} while(valid==0);
+	valid=0;
+	
+	// input age
+	printf("Enter patient's age: ");
+	do{
+		scanf("%d",&newPatient.age);
+		if (newPatient.age<=0){
+			printf("Invalid age. Enter valid age: \n");
+		}
+		else {
+			valid=1;
+		}
+	} while (valid==0);
+	valid=0;
+	
+	// input gender
+	printf("Enter patient's gender at birth (M/F): ");
+	do{
+		scanf(" %c",&newPatient.gender);
+		if (newPatient.gender!='M' && newPatient.gender!='F'){
+			printf("Invalid gender. Enter valid gender: \n");
+		}
+		else {
+			valid=1;
+		}
+	} while (valid==0);
+	valid=0;
 		
-		// input age
-		printf("Enter your age: ");
-		do{
-			scanf("%d",&newPatient.age);
-			if (newPatient.age<=0){
-				printf("Invalid age. Enter valid age: \n");
-			}
-			else {
-				valid=1;
-			}
-		} while (valid==0);
-		valid=0;
+	// input contact details
+	printf("Enter patient's phone number (+63 xxx-xxx-xxxx): ");
+	do{
+		scanf(" %17[^\n]",strInput);
+		if (strlen(strInput)!=16){
+			printf("Invalid details. Enter details again:\n");
+		}
+		else {
+			strcpy(newPatient.contact,strInput);
+			valid=1;
+		}
+	} while(valid==0);
+	valid=0;
 		
-		// input gender
-		printf("Enter your gender at birth (M/F): ");
-		do{
-			scanf(" %c",&newPatient.gender);
-			if (newPatient.gender!='M' && newPatient.gender!='F'){
-				printf("Invalid gender. Enter valid gender: \n");
-			}
-			else {
-				valid=1;
-			}
-		} while (valid==0);
-		valid=0;
+	// input weight and height then calc bmi into patient struct
+	printf("Input patient's weight (in kg): ");
+	do{
+		scanf("%f",&weight);
+		if (weight<0){
+			printf("Invalid measurement. Enter again.");
+		}
+		else {
+			valid=1;
+		}
+	} while(valid==0);
+	valid=0;
+	
+	printf("Input patient's height (in m): ");
+	do{
+		scanf("%f",&height);
+		if (height<0){
+			printf("Invalid measurement. Enter again.");
+		}
+		else {
+			valid=1;
+		}
+	} while(valid==0);
+	valid=0;
+	
+	calculateBMI(&newPatient,weight,height);
 		
-		// input contact details
-		printf("Enter phone number (+63 xxx-xxx-xxxx): ");
-		do{
-			scanf(" %17[^\n]",strInput);
-			if (strlen(strInput)!=16){
-				printf("Invalid details. Enter details again:\n");
-			}
-			else {
-				strcpy(newPatient.contact,strInput);
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
-		
-		// input weight and height then calc bmi into patient struct
-		printf("Input weight (in kg): ");
-		do{
-			scanf("%f",&weight);
-			if (weight<0){
-				printf("Invalid measurement. Enter again.");
-			}
-			else {
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
-		
-		printf("Input height (in m): ");
-		do{
-			scanf("%f",&height);
-			if (height<0){
-				printf("Invalid measurement. Enter again.");
-			}
-			else {
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
-		
-		calculateBMI(&newPatient,weight,height);
-		
-		// input bp details, if none input 0 = will be for diagnosis
-		printf("Enter Blood Pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
-		do{
-			scanf(" %16[^\n]",strInput);
-			if (strlen(strInput)>15){
-				printf("Invalid input. Enter again:\n");
-			}
-			else if(strInput[0]=='0'){
-				printf("A General Practitioner will diagnose this later on.\n");
-				valid=1;
-			}
-			else {
-				strcpy(newPatient.bp,strInput);
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
-		
-		// input blood sugar, if unknown input 0 = will be for diagnosis
-		printf("Enter Blood Sugar, in mg/dL. If unknown input 0.\n");
-		do{
-			scanf("%f",&newPatient.bloodSugar);
-			if (newPatient.bloodSugar<0){
-				printf("Invalid measurement. Enter again.");
-			}
-			else if (newPatient.bloodSugar==0){
-				printf("A General Practitioner will diagnose this later on.\n");
-				valid=1;
-			}
-			else {
-				valid=1;
-			}
-		} while(valid==0);
-		complete=1;
-	} while (complete==0);
+	// input bp details, if none input 0 = will be for diagnosis
+	printf("Enter patient's blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
+	do{
+		scanf(" %16[^\n]",strInput);
+		if (strlen(strInput)>15){
+			printf("Invalid input. Enter again:\n");
+		}
+		else if(strInput[0]=='0'){
+			printf("A General Practitioner will diagnose this later on.\n");
+			strcpy(newPatient.bp, "0");
+			valid=1;
+		}
+		else {
+			strcpy(newPatient.bp,strInput);
+			valid=1;
+		}
+	} while(valid==0);
+	valid=0;
+	
+	// input blood sugar, if unknown input 0 = will be for diagnosis
+	printf("Enter patient's blood sugar, in mg/dL. If unknown input 0.\n");
+	do{
+		scanf("%f",&newPatient.bloodSugar);
+		if (newPatient.bloodSugar<0){
+			printf("Invalid measurement. Enter again.");
+		}
+		else if (newPatient.bloodSugar==0){
+			printf("A General Practitioner will diagnose this later on.\n");
+			valid=1;
+		}
+		else {
+			valid=1;
+		}
+	} while(valid==0);
 	
 	return newPatient;
 }
@@ -148,16 +146,16 @@ void initPatient (Patient *patient){
 	patient->exercise='N';
 	patient->alcohol='N';
 	patient->cardioRisk=0.0;
-	patient->isDiagnosed'N';
+	patient->isDiagnosed='N';
 }
 /*
 For GP to diagnose existing patients.
 */
 // Diagnose a patient, will give suggestions and risk level based on the details that 
 // will be input here and from the addPatient function
-void diagnosePatient (Patient *patients,patientCount){
+Patient diagnosePatient (Patient *patients, int patientCount){
 	char nameInput[101];
-	int found=0;
+	int found=0, i;
 	Patient currentPatient;
 	
 	printf("Enter patient name to diagnose: ");
@@ -166,115 +164,116 @@ void diagnosePatient (Patient *patients,patientCount){
 		if (strcmp(patients[i].name,nameInput)==0){
 			currentPatient=patients[i];
 			found=1;
+			i=patientCount; // end loop
 		}
 	}
 	if (found==0){
 		printf("Patient not found.\n");
 	}
 	else{
-		printf("----- Diagnosing Patient: %s -----\n", currentPatient->name);
+		printf("----- Diagnosing Patient: %s -----\n", currentPatient.name);
 		
 		// Ask user for needed info
 		// Cholesterol values
 		printf("Enter Total Cholesterol (mg/dL): ");
-		scanf("%f", &currentPatient->totalChol);
+		scanf("%f", &currentPatient.totalChol);
 		printf("Enter HDL Cholesterol (mg/dL): ");
-		scanf("%f", &currentPatient->hdlChol);
+		scanf("%f", &currentPatient.hdlChol);
 		
 		// eGFR value, estimated Glomerular Filtration Rate
 		printf("Enter eGFR (mL/min/1.73m^2): ");
-		scanf("%d", &currentPatient->eGFR);
+		scanf("%d", &currentPatient.eGFR);
 	
 		// BP Treatment and Values
 		if (strcmp(currentPatient->bp,"0")==0){
 			printf("Enter blood pressure (SYS/DIA mmHg): ");
-			scanf(" %16[^\n]",currentPatient->bp);
+			scanf(" %16[^\n]",currentPatient.bp);
 		}
 		
 		printf("Is patient using anti-hypertensive medication? (Y/N): ");
-		scanf(" %c", &currentPatient->htMed);
+		scanf(" %c", &currentPatient.htMed);
 		
 		// CVD
 		printf("Does patient have any known cardiovascular disease? (Y/N): ");
-		scanf(" %c", &currentPatient->currentCVD);
+		scanf(" %c", &currentPatient.currentCVD);
 		
 		// Blood sugar
 		if (currentPatient->bloodSugar==0){
 			printf("Enter blood sugar (mg/dL): ");
-			scanf("%f", &currentPatient->bloodSugar);
+			scanf("%f", &currentPatient.bloodSugar);
 		}
 		
 		// LDL treatment
 		printf("Is patient using statins? (Y/N): ");
-		scanf(" %c", &currentPatient->statins);	
+		scanf(" %c", &currentPatient.statins);	
 	
 		// Smoking
 		printf("Is patient a regular smoker? (Y/N): ");
-		scanf(" %c", &currentPatient->smoking);	
+		scanf(" %c", &currentPatient.smoking);	
 
 		// Diabetes
 		printf("Does patient have diabetes? (Y/N): ");
-		scanf(" %c", &currentPatient->diabetes);
+		scanf(" %c", &currentPatient.diabetes);
 		
 		// Creatinine
 		printf("Enter Serum Creatinine of patient (mg/dL): ");
-		scanf("%f", &currentPatient->creatinine);
+		scanf("%f", &currentPatient.creatinine);
 		
 		// Family History CVD
 		printf("Does patient have family history of CVD? (Y/N): ");
-		scanf(" %c", &currentPatient->cvdFamily);
+		scanf(" %c", &currentPatient.cvdFamily);
 	
 		// Diet/Exercise
 		printf("Does patient exercise regularly? (Y/N): ");
-		scanf(" %c", &currentPatient->exercise);
+		scanf(" %c", &currentPatient.exercise);
 		printf("Does patient have a high-fat/sugar diet? (Y/N): ");
-		scanf(" %c", &currentPatient->diet);
+		scanf(" %c", &currentPatient.diet);
 		
 		// Alcohol
 		printf("Does patient consume alcohol regularly? (Y/N): ");
-		scanf(" %c", &currentPatient->alcohol);
+		scanf(" %c", &currentPatient.alcohol);
 	
 		// Calculate Cardio Risk,, Can only be done on adults ages 30-79 without past CVD (This is assumed to be true).
-		if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N')
-			calculateCardioRisk(currentPatient);
+		if (currentPatient.age>=30 && currentPatient.age<=79 && currentPatient.currentCVD=='N')
+			calculateCardioRisk(&currentPatient);
 		else
-			currentPatient->cardioRisk = -1.0; // This should mean invalid since outside of age range
+			currentPatient.cardioRisk = -1.0; // This should mean invalid since outside of age range
 	
 		printf("---------- DIAGNOSIS REPORT ----------\n\n");
 		// Details
-		printf("Patient: %s\n", currentPatient->name);
-		printf("Age: %d\nGender: %c\n", currentPatient->age, currentPatient->gender);
-		printf("BMI: %f\n\n", currentPatient->bmi);
+		printf("Patient: %s\n", currentPatient.name);
+		printf("Age: %d\nGender: %c\n", currentPatient.age, currentPatient.gender);
+		printf("BMI: %f\n\n", currentPatient.bmi);
 		// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 		// Temporary interpretations Changes might be made once AHA provides proper source code.
-		if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
+		if (currentPatient.age>=30 && currentPatient.age<=79 && currentPatient.currentCVD=='N'){
 			// Cardio Risk
-			printf("10-Year Cardiovasular Risk: %.2lf%%\n", currentPatient->cardioRisk * 100);
+			printf("10-Year Cardiovasular Risk: %.2lf%%\n", currentPatient.cardioRisk * 100);
 			// Risk Level Classification
-			if(currentPatient->cardioRisk < 0.05)
+			if(currentPatient.cardioRisk < 0.05)
 				printf("   Risk Level: Low Risk\n\n");
-			else if(currentPatient->cardioRisk >= 0.05 && currentPatient->cardioRisk <= 0.074)
+			else if(currentPatient.cardioRisk >= 0.05 && currentPatient.cardioRisk <= 0.074)
 			printf("   Risk Level: Borderline Risk\n\n");
-			else if(currentPatient->cardioRisk >= 0.075 && currentPatient->cardioRisk <= 0.199)
+			else if(currentPatient.cardioRisk >= 0.075 && currentPatient.cardioRisk <= 0.199)
 				printf("   Risk Level: Intermediate Risk\n\n");
 			else
 				printf("   Risk Level: Very High Risk\n\n");
 		}
 		// Other data and suggestions
 		printf("Data and Suggestions:\n");
-		if (currentPatient->bmi>30)
+		if (currentPatient.bmi>30)
 			printf("   - Suggestion: Consider weight loss through diet and exercise.\n");
-		if (currentPatient->creatinine>1.2)
+		if (currentPatient.creatinine>1.2)
 			printf("   - Kidney Function is decreased. Consider further renal evaluation.\n");
-		if (currentPatient->cvdFamily=='Y')
+		if (currentPatient.cvdFamily=='Y')
 			printf("   - Increased risk of cardiovascular disease due to family history.\n");
-		if (currentPatient->diet=='Y')
+		if (currentPatient.diet=='Y')
 			printf("   - Modify diet to lower fat and sugar intake\n");
-		if (currentPatient->exercise=='Y')
+		if (currentPatient.exercise=='Y')
 			printf("   - Continue regular physical activity\n");
-		if (currentPatient->alcohol=='Y')
+		if (currentPatient.alcohol=='Y')
 			printf("   - Limit alcohol intake to reduce cardiovascular risk.\n");
-		currentPatient->isDiagnosed='Y';
+		currentPatient.isDiagnosed='Y';
 	}
 	return currentPatient;
 }
@@ -457,41 +456,43 @@ void calculateCardioRisk (Patient *patient){
 }
 
 // Save patient to file
-int savePatientToFile (const Patient *patient, const char *filename){
+int saveAllPatientsToFile (Patient *patients, int patientCount, const char *filename){
 	FILE *fp;
-	int flag = 0;
+	int flag = 0, i;
 	if ((fp=fopen(filename, "w"))==NULL){
 		fprintf(stderr, "Error: %s does not exist.\n", filename);
 	}
 	else {
-		fprintf(fp, "%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf\n,%c",
-				patient->name,
-                patient->age,
-                patient->gender,
-                patient->contact,
-                patient->bmi,
-                patient->bmiCat,
-                patient->bp,
-                patient->bloodSugar,
-                patient->currentCVD,
-                patient->totalChol,
-                patient->hdlChol,
-                patient->eGFR,
-                patient->htMed,
-                patient->statins,
-                patient->smoking,
-                patient->diabetes,
-                patient->creatinine,
-                patient->cvdFamily,
-                patient->diet,
-                patient->exercise,
-                patient->alcohol,
-                patient->cardioRisk,
-				patient->isDiagnosed);
+		for (i=0;i<patientCount;i++){
+			fprintf(fp, "%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
+					patients[i].name,
+                	patients[i].age,
+                	patients[i].gender,
+                	patients[i].contact,
+                	patients[i].bmi,
+                	patients[i].bmiCat,
+                	patients[i].bp,
+                	patients[i].bloodSugar,
+                	patients[i].currentCVD,
+                	patients[i].totalChol,
+                	patients[i].hdlChol,
+                	patients[i].eGFR,
+                	patients[i].htMed,
+                	patients[i].statins,
+                	patients[i].smoking,
+               		patients[i].diabetes,
+                	patients[i].creatinine,
+                	patients[i].cvdFamily,
+                	patients[i].diet,
+                	patients[i].exercise,
+                	patients[i].alcohol,
+                	patients[i].cardioRisk,
+					patients[i].isDiagnosed);
+		}
 		flag=1;
+		fclose(fp);
 	}
 	
-	fclose(fp);
 	return flag;
 }
 
@@ -532,7 +533,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							&temp.cardioRisk,
 								&temp.isDiagnosed);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==23){
+			if (result==23 && count < MAX_USERS){
 				patients[count] = temp;
 				count++;
 			}

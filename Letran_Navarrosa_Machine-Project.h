@@ -73,7 +73,7 @@ User* loginUser (User *users, int userCount);
 */
 void hashPassword (const char *password, unsigned long *outputHash);
 // Save user to TXT file, return 1 if success, 0 otherwise
-int saveUserToFile (const User *user, const char *filename);
+int saveAllUsersToFile (User *users, int userCount, const char *filename);
 // Load user from TXT file, return count of users
 int loadUsersFromFile (User *users, const char *filename);
 // Forgot password / Password recovery
@@ -81,15 +81,15 @@ int loadUsersFromFile (User *users, const char *filename);
 
 @return 0 or 1 if success or not
 */
-int forgotPassword ();
+int forgotPassword (User *users, int userCount, const char *username);
 
 // PATIENT LOGGING
 // Set patient ID, name, age, contact in a new log
 Patient addPatient ();
 // to initialize values for new patient
-void initPatient (Patient *patient)
+void initPatient (Patient *patient);
 // Diagnose a patient
-void diagnosePatient (Patient *patients,patientCount);
+Patient diagnosePatient (Patient *patients, int patientCount);
 // Show past diagnosis report
 void showDiagnosisReport (Patient *currentPatient);
 // Calculate BMI
@@ -111,12 +111,12 @@ void showPatients (Patient *patient, int count);
 
 // REFERRAL MANAGEMENT
 // create referral
-void createReferral (Referral *referrals, const User users, const Patient patients, const User currentUser, const int patientCount, const int userCount, int *referralCount);
+void createReferral (Referral *referrals, const User *users, const Patient *patients, const User *currentUser, const int patientCount, const int userCount, int *referralCount);
 void showReferrals (User *currentUser, Referral *referrals, Patient *patients, User *users);
 void editReferral (Referral *referral, User *currentUser);
 void deleteReferral (Referral *referral);
 void selectReferral (int referralID);
-User findUserByName (char *name);
-User findUserByID (int userID);
-int saveReferralToFile (const Referral referral, const char *filename);
-int loadReferralsFromFile (const Referral referrals, const char *filename);
+User* findUserByName (User *users, int userCount, const char *name);
+User* findUserByID (User *users, int userCount, int userID);
+int saveReferralToFile (const Referral *referral, const char *filename);
+int loadReferralsFromFile (Referral *referrals, const char *filename);
