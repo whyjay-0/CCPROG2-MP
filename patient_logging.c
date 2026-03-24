@@ -6,25 +6,32 @@
 For patient to set their details.
 returns Patient* - for saving to the TXT file
 */
-Patient addPatient (){
+Patient addPatient (User *currentUser, Patient *patients, int patientCount){
 	Patient newPatient;
 	int valid=0;
 	float weight,height;
 	char strInput[101];
 	initPatient(&newPatient);
 	
-	printf("Enter patient's full name:\n");
-	do{
-		scanf(" %100[^\n]",strInput);
-		if (strlen(strInput)>100){
-			printf("Invalid name. Enter name again:\n");
-		}
-		else{
-			strcpy(newPatient.name,strInput);
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	if (strcmp(currentUser.role, "Patient")==0){
+		// auto input of name, since patient can only add themself
+		strcpy(newPatient.name,currentUser.name);
+		printf("Patient name: %s\n", newPatient.name);
+	}
+	else{
+		printf("Enter patient's full name:\n");
+		do{
+			scanf(" %100[^\n]",strInput);
+			if (strlen(strInput)>100){
+				printf("Invalid name. Enter name again:\n");
+			}
+			else{
+				strcpy(newPatient.name,strInput);
+				valid=1;
+			}
+		} while(valid==0);
+		valid=0;
+	}
 	
 	// input age
 	printf("Enter patient's age: ");
@@ -127,6 +134,8 @@ Patient addPatient (){
 			valid=1;
 		}
 	} while(valid==0);
+	
+	newPatient.patientID = getPatientID(patients, patientCount); // set the userID of new user to old usercount + 1
 	
 	return newPatient;
 }
@@ -321,6 +330,17 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	
 }
 
+// get next ID
+int getPatientID (Patient *patients, int patientCount){
+	int i,max=0;
+	for (i=0;i<patientCount;i++){
+		if (patient[i].patientID > max){
+			max = patient[i].patientID;
+		}
+	}
+	return max + 1;
+}
+
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height){
 	float bmi = weight / (height * height);
@@ -463,7 +483,8 @@ int saveAllPatientsToFile (Patient *patients, int patientCount, const char *file
 	}
 	else {
 		for (i=0;i<patientCount;i++){
-			fprintf(fp, "%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
+			fprintf(fp, "%d,%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
+					patients[i].patientID,
 					patients[i].name,
                 	patients[i].age,
                 	patients[i].gender,
@@ -507,7 +528,8 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 		while (flag){
 			Patient temp;
 			int result = fscanf(fp,
-								"%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
+								"%d,%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
+								temp.patientID,
 								temp.name,
     							&temp.age,
     							&temp.gender,
@@ -532,7 +554,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							&temp.cardioRisk,
 								&temp.isDiagnosed);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==23 && count < MAX_USERS){
+			if (result==24 && count < MAX_USERS){
 				patients[count] = temp;
 				count++;
 			}
@@ -651,8 +673,9 @@ void showPatients (Patient *patient, int count){
     	printf("------------\n");
     
     	for(int i=0; i<count; i++) {
-        	printf("| %03d | %-25s | %-3d | %3c%3s | %16s | %11s | %-12s | %.2f |",
-           		i+1, 
+        	printf("| %03d | %03d | %-25s | %-3d | %3c%3s | %16s | %11s | %-12s | %.2f |",
+           		i+1,
+           		patient[i].patientID,
             	patient[i].name,
             	patient[i].age,
             	patient[i].gender, "",
@@ -673,4 +696,77 @@ void showPatients (Patient *patient, int count){
     	printf("----------------------------------------");
     	printf("------------\n");
 	}
-}	
+}
+
+void computeAverages(double data[][2], int patientCount){ // param *data - 2D array containing BMI and CRisk data
+	double sumBMI=0, sumRisk=0, valid=0;
+	int i;
+	
+	if (patientCount == 0){
+		printf("No data available.\n");
+	}
+	else {
+		for (i=0;i<patientCount;i++){
+			sumBMI+=data[i][0];
+			if (data[i][1] != -1){ // if patient is diagnosed then add to sum
+				sumRisk += data[i][1];
+				valid++;
+			}
+		}
+	}
+	printf("Average BMI: %.2lf\n", sumBMI / patientCount);
+	printf("Average Cardiovascular Disease Risk: %.2lf\n", (sumRisk / valid)*100);
+}
+
+// selection sort of patientID of patients
+void sortPatientsByID (Patient *patients, int patientCount, User *users, int userCount, int order){
+	int i, j, index;
+	Patient temp;
+	
+	for (i=0;i<patientCount-1;i++){
+		index = i // sorted portion at i
+		// search/select
+		for (j=i+1;j<patientCount;j++){
+			if (order==1){ // ascending
+				if(patients[j].patientID < patients[minMaxIndex].patientID)
+					index = j;
+			}
+			else { // descending
+				if(patients[j].patientID > patients[minMaxIndex].patientID)
+					index = j;
+			}
+		}
+		// swap
+		if (index != i){
+			temp = patients[i];
+			patients[i] = patients[index];
+			patients[index] = temp;
+		}
+	}
+}
+
+// selection sort of nanme of patients
+void sortPatientsByName (Patient *patients, int patientCount, int order){
+	int i, j, index;
+	Patient temp;
+	
+	for (i=0;i<patientCount-1;i++){
+		index = i // sorted portion at i
+		for (j=i+1;j<patientCount;j++){
+			if (order==1){ // ascending
+				if(strcmp(patients[j].name, patients[minMaxIndex].name) < 0)
+					index = j;
+			}
+			else { // descending
+				if(strcmp(patients[j].name, patients[minMaxIndex].name) > 0)
+					index = j
+			}
+		}
+		// swap
+		if (index != i){
+			temp = patients[i];
+			patients[i] = patients[index];
+			patients[index] = temp;
+		}
+	}
+}

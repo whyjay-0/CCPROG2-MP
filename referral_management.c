@@ -65,7 +65,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     int i, j,found=0;
     User temp, temp2;
 	
-    printf("----- REFERRALS -----\n");
+    printf("\n===== REFERRALS =====\n");
     for (i=0;i<referralCount;i++){
         if (strcmp(currentUser->role,"GP")==0){
             if (referrals[i].GPID == currentUser->userID){

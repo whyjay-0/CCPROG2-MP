@@ -87,7 +87,7 @@ int registerUser (User *users, int *userCount){
 				}
 			} while (validChoice==0);
 		}
-		newUser.userID = *userCount + 1; // set the userID of new user to old usercount + 1
+		newUser.userID = getUserID(users, userCount); // set the userID of new user to old usercount + 1
 		users[*userCount] = newUser; //set the array of struct at index *userCount to the newUser made
 		index = *userCount; //the index of the user before it is incremented
 		(*userCount)++; // increase amount of users
@@ -247,4 +247,227 @@ int forgotPassword (User *users, int userCount, const char *username){
 		}
 	}
 	return flag;
+}
+
+// Finds max userID and sets new userID to be used
+int getUserID (User *users, int userCount){
+	int i,max=0;
+	for (i=0;i<userCount;i++){
+		if (users[i].userID > max){
+			max = users[i].userID;
+		}
+	}
+	return max + 1;
+}
+
+// User Dashboards
+// GP Dashboard
+void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]){
+	int choice = -1;
+	
+    do{
+        printf("\n==== GP DASHBOARD ====\n");
+        printf("1. Add Patient\n");
+        printf("2. Show Patients\n");
+        printf("3. Edit Patient\n"); // editing, deleting, diagnosing, and referring will be within patient CRUD when patients are shown
+        printf("4. Delete Patient\n"); //
+        printf("5. Diagnose Patient\n"); // 
+        printf("6. Show Referrals\n"); 
+        printf("7. Compute Averages (BMI + Cardio Risk)\n");
+        printf("0. Logout\n");
+        printf("Choice: ");
+        scanf(" %d",&choice);
+		
+        switch(choice){
+            case 1:
+                if (*patientCount < MAX_USERS){
+                    patients[*patientCount] = addPatient(currentUser,patients,patientCount);
+                    (*patientCount)++;
+                }
+                else
+                	printf("Reached max patient count.");
+                saveAllPatientsToFile(patients,patientCount,"patients.txt");
+                break;
+			
+            case 2:
+                do{
+            		showPatients(patients,patientCount);
+            		printf("\n==== Patient CRUD ====\n");
+            		printf("1. Search patient by patientID");
+            		printf("2. Search patient by name");
+            		printf("3. Sort patient by userID");
+            		printf("4. Sort patient by name");
+            		printf("Choice: ");
+            		scanf(" %d",&pchoice);
+            		
+            		switch(pchoice){
+            			case 1:
+            				// after searching for patient, they should be able to edit or delete it or view diagnoses
+            				break;
+            			case 2:
+            				break;
+            			case 3:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortPatientsByID(patients, patientCount, order);
+            				break;
+            			case 4:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortPatientsByName(patients, patientCount, order);
+            				break;
+            			default:
+            				printf("Invalid input.\n");
+					}
+				} while(pchoice!=0);
+                break;
+            /*case 3:
+                editPatient(patients,*patientCount);
+                saveAllPatientsToFile(patients,patientCount,"patients.txt");
+                break;
+            case 4:
+                deletePatient(patients,patientCount);
+                saveAllPatientsToFile(patients,patientCount,"patients.txt");
+                break;
+            case 5:
+                diagnosePatient(patients,*patientCount);
+                saveAllPatientsToFile(patients,patientCount,"patients.txt");
+                break;*/
+            case 6:
+                showReferrals(currentUser,users,referrals,referralCount);
+                // saveAllReferralsToFile(referrals,referralCount,"referrals.txt"); SAVE WHEN CREATING REFERRALS
+                break;
+            case 7:
+            	for (i=0;i<*patientCount;i++){
+            		data[i][0] = patients[i].bmi;
+            		data[i][1] = patients[i].cardioRisk;
+				}
+                computeAverages(data,*patientCount);
+                break;
+            case 0:
+                printf("Logging out...\n");
+                break;
+            default:
+                printf("Invalid input.\n");
+        }
+    } while(choice!=0);
+}
+
+void specialistDashboard(User *currentUser, User *users, Referral *referrals, int referralCount, Patient *patients, int patientCount, float data[][2]){
+	int choice=-1, pchoice=-1, uchoice=-1, order=-1;
+	
+    do{
+        printf("\n==== SPECIALIST DASHBOARD ====\n");
+        printf("1. View Referrals\n");
+        printf("2. Update Referral Status\n");
+        printf("3. Show patient list.\n");
+        printf("4. Show user list.\n");
+        printf("5. Compute Averages (BMI + Cardio Risk)\n");
+        printf("0. Logout\n");
+        printf("Choice: ");
+        scanf(" %d",&choice);
+        
+        switch(choice){
+            case 1:
+                showReferrals(currentUser, referrals, referralCount);
+                break;
+            case 2:
+                editReferral(referrals, referralCount);
+                break;
+            case 3:
+            	do{
+            		showPatients(patients,patientCount);
+            		printf("\n==== Patient CRUD ====\n");
+            		printf("1. Search patient by patientID");
+            		printf("2. Search patient by name");
+            		printf("3. Sort patient by userID");
+            		printf("4. Sort patient by name");
+            		printf("Choice: ");
+            		scanf(" %d",&pchoice);
+            		
+            		switch(pchoice){
+            			case 1:
+            				// after searching for patient, they should be able to edit or delete it or view diagnoses
+            				break;
+            			case 2:
+            				break;
+            			case 3:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortPatientsByID(patients, patientCount, order);
+            				break;
+            			case 4:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortPatientsByName(patients, patientCount, order);
+            				break;
+            			default:
+            				printf("Invalid input.\n");
+					}
+				} while(pchoice!=0);
+            	break;
+            case 4:
+            	do{
+            		// func that list users
+				} while(uchoice!=0);
+            	break;
+            case 5:
+            	for (i=0;i<patientCount;i++){
+            		data[i][0] = patients[i].bmi;
+            		data[i][1] = patients[i].cardioRisk;
+				}
+            	computeAverages(data,patientCount);
+            	break;
+            case 0:
+            	printf("Logging out...\n");
+                break;
+            default:
+                printf("Invalid input.\n");
+        }
+    } while(choice!=0);
+}
+
+void patientDashboard(User *currentUser, User *users, Patient *patients, int *patientCount, Referral *referrals, int referralCount){
+    int i, found=0, choice=-1;
+
+    do{
+    	printf("\n==== PATIENT DASHBOARD ====\n");
+    	printf("1. Add self as patient\n");
+    	printf("2. View diagnosis reports\n");
+    	printf("3. View referrals");
+    	printf("0. Logout\n");
+    	printf("Choice: ");
+    	scanf(" %d",&choice);
+    	
+    	switch(choice){
+    		case 1:
+    			if (*patientCount < MAX_USERS){
+                    patients[*patientCount] = addPatient(currentUser,patients,patientCount);
+                    (*patientCount)++;
+                }
+                else
+                	printf("Max patient count reached.");
+    			break;
+    		case 2:
+    			printf("\n===== Diagnosis reports ====\n");
+    			for (i=0;i<patientCount;i++){
+			        if (strcmp(patients[i].name,currentUser->name)==0){
+			            showDiagnosisReport(&patients[i]);
+			            found=1;
+			        }
+			    }
+			    if (!found){
+    			    printf("No record found.\n");
+    			}
+    			break;
+    		case 3:
+    			showReferrals(currentUser, users, referrals, referralCount);
+    			break;
+    		case 0:
+    			printf("Logging out...\n");
+    			break;
+    		default:
+    			printf("Invalid input.\n");
+		}
+	} while(choice!=0);
 }

@@ -14,6 +14,8 @@ typedef struct {
     char name[101]; // Full name
 } User;
 typedef struct {
+	int patientID;
+	// int userID; // if no userID should default to -1
 	char name[101];
 	int age; // if age 30-79 cvdRisk is calculated
 	char gender; // M or F, used for cvdRisk
