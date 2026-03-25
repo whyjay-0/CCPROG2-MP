@@ -7,11 +7,12 @@
 @param userCount - amount of users in the array users[]
 @return int - index of newUser
 */
-int registerUser (User *users, int *userCount){
+int registerUser (User *users, int *userCount, Patient *patients, int patientCount){
 	int i,similar=0;
 	User newUser;
 	char input[101];
-	int choice, complete=0, validUser=0, validName=0, validChoice=0, index;
+	char cInput;
+	int choice, complete=0, validUser=0, validName=0, validChoice=0, index, pIndex;
 	
 	if (*userCount >= MAX_USERS){
 		printf("Max User Limit reached.");
@@ -67,17 +68,40 @@ int registerUser (User *users, int *userCount){
 					
 				switch (choice){
 					case 1: 
-						strcpy(newUser.role, "Patient"); 
+						strcpy(newUser.role, "Patient");
+						// find if full name is in patient record/array
+						pIndex = findPatientByName(patients,patientCount,newUser.name);
+						if (pIndex!=-1){
+							printf("A patient record already exists with a similar name.\nDo you want to link this account to your patient record? (Y/N): ");
+							scanf(" %c", &cInput);
+							switch(cInput){
+								case 'Y':
+								case 'y':
+									newUser.userID = patients[pIndex].userID;
+									break;
+								case 'N':
+								case 'n':
+									newUser.userID = getUserID(users,patients);
+									break;
+								default:
+									printf("Invalid input.\n");	
+							}
+						}
+						else {
+							newUser.userID = getUserID(users,patients);
+						}
 						validChoice=1; 
 						complete=1; 
 						break;
 					case 2: 
 						strcpy(newUser.role, "GP"); 
+						newUser.userID = getUserID(users,patients); // set the userID of new user to highest userID found + 1
 						validChoice=1; 
 						complete=1; 
 						break;
 					case 3: 
-						strcpy(newUser.role, "Specialist"); 
+						strcpy(newUser.role, "Specialist");
+						newUser.userID = getUserID(users,patients);
 						validChoice=1; 
 						complete=1; 
 						break;
@@ -87,7 +111,6 @@ int registerUser (User *users, int *userCount){
 				}
 			} while (validChoice==0);
 		}
-		newUser.userID = getUserID(users, *userCount); // set the userID of new user to old usercount + 1
 		users[*userCount] = newUser; //set the array of struct at index *userCount to the newUser made
 		index = *userCount; //the index of the user before it is incremented
 		(*userCount)++; // increase amount of users
@@ -250,11 +273,14 @@ int forgotPassword (User *users, int userCount, const char *username){
 }
 
 // Finds max userID and sets new userID to be used
-int getUserID (User *users, int userCount){
+int getUserID (User *users, Patient *patients){
 	int i,max=0;
-	for (i=0;i<userCount;i++){
+	for (i=0;i<MAX_USERS;i++){
 		if (users[i].userID > max){
 			max = users[i].userID;
+		}
+		if (patients[i].userID > max){
+			max = patients[i].userID;
 		}
 	}
 	return max + 1;

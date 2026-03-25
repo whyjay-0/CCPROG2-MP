@@ -6,7 +6,7 @@
 For patient to set their details.
 returns Patient* - for saving to the TXT file
 */
-Patient addPatient (User *currentUser, Patient *patients, int patientCount){
+Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount){
 	Patient newPatient;
 	int valid=0;
 	float weight,height;
@@ -137,11 +137,13 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount){
 	} while(valid==0);
 	
 	newPatient.patientID = getPatientID(patients, patientCount); // set the userID of new user to old usercount + 1
+	newPatient.userID = getUserID(users, patients); // getting a new userID even if patient does not have account yet
 	
 	return newPatient;
 }
 
 void initPatient (Patient *patient){
+	patient->userID=-1;
 	patient->currentCVD='N';
 	patient->totalChol=0.0;
 	patient->hdlChol=0.0;
@@ -487,8 +489,9 @@ int saveAllPatientsToFile (Patient *patients, int patientCount, const char *file
 	}
 	else {
 		for (i=0;i<patientCount;i++){
-			fprintf(fp, "%d,%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
+			fprintf(fp, "%d,%d,%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
 					patients[i].patientID,
+					patients[i].userID,
 					patients[i].name,
                 	patients[i].age,
                 	patients[i].gender,
@@ -532,8 +535,9 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 		while (flag){
 			Patient temp;
 			int result = fscanf(fp,
-								"%d,%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
+								"%d,%d,%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
 								&temp.patientID,
+								&temp.userID,
 								temp.name,
     							&temp.age,
     							&temp.gender,
@@ -558,7 +562,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							&temp.cardioRisk,
 								&temp.isDiagnosed);
 			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==24 && count < MAX_USERS){
+			if (result==25 && count < MAX_USERS){
 				patients[count] = temp;
 				count++;
 			}
