@@ -76,7 +76,7 @@ void editPatient (Patient *patient, int count);
 void deletePatient (Patient *patient, int *count);
 void showPatients (Patient *patient, int count);
 void computeAverages(double data[][2], int patientCount);
-void sortPatientsByID (Patient *patients, int patientCount, User *users, int userCount, int order);
+void sortPatientsByID (Patient *patients, int patientCount, int order);
 void sortPatientsByName (Patient *patients, int patientCount, int order);
 
 void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount);

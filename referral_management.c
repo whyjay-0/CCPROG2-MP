@@ -1,60 +1,73 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Referral management
-void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount){ 
+void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount){ 
 	// GP access only, currentpatient is patient being referred, user is GP
 	// select patient by entering name,,, would search by strcmp name and strcmp role
 	// select specialist by entering name,,, would search by strcmp name and strcmp role
 	// save referral
-	int i,found=0;
+	int i,found=0,choice=-1, index, valid=0, input;
 	char strInput[101];
 	Referral newReferral;
-	Patient currentPatient;
 	User specialist;
 	newReferral.ReferralID = 0;
 	newReferral.GPID = 0;
 	newReferral.SpecialistID = 0;
-	strcpy(newReferral.status, "");
 	
-	printf("Enter the full name of the patient to refer:\n");
-	scanf(" %100[^\n]", strInput);
-	for(i=0;i<patientCount;i++){
-		if (strcmp(patients[i].name,strInput)==0){
-			currentPatient=patients[i];
-			found=1;
-			strcpy(newReferral.PatientName,currentPatient.name);
-			i=patientCount; // end loop
+	strcpy(newReferral.status, "");
+	strcpy(newReferral.PatientName,currentPatient->name);
+	
+	printf("Referring Patient: %s\n", newReferral.PatientName);
+	if (currentPatient.isDiagnosed=='Y'){
+		printf("Enter details of specialist by:\n1. ID\n2. Name\nChoice: ");
+		scanf(" %d", &choice);
+		switch(choice){
+			case 1:
+				do{
+					// show users func, lists all users but only specialists.
+					printf("Enter user ID to select: ");
+					valid = scanf(" %d", input);
+					if (valid != 1){
+						// invalid input
+						printf("Invalid input.\n");
+						scanf("%*s") // clear input
+					}
+				} while(valid==0);
+			
+				index = findUserByID(users,userCount,input); // index of user
+				if (index!=-1){
+					found=1;
+					specialist = users[index];
+				}
+				break;
+			case 2:
+				// show users func, lists all users but only specialists.
+				printf("Enter name of user to select: ");
+				scanf(" %100[^\n]s", strInput);
+				index = findUserByName(users,userCount,strInput);
+				if (index!=-1){
+					found=1;
+					specialist = users[index];
+				}
+				break;
+			default:
+				printf("Invalid choice.\n");
 		}
-	}
-	if (found==0){
-		printf("Patient not found.\n");
-	}
-	else if (currentPatient.isDiagnosed=='Y' && found==1){
-		printf("Enter the full name of the specialist:\n");
-		scanf(" %100[^\n]", strInput);
-		found=0;
-		for (i=0;i<userCount;i++){
-			// search for user
-			if (strcmp(users[i].name,strInput)==0 && strcmp(users[i].role,"Specialist")==0){
-				specialist=users[i];
-				found=1;
-				i=userCount;
+		if (found){
+			newReferral.SpecialistID = specialist.userID; // found specialist
+			newReferral.GPID = currentUser.userID; // assumed current user is GP
+				
+			strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
+				
+			// setting new ID for referral
+			newReferral.ReferralID = *referralCount + 1; // set the referralID of new referral to old referralCount + 1
+			referrals[*referralCount] = newReferral; //set the array of struct at index *referrakCount to the newReferral made
+			// index = *userCount; // can be used if we want to return ID of the new referral
+			(*referralCount)++; // increase amount of referrals
+			
+			saveAllReferralsToFile(referrals, *referralCount, "referrals.txt");
 			}
-			if (found==0)
-				printf("Specialist not found.\n");
 		}
-		newReferral.SpecialistID = specialist.userID; // found specialist
-		newReferral.GPID = currentUser.userID; // assumed current user is GP
-		
-		strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
-		
-		// setting new ID for referral
-		newReferral.ReferralID = *referralCount + 1; // set the referralID of new referral to old referralCount + 1
-		referrals[*referralCount] = newReferral; //set the array of struct at index *referrakCount to the newReferral made
-		// index = *userCount; // can be used if we want to return ID of the new referral
-		(*referralCount)++; // increase amount of referrals
-		
-		saveAllReferralsToFile(referrals, *referralCount, "referrals.txt");
 	}
 	else {
 		printf("Patient is not yet diagnosed.\n");
@@ -219,6 +232,61 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
 
     return count;
 }
+
+void sortReferralsByID (Referral *referrals, int referralCount, int order){
+	int i, j, index;
+	Referral temp;
+	
+	for (i=0;i<referralCount-1;i++){
+		index = i; // sorted portion at i
+		// search/select
+		for (j=i+1;j<referralCount;j++){
+			if (order==1){ // ascending
+				if(referrals[j].ReferralID < referrals[index].ReferralID)
+					index = j;
+			}
+			else { // descending
+				if(referrals[j].ReferralID > referrals[index].ReferralID)
+					index = j;
+			}
+		}
+		// swap
+		if (index != i){
+			temp = referrals[i];
+			referrals[i] = referrals[index];
+			referrals[index] = temp;
+		}
+	}
+}
+
+void sortReferralsByPatient (Referral *referrals, int referralCount, int order){
+	int i, j, index;
+	Referral temp;
+	
+	for (i=0;i<referralCount-1;i++){
+		index = i; // sorted portion at i
+		for (j=i+1;j<referralCount;j++){
+			if (order==1){ // ascending
+				if(strcmp(referrals[j].PatientName, referrals[index].PatientName) < 0)
+					index = j;
+			}
+			else { // descending
+				if(strcmp(referrals[j].PatientName, referrals[index].PatientName) > 0)
+					index = j;
+			}
+		}
+		// swap
+		if (index != i){
+			temp = referrals[i];
+			referrals[i] = referrals[index];
+			referrals[index] = temp;
+		}
+	}
+}
+
+
+
+
 
 // utility funcs, sorting and searching of diff types by diff means
 /*
