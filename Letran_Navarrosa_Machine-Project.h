@@ -50,78 +50,38 @@ typedef struct {
 	// reason for referral maybe wag na mas simple na referral system kahit medyo di nagmamake sense
 } Referral;
 
-// LOGIN
-
-// User management
-/* Registers a user; returns flag if valid or not
-
-@param users[] - contains the list of users
-@param userCount - amount of users in the array users[]
-@return int - returns 1 or 0
-*/
+// === Function Prototypes ===
 int registerUser (User *users, int *userCount);
-/* Login a user; returns pointer to User struct if successful, NULL otherwise
-
-@param users[] - contains the list of users
-@param userCount - amount of users in the array users[]
-@return User* - address of the user containing their ID, role, etc
-*/
 User* loginUser (User *users, int userCount);
-/* // Hash a password for storage; basic hash I found online "djb2", this is only temporary maybe depending how robust ung hash tignan
-
-@param password - input password as str
-@param outputHash - integers that contains the data for the password
-@return void
-*/
 void hashPassword (const char *password, unsigned long *outputHash);
-// Save user to TXT file, return 1 if success, 0 otherwise
 int saveAllUsersToFile (User *users, int userCount, const char *filename);
-// Load user from TXT file, return count of users
 int loadUsersFromFile (User *users, const char *filename);
-// Forgot password / Password recovery
-/* Allows user to reset passwords. Uses username for validity check before user can change password
-
-@return 0 or 1 if success or not
-*/
 int forgotPassword (User *users, int userCount, const char *username);
+int getUserID (User *users, int userCount);
+void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]);
+void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]);
+void patientDashboard(User *currentUser, User *users, Patient *patients, int *patientCount, Referral *referrals, int referralCount);
 
-// PATIENT LOGGING
-// Set patient ID, name, age, contact in a new log
-Patient addPatient ();
-// to initialize values for new patient
+Patient addPatient (User *currentUser, Patient *patients, int patientCount);
 void initPatient (Patient *patient);
-// Diagnose a patient
 void diagnosePatient (Patient *patients, int patientCount);
-// Show past diagnosis report
 void showDiagnosisReport (Patient *currentPatient);
-// Calculate BMI
+int getPatientID (Patient *patients, int patientCount);
 void calculateBMI (Patient *patient, const float weight, const float height);
-// Convert mg/dL to mmol
 double mmol_conv (double mgdl);
-// Calculate Risk
-void calculateCardioRisk(Patient *patient);
-// Save patient to file
+void calculateCardioRisk (Patient *patient);
 int saveAllPatientsToFile (Patient *patients, int patientCount, const char *filename);
-// Load patient to file
 int loadPatientsFromFile (Patient *patients, const char *filename);
-// Edit patient ID, name, age, contact
 void editPatient (Patient *patient, int count);
-// Delete patient
 void deletePatient (Patient *patient, int *count);
-// Shows list of patients
 void showPatients (Patient *patient, int count);
+void computeAverages(double data[][2], int patientCount);
+void sortPatientsByID (Patient *patients, int patientCount, User *users, int userCount, int order);
+void sortPatientsByName (Patient *patients, int patientCount, int order);
 
-// REFERRAL MANAGEMENT
-// create referral
 void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
 void editReferral (Referral *referrals, int referralCount);
 void deleteReferral (Referral *referrals, int *count);
-void selectReferral (int referralID);
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
 int loadReferralsFromFile (Referral *referrals, const char *filename);
-
-// UTILITIES SORTING SEARCHING
-// User findUserByName ();
-// User findUserByID (int userID);
-void sortPatientsByName(Patient *patients, int count);

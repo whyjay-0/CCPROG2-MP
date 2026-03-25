@@ -10,7 +10,7 @@ int main () {
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
 	int referralCount = loadReferralsFromFile(referrals, "referrals.txt");
 	
-	int exit=0, choice=0, gp=0, specialist=0, patient=0, crudEnd=0;
+	int exit=0, choice=0;
 	int newUser; // userID of new users
 	double data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
 	// 2D array here, for bmi and risk computation, averages.
@@ -36,10 +36,10 @@ int main () {
 				}
 				else {
 					if (strcmp(currentUser->role,"GP")==0){
-						gpDashboard(currentUser,patients,&patientCount,users,userCount,referrals,&referralCount,data[][2]);
+						gpDashboard(currentUser,patients,&patientCount,users,userCount,referrals,&referralCount,data);
 					}
 					else if (strcmp(currentUser->role,"Specialist")==0){
-						specialistDashboard(currentUser,users,referrals,referralCount,patients,patientCount,data[][2]);
+						specialistDashboard(currentUser,users,userCount,referrals,referralCount,patients,patientCount,data);
 						// Dashboard function for each user
 						// they will be able to see list of referrals and patients connected to referral
 						// after selecting a patient, they will be able to see their diagnosis report
@@ -47,7 +47,7 @@ int main () {
 						// and after selecting, print patient details
 					}
 					else if (strcmp(currentUser->role,"Patient")==0){
-						patientDashboard(currentUser,users,patients,patientCount,referrals,referralCount);
+						patientDashboard(currentUser,users,patients,&patientCount,referrals,referralCount);
 						// Dashboard function for each user
 						// Patients should be able to add themself as patient to edit their details.
 						// Within their main menu (dashboard), they will see their details (username, name, age, userID, bmi, role)

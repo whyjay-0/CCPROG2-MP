@@ -237,39 +237,6 @@ User findUserByID (int userID){ // returns User being searched for
 // we could also apply to list of patients within patient_management.c
 // and referral list,,, this is where referral date might be good
 */
-void sortPatientsByName(Patient *patients, int count) { //uses selection sort
-    Patient tempArr[100];
-    int i, j, minIndex;
-    Patient temp;
-
-    // copy original array to tempArr,, temporary sorting?
-    for (i = 0; i < count; i++) {
-        tempArr[i] = patients[i];
-    }
-
-    // selection sort
-    for (i = 0; i < count - 1; i++) {
-        minIndex = i;
-        for (j = i + 1; j < count; j++) {
-            if (strcmp(tempArr[j].name, tempArr[minIndex].name) < 0) {
-                minIndex = j;
-            }
-        }
-
-        // Swap tempArr[i] and tempArr[minIndex]
-        if (minIndex != i) {
-            temp = tempArr[i];
-            tempArr[i] = tempArr[minIndex];
-            tempArr[minIndex] = temp;
-        }
-    }
-
-    // print sorted patients
-    printf("---- SORTED PATIENTS BY NAME (A-Z) ----\n");
-    for (i = 0; i < count; i++) {
-        printf("%s | Age: %d | BMI: %.2f\n", tempArr[i].name, tempArr[i].age, tempArr[i].bmi);
-    }
-}
 
 /*
 2D arrays will be implemented through computation averages of BMI and CardioRisk for Specialists

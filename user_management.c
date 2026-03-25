@@ -87,7 +87,7 @@ int registerUser (User *users, int *userCount){
 				}
 			} while (validChoice==0);
 		}
-		newUser.userID = getUserID(users, userCount); // set the userID of new user to old usercount + 1
+		newUser.userID = getUserID(users, *userCount); // set the userID of new user to old usercount + 1
 		users[*userCount] = newUser; //set the array of struct at index *userCount to the newUser made
 		index = *userCount; //the index of the user before it is incremented
 		(*userCount)++; // increase amount of users
@@ -263,7 +263,7 @@ int getUserID (User *users, int userCount){
 // User Dashboards
 // GP Dashboard
 void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]){
-	int choice = -1;
+	int i, choice = -1, pchoice = -1, order = -1;
 	
     do{
         printf("\n==== GP DASHBOARD ====\n");
@@ -281,22 +281,23 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
         switch(choice){
             case 1:
                 if (*patientCount < MAX_USERS){
-                    patients[*patientCount] = addPatient(currentUser,patients,patientCount);
+                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount);
                     (*patientCount)++;
                 }
                 else
                 	printf("Reached max patient count.");
-                saveAllPatientsToFile(patients,patientCount,"patients.txt");
+                saveAllPatientsToFile(patients,*patientCount,"patients.txt");
                 break;
 			
             case 2:
                 do{
-            		showPatients(patients,patientCount);
+            		showPatients(patients,*patientCount);
             		printf("\n==== Patient CRUD ====\n");
-            		printf("1. Search patient by patientID");
-            		printf("2. Search patient by name");
-            		printf("3. Sort patient by userID");
-            		printf("4. Sort patient by name");
+            		printf("1. Search patient by patientID\n");
+            		printf("2. Search patient by name\n");
+            		printf("3. Sort patient by userID\n");
+            		printf("4. Sort patient by name\n");
+            		printf("0. Exit\n");
             		printf("Choice: ");
             		scanf(" %d",&pchoice);
             		
@@ -309,12 +310,12 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
             				scanf(" %d",&order);
-            				sortPatientsByID(patients, patientCount, order);
+            				sortPatientsByID(patients, *patientCount, users, userCount, order);
             				break;
             			case 4:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
             				scanf(" %d",&order);
-            				sortPatientsByName(patients, patientCount, order);
+            				sortPatientsByName(patients, *patientCount, order);
             				break;
             			default:
             				printf("Invalid input.\n");
@@ -334,7 +335,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 saveAllPatientsToFile(patients,patientCount,"patients.txt");
                 break;*/
             case 6:
-                showReferrals(currentUser,users,referrals,referralCount);
+                showReferrals(currentUser,users,referrals,*referralCount);
                 // saveAllReferralsToFile(referrals,referralCount,"referrals.txt"); SAVE WHEN CREATING REFERRALS
                 break;
             case 7:
@@ -353,8 +354,8 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
     } while(choice!=0);
 }
 
-void specialistDashboard(User *currentUser, User *users, Referral *referrals, int referralCount, Patient *patients, int patientCount, float data[][2]){
-	int choice=-1, pchoice=-1, uchoice=-1, order=-1;
+void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]){
+	int i, choice=-1, pchoice=-1, uchoice=-1, order=-1;
 	
     do{
         printf("\n==== SPECIALIST DASHBOARD ====\n");
@@ -369,7 +370,7 @@ void specialistDashboard(User *currentUser, User *users, Referral *referrals, in
         
         switch(choice){
             case 1:
-                showReferrals(currentUser, referrals, referralCount);
+                showReferrals(currentUser, users, referrals, referralCount);
                 break;
             case 2:
                 editReferral(referrals, referralCount);
@@ -394,7 +395,7 @@ void specialistDashboard(User *currentUser, User *users, Referral *referrals, in
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
             				scanf(" %d",&order);
-            				sortPatientsByID(patients, patientCount, order);
+            				sortPatientsByID(patients, patientCount, users, userCount,order);
             				break;
             			case 4:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
@@ -442,15 +443,16 @@ void patientDashboard(User *currentUser, User *users, Patient *patients, int *pa
     	switch(choice){
     		case 1:
     			if (*patientCount < MAX_USERS){
-                    patients[*patientCount] = addPatient(currentUser,patients,patientCount);
+                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount);
                     (*patientCount)++;
                 }
-                else
+                else{
                 	printf("Max patient count reached.");
+				}
     			break;
     		case 2:
     			printf("\n===== Diagnosis reports ====\n");
-    			for (i=0;i<patientCount;i++){
+    			for (i=0;i<*patientCount;i++){
 			        if (strcmp(patients[i].name,currentUser->name)==0){
 			            showDiagnosisReport(&patients[i]);
 			            found=1;

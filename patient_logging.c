@@ -11,11 +11,12 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount){
 	int valid=0;
 	float weight,height;
 	char strInput[101];
+	
 	initPatient(&newPatient);
 	
-	if (strcmp(currentUser.role, "Patient")==0){
+	if (strcmp(currentUser->role, "Patient")==0){
 		// auto input of name, since patient can only add themself
-		strcpy(newPatient.name,currentUser.name);
+		strcpy(newPatient.name,currentUser->name);
 		printf("Patient name: %s\n", newPatient.name);
 	}
 	else{
@@ -252,7 +253,9 @@ void diagnosePatient (Patient *patients, int patientCount){
 		// Details
 		printf("Patient: %s\n", currentPatient.name);
 		printf("Age: %d\nGender: %c\n", currentPatient.age, currentPatient.gender);
-		printf("BMI: %f\n\n", currentPatient.bmi);
+		printf("BMI: %f, %s\n", currentPatient.bmi, currentPatient.bmiCat);
+		printf("Blood Pressure: %s\n", currentPatient.bp);
+		printf("Blood Sugar: %d mg/dL\n", currentPatient.bloodSugar);
 		// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 		// Temporary interpretations Changes might be made once AHA provides proper source code.
 		if (currentPatient.age>=30 && currentPatient.age<=79 && currentPatient.currentCVD=='N'){
@@ -293,7 +296,9 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 		// Details
 		printf("Patient: %s\n", currentPatient->name);
 		printf("Age: %d\nGender: %c\n", currentPatient->age, currentPatient->gender);
-		printf("BMI: %f\n\n", currentPatient->bmi);
+		printf("BMI: %f, %s\n", currentPatient->bmi, currentPatient->bmiCat);
+		printf("Blood Pressure: %s\n", currentPatient->bp);
+		printf("Blood Sugar: %d mg/dL\n", currentPatient->bloodSugar);
 		// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 		// Temporary interpretations Changes might be made once AHA provides proper source code.
 		if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
@@ -334,8 +339,8 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 int getPatientID (Patient *patients, int patientCount){
 	int i,max=0;
 	for (i=0;i<patientCount;i++){
-		if (patient[i].patientID > max){
-			max = patient[i].patientID;
+		if (patients[i].patientID > max){
+			max = patients[i].patientID;
 		}
 	}
 	return max + 1;
@@ -529,7 +534,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 			Patient temp;
 			int result = fscanf(fp,
 								"%d,%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
-								temp.patientID,
+								&temp.patientID,
 								temp.name,
     							&temp.age,
     							&temp.gender,
@@ -724,15 +729,15 @@ void sortPatientsByID (Patient *patients, int patientCount, User *users, int use
 	Patient temp;
 	
 	for (i=0;i<patientCount-1;i++){
-		index = i // sorted portion at i
+		index = i; // sorted portion at i
 		// search/select
 		for (j=i+1;j<patientCount;j++){
 			if (order==1){ // ascending
-				if(patients[j].patientID < patients[minMaxIndex].patientID)
+				if(patients[j].patientID < patients[index].patientID)
 					index = j;
 			}
 			else { // descending
-				if(patients[j].patientID > patients[minMaxIndex].patientID)
+				if(patients[j].patientID > patients[index].patientID)
 					index = j;
 			}
 		}
@@ -751,15 +756,15 @@ void sortPatientsByName (Patient *patients, int patientCount, int order){
 	Patient temp;
 	
 	for (i=0;i<patientCount-1;i++){
-		index = i // sorted portion at i
+		index = i; // sorted portion at i
 		for (j=i+1;j<patientCount;j++){
 			if (order==1){ // ascending
-				if(strcmp(patients[j].name, patients[minMaxIndex].name) < 0)
+				if(strcmp(patients[j].name, patients[index].name) < 0)
 					index = j;
 			}
 			else { // descending
-				if(strcmp(patients[j].name, patients[minMaxIndex].name) > 0)
-					index = j
+				if(strcmp(patients[j].name, patients[index].name) > 0)
+					index = j;
 			}
 		}
 		// swap
