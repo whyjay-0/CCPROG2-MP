@@ -1,2 +1,3 @@
-1, whyjay, 512473498, GP, Yerachmiel Jannes C. Navarrosa
-2, letran, 193432059, Patient, Jessica Letran
+0, Patient1, 193432059, Patient, Patient 1
+0, Patient2, 193432059, Patient, Patient 2
+0, Patient 1, 193432059, Patient, Patient 1

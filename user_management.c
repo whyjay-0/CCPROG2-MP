@@ -274,16 +274,30 @@ int forgotPassword (User *users, int userCount, const char *username){
 
 // Finds max userID and sets new userID to be used
 int getUserID (User *users, Patient *patients){
-	int i,max=0;
+	int i,id,max=-1;
+	int isEmpty=1;
+	// check if there are no users
 	for (i=0;i<MAX_USERS;i++){
 		if (users[i].userID > max){
 			max = users[i].userID;
-		}
-		if (patients[i].userID > max){
-			max = patients[i].userID;
+			isEmpty=0;
 		}
 	}
-	return max + 1;
+	
+	for (i=0;i<MAX_USERS;i++){
+		if (patients[i].userID > max){
+			max = patients[i].userID;
+			isEmpty=0;
+		}
+	}
+	
+	if (isEmpty){
+		id = 1;
+	}
+	else{
+		id = max + 1;
+	}
+	return id;
 }
 
 // User Dashboards
@@ -304,7 +318,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
         switch(choice){
             case 1:
                 if (*patientCount < MAX_USERS){
-                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount);
+                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount,users,userCount);
                     (*patientCount)++;
                 }
                 else
@@ -326,10 +340,10 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             		
             		switch(pchoice){
             			case 1:
-            				selectPatientID(patients,&patientCount,referrals,users,currentUser,userCount,&referralCount);
+            				selectPatientID(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
 							break;
             			case 2:
-            				selectPatientName(patients,&patientCount,referrals,users,currentUser,userCount,&referralCount);
+            				selectPatientName(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
 							break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
@@ -391,7 +405,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
         switch(choice){
             case 1:
                 do{
-                	showReferrals(currentUser,users,referrals,*referralCount);
+                	showReferrals(currentUser,users,referrals,referralCount);
                 	printf("\n==== Referral CRUD ====\n");
             		printf("1. Select referrals by ID\n");
             		printf("2. Sort referrals by ID\n");
@@ -452,7 +466,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
     } while(choice!=0);
 }
 
-void patientDashboard(User *currentUser, User *users, Patient *patients, int *patientCount, Referral *referrals, int referralCount){
+void patientDashboard(User *currentUser, User *users, int userCount, Patient *patients, int *patientCount, Referral *referrals, int referralCount){
     int i, found=0, choice=-1;
 
     do{
@@ -467,7 +481,7 @@ void patientDashboard(User *currentUser, User *users, Patient *patients, int *pa
     	switch(choice){
     		case 1:
     			if (*patientCount < MAX_USERS){
-                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount);
+                    patients[*patientCount] = addPatient(currentUser,patients,*patientCount,users,userCount);
                     (*patientCount)++;
                 }
                 else{
@@ -503,7 +517,7 @@ int findUserByID (User *users, int userCount, int input){
 	for (i=0;i<userCount;i++){
 		if (users[i].userID == input){
 			index = i;
-			i = patientCount; // end loop
+			i = userCount; // end loop
 		}
 	}
 	

@@ -6,7 +6,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	// select patient by entering name,,, would search by strcmp name and strcmp role
 	// select specialist by entering name,,, would search by strcmp name and strcmp role
 	// save referral
-	int i,found=0,choice=-1, index, valid=0, input;
+	int found=0,choice=-1, index, valid=0, input;
 	char strInput[101];
 	Referral newReferral;
 	User specialist;
@@ -18,7 +18,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	strcpy(newReferral.PatientName,currentPatient->name);
 	
 	printf("Referring Patient: %s\n", newReferral.PatientName);
-	if (currentPatient.isDiagnosed=='Y'){
+	if (currentPatient->isDiagnosed=='Y'){
 		printf("Enter details of specialist by:\n1. ID\n2. Name\nChoice: ");
 		scanf(" %d", &choice);
 		switch(choice){
@@ -26,11 +26,11 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 				do{
 					// show users func, lists all users but only specialists.
 					printf("Enter user ID to select: ");
-					valid = scanf(" %d", input);
+					valid = scanf(" %d", &input);
 					if (valid != 1){
 						// invalid input
 						printf("Invalid input.\n");
-						scanf("%*s") // clear input
+						scanf("%*s"); // clear input
 					}
 				} while(valid==0);
 			
@@ -66,7 +66,6 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 			(*referralCount)++; // increase amount of referrals
 			
 			saveAllReferralsToFile(referrals, *referralCount, "referrals.txt");
-			}
 		}
 	}
 	else {

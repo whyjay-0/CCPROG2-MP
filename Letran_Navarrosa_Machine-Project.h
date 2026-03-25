@@ -51,20 +51,23 @@ typedef struct {
 } Referral;
 
 // === Function Prototypes ===
-int registerUser (User *users, int *userCount);
+int registerUser (User *users, int *userCount, Patient *patients, int patientCount);
 User* loginUser (User *users, int userCount);
 void hashPassword (const char *password, unsigned long *outputHash);
 int saveAllUsersToFile (User *users, int userCount, const char *filename);
 int loadUsersFromFile (User *users, const char *filename);
 int forgotPassword (User *users, int userCount, const char *username);
-int getUserID (User *users, int userCount);
+int getUserID (User *users, Patient *patients);
 void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]);
 void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]);
-void patientDashboard(User *currentUser, User *users, Patient *patients, int *patientCount, Referral *referrals, int referralCount);
+void patientDashboard(User *currentUser, User *users, int userCount, Patient *patients, int *patientCount, Referral *referrals, int referralCount);
+int findUserByID (User *users, int userCount, int input);
+int findUserByName (User *users, int userCount, char *input);
+void printUsers (User *users, int userCount, char *filter);
 
-Patient addPatient (User *currentUser, Patient *patients, int patientCount);
+Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);
-void diagnosePatient (Patient *patients, int patientCount);
+void diagnosePatient (Patient *patient);
 void showDiagnosisReport (Patient *currentPatient);
 int getPatientID (Patient *patients, int patientCount);
 void calculateBMI (Patient *patient, const float weight, const float height);
@@ -72,16 +75,22 @@ double mmol_conv (double mgdl);
 void calculateCardioRisk (Patient *patient);
 int saveAllPatientsToFile (Patient *patients, int patientCount, const char *filename);
 int loadPatientsFromFile (Patient *patients, const char *filename);
-void editPatient (Patient *patient, int count);
-void deletePatient (Patient *patient, int *count);
+void editPatient (Patient *patient);
+void deletePatient (Patient *patients, int *patientCount, int index);
 void showPatients (Patient *patient, int count);
 void computeAverages(double data[][2], int patientCount);
 void sortPatientsByID (Patient *patients, int patientCount, int order);
 void sortPatientsByName (Patient *patients, int patientCount, int order);
+int findPatientByID (Patient *patients, int patientCount, int input);
+int findPatientByName (Patient *patients, int patientCount, char *input);
+void selectPatientID (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
+void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
 
-void createReferral (Referral *referrals, User *users, Patient *patients, User currentUser, int patientCount, int userCount, int *referralCount);
+void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
 void editReferral (Referral *referrals, int referralCount);
 void deleteReferral (Referral *referrals, int *count);
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
 int loadReferralsFromFile (Referral *referrals, const char *filename);
+void sortReferralsByID (Referral *referrals, int referralCount, int order);
+void sortReferralsByPatient (Referral *referrals, int referralCount, int order);

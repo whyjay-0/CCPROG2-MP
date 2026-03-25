@@ -1,10 +1,10 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 
 int main () {
-	User users[MAX_USERS];
+	User users[MAX_USERS] = {0};
 	User *currentUser;
-	Patient patients[MAX_USERS];
-	Referral referrals[MAX_USERS];
+	Patient patients[MAX_USERS] = {0};
+	Referral referrals[MAX_USERS] = {0};
 	
 	int userCount = loadUsersFromFile(users, "users.txt");
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
@@ -14,15 +14,18 @@ int main () {
 	int newUser; // userID of new users
 	double data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
 	// 2D array here, for bmi and risk computation, averages.
-	printf("User count: %d\n", userCount);
+	// printf("User count: %d\n", userCount);
 	do{
 		// design for main menu/login screen here
+		printf("1. Register account\n");
+		printf("2. Login\n");
+		printf("3. Exit program\n");
 		printf("Input choice: "); // design nalang later
 		scanf("%d",&choice);
 		
 		switch (choice){
 			case 1: // Registration
-				newUser = registerUser(users, &userCount); // registerUser returns -1 if not valid registration
+				newUser = registerUser(users, &userCount, patients, patientCount); // registerUser returns -1 if not valid registration
 				if (newUser != -1){
 					saveAllUsersToFile(users, userCount, "users.txt");
 					printf("User saved successfully!\n");
@@ -47,7 +50,7 @@ int main () {
 						// and after selecting, print patient details
 					}
 					else if (strcmp(currentUser->role,"Patient")==0){
-						patientDashboard(currentUser,users,patients,&patientCount,referrals,referralCount);
+						patientDashboard(currentUser,users,userCount,patients,&patientCount,referrals,referralCount);
 						// Dashboard function for each user
 						// Patients should be able to add themself as patient to edit their details.
 						// Within their main menu (dashboard), they will see their details (username, name, age, userID, bmi, role)
@@ -62,6 +65,7 @@ int main () {
 				}
 				break;
 			case 3: // Exit
+				printf("Exiting program...\n");
 				exit=1;
 				break;
 			default: 
