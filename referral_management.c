@@ -10,14 +10,14 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	char strInput[101];
 	Referral newReferral;
 	User specialist;
-	newReferral.ReferralID = 0;
-	newReferral.GPID = 0;
-	newReferral.SpecialistID = 0;
+	newReferral.referralID = 0;
+	newReferral.gpID = 0;
+	newReferral.specialistID = 0;
 	
 	strcpy(newReferral.status, "");
-	strcpy(newReferral.PatientName,currentPatient->name);
+	strcpy(newReferral.patientName,currentPatient->name);
 	
-	printf("Referring Patient: %s\n", newReferral.PatientName);
+	printf("Referring Patient: %s\n", newReferral.patientName);
 	if (currentPatient->isDiagnosed=='Y'){
 		printf("Enter details of specialist by:\n1. ID\n2. Name\nChoice: ");
 		scanf(" %d", &choice);
@@ -54,13 +54,13 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 				printf("Invalid choice.\n");
 		}
 		if (found){
-			newReferral.SpecialistID = specialist.userID; // found specialist
-			newReferral.GPID = currentUser.userID; // assumed current user is GP
+			newReferral.specialistID = specialist.userID; // found specialist
+			newReferral.gpID = currentUser.userID; // assumed current user is GP
 				
 			strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
 				
 			// setting new ID for referral
-			newReferral.ReferralID = *referralCount + 1; // set the referralID of new referral to old referralCount + 1
+			newReferral.referralID = *referralCount + 1; // set the referralID of new referral to old referralCount + 1
 			referrals[*referralCount] = newReferral; //set the array of struct at index *referrakCount to the newReferral made
 			// index = *userCount; // can be used if we want to return ID of the new referral
 			(*referralCount)++; // increase amount of referrals
@@ -113,7 +113,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
 		}
     }
 
-    if (!found){
+    if (found==0){
         printf("No referrals found.\n");
     }
 }
@@ -148,7 +148,7 @@ void editReferral (Referral *referrals, int referralCount){
         }
     }
 	
-    if (!found){
+    if (found==0){
         printf("Referral not found.\n");
     }
 }
@@ -173,7 +173,7 @@ void deleteReferral (Referral *referrals, int *count){
         }
     }
 	
-    if (!found){
+    if (found==0){
         printf("Referral not found.\n");
     }
 }
@@ -258,7 +258,7 @@ void sortReferralsByID (Referral *referrals, int referralCount, int order){
 	}
 }
 
-void sortReferralsByPatient (Referral *referrals, int referralCount, int order){
+void sortReferralsByStatus (Referral *referrals, int referralCount, int order){
 	int i, j, index;
 	Referral temp;
 	
@@ -266,11 +266,11 @@ void sortReferralsByPatient (Referral *referrals, int referralCount, int order){
 		index = i; // sorted portion at i
 		for (j=i+1;j<referralCount;j++){
 			if (order==1){ // ascending
-				if(strcmp(referrals[j].PatientName, referrals[index].PatientName) < 0)
+				if(strcmp(referrals[j].status, referrals[index].status) < 0)
 					index = j;
 			}
 			else { // descending
-				if(strcmp(referrals[j].PatientName, referrals[index].PatientName) > 0)
+				if(strcmp(referrals[j].status, referrals[index].status) > 0)
 					index = j;
 			}
 		}
@@ -280,6 +280,83 @@ void sortReferralsByPatient (Referral *referrals, int referralCount, int order){
 			referrals[i] = referrals[index];
 			referrals[index] = temp;
 		}
+	}
+}
+
+int findReferralByID (Referral *referrals, int referralCount, int input){
+	int i, index=-1;
+	for (i=0;i<referralCount;i++){
+		if (referrals[i].referralID == input){
+			index = i;
+			i = referralCount; // end loop
+		}
+	}
+	
+	return index;
+}
+
+void selectReferralID (User *currentUser, Referral *referrals, int *referralCount){
+	int input, choice;
+	int index, valid=0;
+	
+	do{
+		printf("Enter Referral ID to select: ");
+		valid = scanf(" %d", &input);
+		if (valid==0){
+			scanf("%*[^\n]"); // clear inputs until newline
+			printf("Invalid input.\n\n");
+		}
+	} while(valid==0);
+	
+	
+	index = findReferralByID(referrals,*referralCount,input);
+	
+	if (index == -1){
+		printf("Patient not found.\n");
+	}
+	else if (strcmp(currentUser.role,"GP")==0 && index!=-1){
+		do{
+			showReferrals();
+			printf("\n==== Referral CRUD ====\n");
+			printf("1. Delete Referral\n");
+			printf("0. Exit\n");
+			printf("Choice: ");
+    	    scanf(" %d", &choice);
+    	    
+    	    switch(choice){
+    	    	case 1:
+    	    		deleteReferral();
+    	    		break;
+				case 0:
+    	    		printf("Exiting...\n\n");
+    	    		break;
+			}
+		} while (choice!=0);
+	}
+	else if (strcmp(currentUser.role,"Specialist")==0 && index!=-1){
+		do{
+			showReferrals();
+			printf("\n==== Referral CRUD ====\n");
+			printf("1. Edit status of referral\n");
+    	    printf("2. Delete referral\n");
+    	    printf("0. Exit\n");
+    	    printf("Choice: ");
+    	    scanf(" %d", &choice);
+    	    
+    	    switch(choice){
+    	    	case 1:
+   		     		editReferral();
+    	    		break;
+    	    	case 2:
+    	    		deleteReferral();
+    	    		break;
+    	    	case 0:
+    	    		printf("Exiting...\n\n");
+    	    		break;
+    	    	default:
+    	    		printf("Invalid input.\n");
+			}
+		} while(choice!=0);
 	}
 }
 

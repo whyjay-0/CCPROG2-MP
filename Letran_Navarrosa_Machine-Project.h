@@ -41,10 +41,10 @@ typedef struct {
 	char isDiagnosed; // Will show if patient has been diagnosed or not
 } Patient;
 typedef struct {
-	int ReferralID; // Referral ID
-	int GPID; // GP user ID
-	char PatientName[101]; // Patient Name
-	int SpecialistID; // Specialist user ID
+	int referralID; // Referral ID
+	int gpID; // GP user ID
+	char patientName[101]; // Patient Name
+	int specialistID; // Specialist user ID
 	char status[31]; // "Pending" "Accepted" "Completed" "Rejected"
 	// maybe date?? pero we'll need to remake most to include date too for it to make sense T~T
 	// reason for referral maybe wag na mas simple na referral system kahit medyo di nagmamake sense

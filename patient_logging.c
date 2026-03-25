@@ -32,6 +32,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 			}
 		} while(valid==0);
 		valid=0;
+		
+		/* TODO (#1#): If a patient with an account is added (WITH 
+		               SIMILAR NAME). They should be prompted so 
+		               that userID set within patient struct is the same 
+		               as their account. */
+		
+		
+		
 	}
 	
 	// input age
@@ -783,8 +791,9 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 		valid = scanf(" %d", &input);
 		if (valid != 1){
 			// invalid input
-			printf("Invalid input.\n");
-			scanf("%*s"); // clear input
+			scanf("%*[^\n]");
+			printf("Invalid input.\n\n");
+			 // clear input
 		}
 	} while(valid==0);
 	

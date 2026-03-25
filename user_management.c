@@ -274,9 +274,10 @@ int forgotPassword (User *users, int userCount, const char *username){
 
 // Finds max userID and sets new userID to be used
 int getUserID (User *users, Patient *patients){
-	int i,id,max=-1;
+	int i,id,max=-1; // -1 since -1 < 0,, avoiding recurring 0 for userID, but will cause userID to start from 1
 	int isEmpty=1;
 	// check if there are no users
+	
 	for (i=0;i<MAX_USERS;i++){
 		if (users[i].userID > max){
 			max = users[i].userID;
@@ -291,8 +292,8 @@ int getUserID (User *users, Patient *patients){
 		}
 	}
 	
-	if (isEmpty){
-		id = 1;
+	if (isEmpty == 1){
+		id = 0;
 	}
 	else{
 		id = max + 1;
@@ -355,10 +356,14 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				scanf(" %d",&order);
             				sortPatientsByName(patients, *patientCount, order);
             				break;
+            			case 0:
+            				printf("Exiting...\n");
+            				break;
             			default:
             				printf("Invalid input.\n");
 					}
 				} while(pchoice!=0);
+				saveAllPatientsToFile(patients,patientCount,"patients.txt");
                 break;
             case 3:
                 do{
@@ -366,13 +371,36 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 	printf("\n==== Referral CRUD ====\n");
             		printf("1. Select referrals by ID\n");
             		printf("2. Sort referrals by ID\n");
-            		printf("3. Sort referrals by Status?\n");
+            		printf("3. Sort referrals by Status\n");
             		printf("0. Exit\n");
             		printf("Choice: ");
+            		
+            		scanf(" %d",&rchoice);
+            		
+            		switch(rchoice){
+            			case 1:
+            				/* TODO (#2#): selectReferralID and other CRUD */
+							// selectReferralIDbyGP();
+							// after selecting GP should be able to their own referrals
+							break;
+            			case 2:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortReferralsByID(referrals,*referralCount,order);
+            				break;
+            			case 3:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortReferralsByStatus(referrals,*referralCount,order);
+            				break;
+            			case 0:
+            				printf("Exiting...\n");
+            				break;
+            			default:
+            				printf("Invalid input.\n");
+					}
 				} while(rchoice!=0);
-				
-                
-                // saveAllReferralsToFile(referrals,referralCount,"referrals.txt"); SAVE WHEN CREATING REFERRALS
+                saveAllReferralsToFile(referrals,referralCount,"referrals.txt");
                 break;
             case 4:
             	for (i=0;i<*patientCount;i++){
@@ -382,8 +410,8 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 computeAverages(data,*patientCount);
                 break;
             case 0:
-                printf("Logging out...\n");
-                break;
+    			printf("Logging out...\n\n");
+    			break;
             default:
                 printf("Invalid input.\n");
         }
@@ -395,9 +423,8 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
     do{
         printf("\n==== SPECIALIST DASHBOARD ====\n");
         printf("1. Show Referrals\n");
-        printf("2. Update Referral Status\n");
-        printf("3. Show patient list.\n");
-        printf("4. Compute Averages (BMI + Cardio Risk)\n");
+        printf("2. Show patient list.\n");
+        printf("3. Compute Averages (BMI + Cardio Risk)\n");
         printf("0. Logout\n");
         printf("Choice: ");
         scanf(" %d",&choice);
@@ -405,19 +432,42 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
         switch(choice){
             case 1:
                 do{
-                	showReferrals(currentUser,users,referrals,referralCount);
+                	showReferrals(currentUser,users,referrals,*referralCount);
                 	printf("\n==== Referral CRUD ====\n");
             		printf("1. Select referrals by ID\n");
             		printf("2. Sort referrals by ID\n");
-            		printf("3. Sort referrals by Status?\n");
+            		printf("3. Sort referrals by Status\n");
             		printf("0. Exit\n");
             		printf("Choice: ");
+            		
+            		scanf(" %d",&rchoice);
+            		
+            		switch(rchoice){
+            			case 1:
+            				/* TODO (#2#): selectReferralID and other CRUD */
+							// selectReferralIDbyGP();
+							// after selecting Specialist should be able to edit, delete, 
+							break;
+            			case 2:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortReferralsByID(referrals,*referralCount,order);
+            				break;
+            			case 3:
+            				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
+            				scanf(" %d",&order);
+            				sortReferralsByStatus(referrals,*referralCount,order);
+            				break;
+            			case 0:
+            				printf("Exiting...\n");
+            				break;
+            			default:
+            				printf("Invalid input.\n");
+					}
 				} while(rchoice!=0);
+				saveAllReferralsToFile(referrals,referralCount,"referrals.txt");
                 break;
             case 2:
-                editReferral(referrals, referralCount);
-                break;
-            case 3:
             	do{
             		showPatients(patients,patientCount);
             		printf("\n==== Patient CRUD ====\n");
@@ -425,6 +475,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             		printf("2. Select patient by name\n");
             		printf("3. Sort patient by userID\n");
             		printf("4. Sort patient by name\n");
+            		printf("0. Exit\n");
             		printf("Choice: ");
             		scanf(" %d",&pchoice);
             		
@@ -445,12 +496,16 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				scanf(" %d",&order);
             				sortPatientsByName(patients, patientCount, order);
             				break;
+            			case 0:
+            				printf("Exiting...\n");
+            				break;
             			default:
             				printf("Invalid input.\n");
 					}
 				} while(pchoice!=0);
+				saveAllPatientsToFile(patients,patientCount,"patients.txt");
             	break;
-            case 4:
+            case 3:
             	for (i=0;i<patientCount;i++){
             		data[i][0] = patients[i].bmi;
             		data[i][1] = patients[i].cardioRisk;
@@ -458,8 +513,8 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             	computeAverages(data,patientCount);
             	break;
             case 0:
-            	printf("Logging out...\n");
-                break;
+    			printf("Logging out...\n\n");
+    			break;
             default:
                 printf("Invalid input.\n");
         }
@@ -487,6 +542,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
                 else{
                 	printf("Max patient count reached.");
 				}
+				saveAllPatientsToFile(patients,patientCount,"patients.txt");
     			break;
     		case 2:
     			printf("\n===== Diagnosis report ====\n\n");
@@ -504,7 +560,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
     			showReferrals(currentUser, users, referrals, referralCount);
     			break;
     		case 0:
-    			printf("Logging out...\n");
+    			printf("Logging out...\n\n");
     			break;
     		default:
     			printf("Invalid input.\n");
