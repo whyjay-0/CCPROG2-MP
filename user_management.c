@@ -308,11 +308,11 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 	
     do{
         printf("\n==== GP DASHBOARD ====\n");
-        printf("1. Add Patient\n");
-        printf("2. Show Patients\n");
-        printf("3. Show Referrals\n"); 
-        printf("4. Compute Averages (BMI + Cardio Risk)\n");
-        printf("0. Logout\n");
+        printf("[1] Add Patient\n");
+        printf("[2] Show Patients\n");
+        printf("[3] Show Referrals\n"); 
+        printf("[4] Compute Averages (BMI + Cardio Risk)\n");
+        printf("[0] Logout\n");
         printf("Choice: ");
         scanf(" %d",&choice);
 		
@@ -331,11 +331,11 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 do{
             		showPatients(patients,*patientCount);
             		printf("\n==== Patient CRUD ====\n");
-            		printf("1. Select patient by patientID\n");
-            		printf("2. Select patient by name\n");
-            		printf("3. Sort patient by userID\n");
-            		printf("4. Sort patient by name\n");
-            		printf("0. Exit\n");
+            		printf("[1] Select patient by patientID\n");
+            		printf("[2] Select patient by name\n");
+            		printf("[3] Sort patient by userID\n");
+            		printf("[4] Sort patient by name\n");
+            		printf("[0] Exit\n");
             		printf("Choice: ");
             		scanf(" %d",&pchoice);
             		
@@ -363,16 +363,16 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				printf("Invalid input.\n");
 					}
 				} while(pchoice!=0);
-				saveAllPatientsToFile(patients,patientCount,"patients.txt");
+				saveAllPatientsToFile(patients,*patientCount,"patients.txt");
                 break;
             case 3:
                 do{
                 	showReferrals(currentUser,users,referrals,*referralCount);
                 	printf("\n==== Referral CRUD ====\n");
-            		printf("1. Select referrals by ID\n");
-            		printf("2. Sort referrals by ID\n");
-            		printf("3. Sort referrals by Status\n");
-            		printf("0. Exit\n");
+            		printf("[1] Select referrals by ID\n");
+            		printf("[2] Sort referrals by ID\n");
+            		printf("[3] Sort referrals by Status\n");
+            		printf("[0] Exit\n");
             		printf("Choice: ");
             		
             		scanf(" %d",&rchoice);
@@ -400,7 +400,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				printf("Invalid input.\n");
 					}
 				} while(rchoice!=0);
-                saveAllReferralsToFile(referrals,referralCount,"referrals.txt");
+                saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
                 break;
             case 4:
             	for (i=0;i<*patientCount;i++){
@@ -422,22 +422,22 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 	int i, choice=-1, pchoice=-1, rchoice=-1, order=-1;
     do{
         printf("\n==== SPECIALIST DASHBOARD ====\n");
-        printf("1. Show Referrals\n");
-        printf("2. Show patient list.\n");
-        printf("3. Compute Averages (BMI + Cardio Risk)\n");
-        printf("0. Logout\n");
+        printf("[1] Show Referrals\n");
+        printf("[2] Show patient list.\n");
+        printf("[3] Compute Averages (BMI + Cardio Risk)\n");
+        printf("[0] Logout\n");
         printf("Choice: ");
         scanf(" %d",&choice);
         
         switch(choice){
             case 1:
                 do{
-                	showReferrals(currentUser,users,referrals,*referralCount);
+                	showReferrals(currentUser,users,referrals,referralCount);
                 	printf("\n==== Referral CRUD ====\n");
-            		printf("1. Select referrals by ID\n");
-            		printf("2. Sort referrals by ID\n");
-            		printf("3. Sort referrals by Status\n");
-            		printf("0. Exit\n");
+            		printf("[1] Select referrals by ID\n");
+            		printf("[2] Sort referrals by ID\n");
+            		printf("[3] Sort referrals by Status\n");
+            		printf("[0] Exit\n");
             		printf("Choice: ");
             		
             		scanf(" %d",&rchoice);
@@ -451,12 +451,12 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
             				scanf(" %d",&order);
-            				sortReferralsByID(referrals,*referralCount,order);
+            				sortReferralsByID(referrals,referralCount,order);
             				break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
             				scanf(" %d",&order);
-            				sortReferralsByStatus(referrals,*referralCount,order);
+            				sortReferralsByStatus(referrals,referralCount,order);
             				break;
             			case 0:
             				printf("Exiting...\n");
@@ -471,11 +471,11 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             	do{
             		showPatients(patients,patientCount);
             		printf("\n==== Patient CRUD ====\n");
-            		printf("1. Select patient by patientID\n");
-            		printf("2. Select patient by name\n");
-            		printf("3. Sort patient by userID\n");
-            		printf("4. Sort patient by name\n");
-            		printf("0. Exit\n");
+            		printf("[1] Select patient by patientID\n");
+            		printf("[2] Select patient by name\n");
+            		printf("[3] Sort patient by userID\n");
+            		printf("[4] Sort patient by name\n");
+            		printf("[0] Exit\n");
             		printf("Choice: ");
             		scanf(" %d",&pchoice);
             		
@@ -526,10 +526,10 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
 
     do{
     	printf("\n==== PATIENT DASHBOARD ====\n");
-    	printf("1. Add self as patient\n");
-    	printf("2. View diagnosis reports\n");
-    	printf("3. View referrals");
-    	printf("0. Logout\n");
+    	printf("[1] Add self as patient\n");
+    	printf("[2] View diagnosis reports\n");
+    	printf("[3] View referrals");
+    	printf("[0] Logout\n");
     	printf("Choice: ");
     	scanf(" %d",&choice);
     	
@@ -542,7 +542,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
                 else{
                 	printf("Max patient count reached.");
 				}
-				saveAllPatientsToFile(patients,patientCount,"patients.txt");
+				saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     			break;
     		case 2:
     			printf("\n===== Diagnosis report ====\n\n");

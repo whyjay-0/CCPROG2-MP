@@ -8,9 +8,10 @@ returns Patient* - for saving to the TXT file
 */
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount){
 	Patient newPatient;
-	int valid=0;
+	int valid=0, index;
 	float weight,height;
 	char strInput[101];
+	char choice;
 	
 	initPatient(&newPatient);
 	
@@ -24,6 +25,7 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 		do{
 			scanf(" %100[^\n]",strInput);
 			if (strlen(strInput)>100){
+				scanf("%*s"); // clear input
 				printf("Invalid name. Enter name again:\n");
 			}
 			else{
@@ -33,20 +35,50 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 		} while(valid==0);
 		valid=0;
 		
-		/* TODO (#1#): If a patient with an account is added (WITH 
-		               SIMILAR NAME). They should be prompted so 
-		               that userID set within patient struct is the same 
-		               as their account. */
+		index = findUserByName(users,userCount,newPatient.name);
 		
-		
-		
+		if (index!=-1){ // found user
+			// prompt
+			printf("A user with a similar name is a patient. Would you like to link their accounts? (Y/N): ");
+			valid=0;
+			while(valid==0){
+				scanf(" %c", &choice);
+				if (valid==0){
+					printf("Invalid input.\n");
+				}
+				else {
+					switch (choice){
+						case 'Y':
+						case 'y':
+							newPatient.patientID = getPatientID(patients, patientCount);
+							newPatient.userID = users[index].userID;
+							break;
+						case 'N':
+						case 'n':
+							newPatient.patientID = getPatientID(patients, patientCount);
+							newPatient.userID = getUserID(users, patients);
+							break;
+						default:
+							printf("Invalid choice.\n");
+					}
+				}
+			}
+		}
+		else { // no old user
+			newPatient.patientID = getPatientID(patients, patientCount); // set the userID of new user to old usercount + 1
+			newPatient.userID = getUserID(users, patients); // getting a new userID even if patient does not have account yet
+		}
 	}
 	
 	// input age
-	printf("Enter patient's age: ");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Enter your age: ");
+	else
+		printf("Enter patient's age: ");
 	do{
 		scanf("%d",&newPatient.age);
 		if (newPatient.age<=0){
+			scanf("%*s"); // clear input
 			printf("Invalid age. Enter valid age: \n");
 		}
 		else {
@@ -56,10 +88,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	valid=0;
 	
 	// input gender
-	printf("Enter patient's gender at birth (M/F): ");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Enter your gender at birth (M/F): ");
+	else
+		printf("Enter patient's gender at birth (M/F): ");
 	do{
 		scanf(" %c",&newPatient.gender);
 		if (newPatient.gender!='M' && newPatient.gender!='F'){
+			scanf("%*s"); // clear input
 			printf("Invalid gender. Enter valid gender: \n");
 		}
 		else {
@@ -69,10 +105,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	valid=0;
 		
 	// input contact details
-	printf("Enter patient's phone number (+63 xxx-xxx-xxxx): ");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Enter your phone number (+63 xxx-xxx-xxxx): ");
+	else
+		printf("Enter patient's phone number (+63 xxx-xxx-xxxx): ");
 	do{
 		scanf(" %17[^\n]",strInput);
 		if (strlen(strInput)!=16){
+			scanf("%*s"); // clear input
 			printf("Invalid details. Enter details again:\n");
 		}
 		else {
@@ -83,10 +123,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	valid=0;
 		
 	// input weight and height then calc bmi into patient struct
-	printf("Input patient's weight (in kg): ");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Input your weight (in kg): ");
+	else
+		printf("Input patient's weight (in kg): ");
 	do{
 		scanf("%f",&weight);
 		if (weight<0){
+			scanf("%*s"); // clear input
 			printf("Invalid measurement. Enter again.");
 		}
 		else {
@@ -95,10 +139,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	} while(valid==0);
 	valid=0;
 	
-	printf("Input patient's height (in m): ");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Input your height (in m): ");
+	else
+		printf("Input patient's height (in m): ");
 	do{
 		scanf("%f",&height);
 		if (height<0){
+			scanf("%*s"); // clear input
 			printf("Invalid measurement. Enter again.");
 		}
 		else {
@@ -110,10 +158,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	calculateBMI(&newPatient,weight,height);
 		
 	// input bp details, if none input 0 = will be for diagnosis
-	printf("Enter patient's blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown input 0.\n");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Enter your blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown, input 0.\n");
+	else
+		printf("Enter patient's blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown, input 0.\n");
 	do{
 		scanf(" %16[^\n]",strInput);
 		if (strlen(strInput)>15){
+			scanf("%*s"); // clear input
 			printf("Invalid input. Enter again:\n");
 		}
 		else if(strInput[0]=='0'){
@@ -129,10 +181,14 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	valid=0;
 	
 	// input blood sugar, if unknown input 0 = will be for diagnosis
-	printf("Enter patient's blood sugar, in mg/dL. If unknown input 0.\n");
+	if (strcmp(currentUser->role, "Patient")==0)
+		printf("Enter your blood sugar, in mg/dL. If unknown, input 0.\n");
+	else
+		printf("Enter patient's blood sugar, in mg/dL. If unknown, input 0.\n");
 	do{
 		scanf("%f",&newPatient.bloodSugar);
 		if (newPatient.bloodSugar<0){
+			scanf("%*s"); // clear input
 			printf("Invalid measurement. Enter again.");
 		}
 		else if (newPatient.bloodSugar==0){
@@ -143,9 +199,6 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 			valid=1;
 		}
 	} while(valid==0);
-	
-	newPatient.patientID = getPatientID(patients, patientCount); // set the userID of new user to old usercount + 1
-	newPatient.userID = getUserID(users, patients); // getting a new userID even if patient does not have account yet
 	
 	return newPatient;
 }
@@ -176,6 +229,7 @@ For GP to diagnose existing patients.
 void diagnosePatient (Patient *patient){
 	Patient *currentPatient;
 	currentPatient = patient;
+	// int validInput;
 	
 	printf("----- Diagnosing Patient: %s -----\n", currentPatient->name);
 	
@@ -818,16 +872,20 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    switch(choice){
     	    	case 1:
    		     		editPatient(&patients[index]);
+   		     		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
     	    	case 2:
     	    		deletePatient(patients,patientCount,index);
+    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
     	    	case 3:
     	    		diagnosePatient(&patients[index]);
+    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
     	    	case 4:
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
-    	    		break;
+    	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					break;
     	    	default:
     	    		printf("Invalid input.\n");
 			}
@@ -836,9 +894,10 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 }
 
 void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount){
-	int choice;
+	int choice,valid;
 	int index;
 	char input[101];
+	char cInput;
 	printf("Enter name of patient to select: ");
 	scanf(" %100[^\n]s", input);
 	
@@ -862,16 +921,40 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    switch(choice){
     	    	case 1:
    		     		editPatient(&patients[index]);
-    	    		break;
+    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+					break;
     	    	case 2:
-    	    		deletePatient(patients,patientCount,index);
-    	    		break;
+    	    		printf("Are you sure you want to delete patient #%d? (Y/N): ", patients[index].patientID);
+    	    		valid = 0;
+    	    		while (valid==0){
+    	    			valid = scanf(" %c", &cInput);
+    	    			if (valid==0){
+    	    				printf("Invalid input.\n");
+						}
+						else{
+							switch (cInput){
+    	    					case 'Y':
+    	    					case 'y':
+									deletePatient(patients,patientCount,index);
+    	    						break;
+    	    					case 'N':
+    	    					case 'n':
+    	    						break;
+    	    					default:
+    	    						printf("Invalid input.\n");
+							}
+						}
+					}
+    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+					break;
     	    	case 3:
     	    		diagnosePatient(&patients[index]);
-    	    		break;
+    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+					break;
     	    	case 4:
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
-    	    		break;
+    	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					break;
     	    	default:
     	    		printf("Invalid input.\n");
 			}

@@ -88,9 +88,11 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 
 void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
-void editReferral (Referral *referrals, int referralCount);
-void deleteReferral (Referral *referrals, int *count);
+void editReferral (Referral *referral);
+void deleteReferral (Referral *referrals, int *referralCount, int index);
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
 int loadReferralsFromFile (Referral *referrals, const char *filename);
 void sortReferralsByID (Referral *referrals, int referralCount, int order);
-void sortReferralsByPatient (Referral *referrals, int referralCount, int order);
+void sortReferralsByStatus (Referral *referrals, int referralCount, int order);
+int findReferralByID (Referral *referrals, int referralCount, int input);
+void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users);

@@ -1,5 +1,5 @@
 #include "Letran_Navarrosa_Machine-Project.h"
-
+// gcc -Wall -std=c99 main.c user_management.c patient_logging.c referral_management.c
 int main () {
 	User users[MAX_USERS] = {0};
 	User *currentUser;
@@ -17,9 +17,9 @@ int main () {
 	// printf("User count: %d\n", userCount);
 	do{
 		// design for main menu/login screen here
-		printf("1. Register account\n");
-		printf("2. Login\n");
-		printf("3. Exit program\n");
+		printf("[1] Register account\n");
+		printf("[2] Login\n");
+		printf("[3] Exit program\n");
 		printf("Input choice: "); // design nalang later
 		validInput = scanf(" %d",&choice); // to check if it received an int
 		if (validInput==0){

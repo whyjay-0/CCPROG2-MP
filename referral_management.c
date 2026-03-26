@@ -75,40 +75,40 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount){
     int i, j,found=0;
-    User temp, temp2;
+    User gp, specialist;
 	
     printf("\n===== REFERRALS =====\n");
     for (i=0;i<referralCount;i++){
         if (strcmp(currentUser->role,"GP")==0){
-            if (referrals[i].GPID == currentUser->userID){
+            if (referrals[i].gpID == currentUser->userID){
                 printf("%d | %s | Specialist ID: %d | %s\n",
-                    referrals[i].ReferralID,
-                    referrals[i].PatientName,
-                    referrals[i].SpecialistID,
+                    referrals[i].referralID,
+                    referrals[i].patientName,
+                    referrals[i].specialistID,
                     referrals[i].status);
                 found=1;
             }
         }
         else if (strcmp(currentUser->role,"Specialist")==0){
-            if (referrals[i].SpecialistID == currentUser->userID){
+            if (referrals[i].specialistID == currentUser->userID){
                 printf("%d | %s | Status: %s\n",
-                    referrals[i].ReferralID,
-                    referrals[i].PatientName,
+                    referrals[i].referralID,
+                    referrals[i].patientName,
                     referrals[i].status);
                 found=1;
             }
         }
         else if (strcmp(currentUser->role,"Patient")==0){
-        	if (strcmp(referrals[i].PatientName,currentUser->name) == 0){
+        	if (strcmp(referrals[i].patientName,currentUser->name) == 0){
         		for (j=0;j<MAX_USERS;j++){ // search name by userID GP
-        			if (referrals[i].GPID == users[j].userID){
-        				temp = users[j];
+        			if (referrals[i].gpID == users[j].userID){
+        				gp = users[j];
 					}
-					if (referrals[i].SpecialistID == users[j].userID){
-						temp2 = users[j];
+					if (referrals[i].specialistID == users[j].userID){
+						specialist = users[j];
 					}
 				}
-        		printf("%d | GP: %s | Specialist: %s", referrals[i].ReferralID, temp.name, temp2.name);
+        		printf("%d | GP: %s | Specialist: %s", referrals[i].referralID, gp.name, specialist.name);
 			}
 		}
     }
@@ -118,64 +118,39 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     }
 }
 
-void editReferral (Referral *referrals, int referralCount){
-    int id, i, found=0, choice;
+void editReferral (Referral *referral){
+	int choice, valid;
+    printf("[1] Accept\n[2] Complete\n[3] Reject\nChoice: ");
+    valid = scanf("%d",&choice);
 	
-    printf("Enter Referral ID to update: ");
-    scanf("%d",&id);
-	
-    for (i=0;i<referralCount;i++){
-        if (referrals[i].ReferralID == id){
-            printf("1 - Accept\n2 - Complete\n3 - Reject\nChoice: ");
-            scanf("%d",&choice);
-			
-            switch(choice){
-                case 1:
-                    strcpy(referrals[i].status,"Accepted");
-                    break;
-                case 2:
-                    strcpy(referrals[i].status,"Completed");
-                    break;
-                case 3:
-                    strcpy(referrals[i].status,"Rejected");
-                    break;
-                default:
-                    printf("Invalid choice.\n");
-            }
-			
-            found=1;
-            i=referralCount; // end loop
-        }
-    }
-	
-    if (found==0){
-        printf("Referral not found.\n");
-    }
+	if (valid){
+		switch(choice){
+        	case 1:
+       	     strcpy(referral->status,"Accepted");
+        	    break;
+        	case 2:
+        	    strcpy(referral->status,"Completed");
+        	    break;
+        	case 3:
+        	    strcpy(referral->status,"Rejected");
+        	    break;
+        	default:
+        	    printf("Invalid choice.\n");
+    	}
+	}
+	else {
+		printf("Invalid input.\n\n");
+	}
 }
 
-void deleteReferral (Referral *referrals, int *count){
-    int id, i, j, found=0;
+void deleteReferral (Referral *referrals, int *referralCount, int index){
+    int i;
 	
-    printf("Enter Referral ID to delete: ");
-    scanf("%d",&id);
-	
-    for (i=0;i<*count;i++){
-        if (referrals[i].ReferralID == id){
-            for (j=i;j<*count-1;j++){
-                referrals[j] = referrals[j+1];
-            }
-			
-            (*count)--;
-            found=1;
-            printf("Referral deleted.\n");
-			
-            i=*count;
+    for (i=index;i<*referralCount-1;i++){
+        referrals[i] = referrals[i+1];
         }
-    }
-	
-    if (found==0){
-        printf("Referral not found.\n");
-    }
+	(*referralCount)--;
+	printf("\nSucessfully deleted referral #%d\n", referrals[i].referralID);
 }
 
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename){
@@ -188,10 +163,10 @@ int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *
     else{
         for (i=0;i<referralCount;i++){
         	fprintf(fp, "%d,%d,%s,%d,%s\n",
-            	referrals[i].ReferralID,
-            	referrals[i].GPID,
-            	referrals[i].PatientName,
-            	referrals[i].SpecialistID,
+            	referrals[i].referralID,
+            	referrals[i].gpID,
+            	referrals[i].patientName,
+            	referrals[i].specialistID,
             	referrals[i].status);
 		}
         flag = 1;
@@ -212,10 +187,10 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
             Referral temp;
 
             result = fscanf(fp, "%d,%d,%100[^,],%d,%30[^\n]",
-                &temp.ReferralID,
-                &temp.GPID,
-                temp.PatientName,
-                &temp.SpecialistID,
+                &temp.referralID,
+                &temp.gpID,
+                temp.patientName,
+                &temp.specialistID,
                 temp.status);
 
             if (result==5){
@@ -241,11 +216,11 @@ void sortReferralsByID (Referral *referrals, int referralCount, int order){
 		// search/select
 		for (j=i+1;j<referralCount;j++){
 			if (order==1){ // ascending
-				if(referrals[j].ReferralID < referrals[index].ReferralID)
+				if(referrals[j].referralID < referrals[index].referralID)
 					index = j;
 			}
 			else { // descending
-				if(referrals[j].ReferralID > referrals[index].ReferralID)
+				if(referrals[j].referralID > referrals[index].referralID)
 					index = j;
 			}
 		}
@@ -295,9 +270,10 @@ int findReferralByID (Referral *referrals, int referralCount, int input){
 	return index;
 }
 
-void selectReferralID (User *currentUser, Referral *referrals, int *referralCount){
+void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users){
 	int input, choice;
 	int index, valid=0;
+	char cInput;
 	
 	do{
 		printf("Enter Referral ID to select: ");
@@ -314,9 +290,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	if (index == -1){
 		printf("Patient not found.\n");
 	}
-	else if (strcmp(currentUser.role,"GP")==0 && index!=-1){
+	else if (strcmp(currentUser->role,"GP")==0 && index!=-1){
 		do{
-			showReferrals();
+			showReferrals(currentUser,users,referrals,*referralCount);
 			printf("\n==== Referral CRUD ====\n");
 			printf("1. Delete Referral\n");
 			printf("0. Exit\n");
@@ -325,17 +301,38 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    
     	    switch(choice){
     	    	case 1:
-    	    		deleteReferral();
-    	    		break;
+    	    		printf("Are you sure you want to delete referral #%d? (Y/N): ", referrals[index].referralID);
+    	    		valid = 0;
+    	    		while (valid==0){
+    	    			valid = scanf(" %c", &cInput);
+    	    			if (valid==0){
+    	    				printf("Invalid input.\n");
+						}
+						else{
+							switch (cInput){
+    	    					case 'Y':
+    	    					case 'y':
+									deleteReferral(referrals,referralCount,index);
+    	    						break;
+    	    					case 'N':
+    	    					case 'n':
+    	    						break;
+    	    					default:
+    	    						printf("Invalid input.\n");
+							}
+						}
+					}
+					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					break;
 				case 0:
     	    		printf("Exiting...\n\n");
     	    		break;
 			}
 		} while (choice!=0);
 	}
-	else if (strcmp(currentUser.role,"Specialist")==0 && index!=-1){
+	else if (strcmp(currentUser->role,"Specialist")==0 && index!=-1){
 		do{
-			showReferrals();
+			showReferrals(currentUser,users,referrals,*referralCount);
 			printf("\n==== Referral CRUD ====\n");
 			printf("1. Edit status of referral\n");
     	    printf("2. Delete referral\n");
@@ -345,10 +342,32 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    
     	    switch(choice){
     	    	case 1:
-   		     		editReferral();
+   		     		editReferral(&referrals[index]);
+   		     		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
     	    		break;
     	    	case 2:
-    	    		deleteReferral();
+    	    		printf("Are you sure you want to delete referral #%d? (Y/N): ", referrals[index].referralID);
+    	    		valid = 0;
+    	    		while (valid==0){
+    	    			valid = scanf(" %c", &cInput);
+    	    			if (valid==0){
+    	    				printf("Invalid input.\n");
+						}
+						else{
+							switch (cInput){
+    	    					case 'Y':
+    	    					case 'y':
+									deleteReferral(referrals,referralCount,index);
+    	    						break;
+    	    					case 'N':
+    	    					case 'n':
+    	    						break;
+    	    					default:
+    	    						printf("Invalid input.\n");
+							}
+						}
+					}
+					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
     	    		break;
     	    	case 0:
     	    		printf("Exiting...\n\n");
