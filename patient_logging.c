@@ -8,7 +8,7 @@ returns Patient* - for saving to the TXT file
 */
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount){
 	Patient newPatient;
-	int valid=0, index;
+	int index;
 	float weight,height;
 	char strInput[101];
 	char choice;
@@ -18,50 +18,34 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 	if (strcmp(currentUser->role, "Patient")==0){
 		// auto input of name, since patient can only add themself
 		strcpy(newPatient.name,currentUser->name);
+		newPatient.userID = currentUser->userID;
+		newPatient.patientID = getPatientID(patients, patientCount);
 		printf("Patient name: %s\n", newPatient.name);
 	}
-	else{
+	else{ // user is not patient
 		printf("Enter patient's full name:\n");
-		do{
-			scanf(" %100[^\n]",strInput);
-			if (strlen(strInput)>100){
-				scanf("%*s"); // clear input
-				printf("Invalid name. Enter name again:\n");
-			}
-			else{
-				strcpy(newPatient.name,strInput);
-				valid=1;
-			}
-		} while(valid==0);
-		valid=0;
+		getValidInput(strInput,4,0,0,0,0,0,0);
 		
 		index = findUserByName(users,userCount,newPatient.name);
 		
 		if (index!=-1){ // found user
 			// prompt
 			printf("A user with a similar name is a patient. Would you like to link their accounts? (Y/N): ");
-			valid=0;
-			while(valid==0){
-				scanf(" %c", &choice);
-				if (valid==0){
-					printf("Invalid input.\n");
-				}
-				else {
-					switch (choice){
-						case 'Y':
-						case 'y':
-							newPatient.patientID = getPatientID(patients, patientCount);
-							newPatient.userID = users[index].userID;
-							break;
-						case 'N':
-						case 'n':
-							newPatient.patientID = getPatientID(patients, patientCount);
-							newPatient.userID = getUserID(users, patients);
-							break;
-						default:
-							printf("Invalid choice.\n");
-					}
-				}
+			
+			getValidInput(&choice,3,0,0,'Y','N','y','n');
+			switch (choice){
+				case 'Y':
+				case 'y':
+					newPatient.patientID = getPatientID(patients, patientCount);
+					newPatient.userID = users[index].userID;
+					break;
+				case 'N':
+				case 'n':
+					newPatient.patientID = getPatientID(patients, patientCount);
+					newPatient.userID = getUserID(users, patients);
+					break;
+				default:
+					printf("Invalid choice.\n");
 			}
 		}
 		else { // no old user
@@ -75,85 +59,36 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 		printf("Enter your age: ");
 	else
 		printf("Enter patient's age: ");
-	do{
-		scanf("%d",&newPatient.age);
-		if (newPatient.age<=0){
-			scanf("%*s"); // clear input
-			printf("Invalid age. Enter valid age: \n");
-		}
-		else {
-			valid=1;
-		}
-	} while (valid==0);
-	valid=0;
+	getValidInput(&newPatient.age,1,0,200,0,0,0,0);
 	
 	// input gender
 	if (strcmp(currentUser->role, "Patient")==0)
 		printf("Enter your gender at birth (M/F): ");
 	else
 		printf("Enter patient's gender at birth (M/F): ");
-	do{
-		scanf(" %c",&newPatient.gender);
-		if (newPatient.gender!='M' && newPatient.gender!='F'){
-			scanf("%*s"); // clear input
-			printf("Invalid gender. Enter valid gender: \n");
-		}
-		else {
-			valid=1;
-		}
-	} while (valid==0);
-	valid=0;
+	getValidInput(&newPatient.gender,3,0,0,'M','F','m','f');
+	
+	updateGender(&newPatient);
 		
 	// input contact details
 	if (strcmp(currentUser->role, "Patient")==0)
 		printf("Enter your phone number (+63 xxx-xxx-xxxx): ");
 	else
 		printf("Enter patient's phone number (+63 xxx-xxx-xxxx): ");
-	do{
-		scanf(" %17[^\n]",strInput);
-		if (strlen(strInput)!=16){
-			scanf("%*s"); // clear input
-			printf("Invalid details. Enter details again:\n");
-		}
-		else {
-			strcpy(newPatient.contact,strInput);
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	getValidInput(newPatient.contact,5,0,0,0,0,0,0);
 		
 	// input weight and height then calc bmi into patient struct
 	if (strcmp(currentUser->role, "Patient")==0)
 		printf("Input your weight (in kg): ");
 	else
 		printf("Input patient's weight (in kg): ");
-	do{
-		scanf("%f",&weight);
-		if (weight<0){
-			scanf("%*s"); // clear input
-			printf("Invalid measurement. Enter again.");
-		}
-		else {
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	getValidInput(&weight,2,0,500,0,0,0,0);
 	
 	if (strcmp(currentUser->role, "Patient")==0)
 		printf("Input your height (in m): ");
 	else
 		printf("Input patient's height (in m): ");
-	do{
-		scanf("%f",&height);
-		if (height<0){
-			scanf("%*s"); // clear input
-			printf("Invalid measurement. Enter again.");
-		}
-		else {
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	getValidInput(&height,2,0,500,0,0,0,0);
 	
 	calculateBMI(&newPatient,weight,height);
 		
@@ -162,43 +97,16 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 		printf("Enter your blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown, input 0.\n");
 	else
 		printf("Enter patient's blood pressure, in [Systolic/Diastolic] mmHg (i.e 120/80 mmHg). If unknown, input 0.\n");
-	do{
-		scanf(" %16[^\n]",strInput);
-		if (strlen(strInput)>15){
-			scanf("%*s"); // clear input
-			printf("Invalid input. Enter again:\n");
-		}
-		else if(strInput[0]=='0'){
-			printf("A General Practitioner will diagnose this later on.\n");
-			strcpy(newPatient.bp, "0");
-			valid=1;
-		}
-		else {
-			strcpy(newPatient.bp,strInput);
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	getValidInput(newPatient.bp,6,0,0,0,0,0,0);
 	
 	// input blood sugar, if unknown input 0 = will be for diagnosis
 	if (strcmp(currentUser->role, "Patient")==0)
 		printf("Enter your blood sugar, in mg/dL. If unknown, input 0.\n");
 	else
 		printf("Enter patient's blood sugar, in mg/dL. If unknown, input 0.\n");
-	do{
-		scanf("%f",&newPatient.bloodSugar);
-		if (newPatient.bloodSugar<0){
-			scanf("%*s"); // clear input
-			printf("Invalid measurement. Enter again.");
-		}
-		else if (newPatient.bloodSugar==0){
-			printf("A General Practitioner will diagnose this later on.\n");
-			valid=1;
-		}
-		else {
-			valid=1;
-		}
-	} while(valid==0);
+	getValidInput(&newPatient.bloodSugar,2,0,500,0,0,0,0);
+	if (newPatient.bloodSugar==0)
+		printf("A General Practitioner will diagnose this later on.\n");
 	
 	return newPatient;
 }
@@ -236,62 +144,62 @@ void diagnosePatient (Patient *patient){
 	// Ask user for needed info
 	// Cholesterol values
 	printf("Enter Total Cholesterol (mg/dL): ");
-	scanf("%f", &currentPatient->totalChol);
+	getValidInput(&currentPatient->totalChol,2,0,1000,0,0,0,0);
 	printf("Enter HDL Cholesterol (mg/dL): ");
-	scanf("%f", &currentPatient->hdlChol);
+	getValidInput(&currentPatient->hdlChol,2,0,1000,0,0,0,0);
 	
 	// eGFR value, estimated Glomerular Filtration Rate
 	printf("Enter eGFR (mL/min/1.73m^2): ");
-	scanf("%d", &currentPatient->eGFR);
+	getValidInput(&currentPatient->eGFR,1,0,1000,0,0,0,0);
 	
 	// BP Treatment and Values
 	if (strcmp(currentPatient->bp,"0")==0){
 		printf("Enter blood pressure (SYS/DIA mmHg): ");
-		scanf(" %16[^\n]",currentPatient->bp);
+		getValidInput(currentPatient->bp,6,0,0,0,0,0,0);
 	}
 	
 	printf("Is patient using anti-hypertensive medication? (Y/N): ");
-	scanf(" %c", &currentPatient->htMed);
+	getValidInput(&currentPatient->htMed,3,0,0,'Y','N','y','n');
 	
 	// CVD
 	printf("Does patient have any known cardiovascular disease? (Y/N): ");
-	scanf(" %c", &currentPatient->currentCVD);
+	getValidInput(&currentPatient->currentCVD,3,0,0,'Y','N','y','n');
 	
 	// Blood sugar
 	if (currentPatient->bloodSugar==0){
 		printf("Enter blood sugar (mg/dL): ");
-		scanf("%f", &currentPatient->bloodSugar);
+		getValidInput(&currentPatient->bloodSugar,2,0,1000,0,0,0,0);
 	}
 	
 	// LDL treatment
 	printf("Is patient using statins? (Y/N): ");
-	scanf(" %c", &currentPatient->statins);	
+	getValidInput(&currentPatient->statins,3,0,0,'Y','N','y','n');
 	
 	// Smoking
 	printf("Is patient a regular smoker? (Y/N): ");
-	scanf(" %c", &currentPatient->smoking);	
+	getValidInput(&currentPatient->smoking,3,0,0,'Y','N','y','n');
 	
 	// Diabetes
 	printf("Does patient have diabetes? (Y/N): ");
-	scanf(" %c", &currentPatient->diabetes);
+	getValidInput(&currentPatient->diabetes,3,0,0,'Y','N','y','n');
 	
 	// Creatinine
 	printf("Enter Serum Creatinine of patient (mg/dL): ");
-	scanf("%f", &currentPatient->creatinine);
+	getValidInput(&currentPatient->creatinine,2,0,1000,0,0,0,0);
 	
 	// Family History CVD
 	printf("Does patient have family history of CVD? (Y/N): ");
-	scanf(" %c", &currentPatient->cvdFamily);
+	getValidInput(&currentPatient->cvdFamily,3,0,0,'Y','N','y','n');
 	
 	// Diet/Exercise
 	printf("Does patient exercise regularly? (Y/N): ");
-	scanf(" %c", &currentPatient->exercise);
+	getValidInput(&currentPatient->exercise,3,0,0,'Y','N','y','n');
 	printf("Does patient have a high-fat/sugar diet? (Y/N): ");
-	scanf(" %c", &currentPatient->diet);
+	getValidInput(&currentPatient->diet,3,0,0,'Y','N','y','n');
 	
 	// Alcohol
 	printf("Does patient consume alcohol regularly? (Y/N): ");
-	scanf(" %c", &currentPatient->alcohol);
+	getValidInput(&currentPatient->alcohol,3,0,0,'Y','N','y','n');
 	
 	// Calculate Cardio Risk,, Can only be done on adults ages 30-79 without past CVD (This is assumed to be true).
 	if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N')
@@ -353,7 +261,7 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	
 	if (currentPatient->isDiagnosed=='Y'){
 		printf("Show past diagnosis? (Y/N)");
-		scanf(" %c", &choice);
+		getValidInput(&choice,3,0,0,'Y','N','y','n');
 		switch (choice){
 			case 'Y':
 			case 'y':
@@ -453,23 +361,23 @@ void calculateCardioRisk (Patient *patient){
 	int nSmoking = 0;
 	int nHTMed = 0;
 	int nStatin = 0;
-	if (patient->diabetes=='Y'){
+	if (patient->diabetes=='Y' || patient->diabetes=='y'){
 		nDiabetes = 1;
 	}
-	if (patient->smoking=='Y'){
+	if (patient->smoking=='Y' || patient->smoking=='y'){
 		nSmoking = 1;
 	}
-	if (patient->htMed=='Y'){
+	if (patient->htMed=='Y' || patient->htMed=='y'){
 		nHTMed = 1;
 	}
-	if (patient->statins=='Y'){
+	if (patient->statins=='Y' || patient->statins=='y'){
 		nStatin = 1;
 	}
 	int flag=1;
 	// Input validation
-	if (patient->currentCVD=='Y')
+	if (patient->currentCVD=='Y' || patient->currentCVD=='y')
 		flag=0;
-	if (!(patient->gender=='M'||patient->gender=='F'))
+	if (!(patient->gender=='M'||patient->gender=='F'||patient->gender=='m'||patient->gender=='f'))
 		flag=0;
 	if (patient->age < 30 || patient->age > 79)
 		flag=0;
@@ -490,7 +398,7 @@ void calculateCardioRisk (Patient *patient){
 	if (!(nStatin==0 || nStatin==1))
 		flag=0;
 	
-	if (patient->gender=='F' && flag==1){
+	if ((patient->gender=='F' || patient->gender=='f')&& flag==1){
 		logor_10yr_CVD = -3.307728 +
         				 0.7939329*(patient->age - 55)/10 +
         				 0.0305239*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
@@ -512,7 +420,7 @@ void calculateCardioRisk (Patient *patient){
         				 0.078715*(patient->age - 55)/10*(nSmoking) -
         				 0.1637806*(patient->age - 55)/10*(fmin(patient->eGFR, 60) - 60)/(-15);
 	} 
-	else if (patient->gender=='M' && flag==1){
+	else if ((patient->gender=='M' || patient->gender=='m') && flag==1){
 		logor_10yr_CVD = -3.031168 +
         				 0.7688528*(patient->age - 55)/10 +
         				 0.0736174*(mmol_conv(patient->totalChol - patient->hdlChol) - 3.5) -
@@ -550,7 +458,7 @@ int saveAllPatientsToFile (Patient *patients, int patientCount, const char *file
 	}
 	else {
 		for (i=0;i<patientCount;i++){
-			fprintf(fp, "%d,%d,%s,%d,%c,%s,%.2f,%s,%s,%.2f,%c,%.2f,%.2f,%d,%c,%c,%c,%c,%.2f,%c,%c,%c,%c,%.2lf,%c\n",
+			fprintf(fp, "%d, %d, %s, %d, %c, %s, %.2f, %s, %s, %.2f, %c, %.2f, %.2f, %d, %c, %c, %c, %c, %.2f, %c, %c, %c, %c, %.2lf, %c\n",
 					patients[i].patientID,
 					patients[i].userID,
 					patients[i].name,
@@ -596,7 +504,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 		while (flag){
 			Patient temp;
 			int result = fscanf(fp,
-								"%d,%d,%100[^,],%d,%c,%16[^,],%f,%11[^,],%15[^,],%f,%c,%f,%f,%d,%c,%c,%c,%c,%f,%c,%c,%c,%c,%lf\n,%c",
+								"%d, %d, %100[^,], %d, %c, %16[^,], %f, %11[^,], %15[^,], %f, %c, %f, %f, %d, %c, %c, %c, %c, %f, %c, %c, %c, %c, %lf, %c\n",
 								&temp.patientID,
 								&temp.userID,
 								temp.name,
@@ -622,7 +530,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
     							&temp.alcohol,
     							&temp.cardioRisk,
 								&temp.isDiagnosed);
-			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
+			// since fscanf outputs the amount of input items, we can use it to check if fscanf was successful
 			if (result==25 && count < MAX_USERS){
 				patients[count] = temp;
 				count++;
@@ -638,47 +546,17 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 
 // Edit name, age, contact
 void editPatient (Patient *patient){
-	char strInput[101];
-	int valid = 0;
 	// input name
 	printf("Enter new name:\n");
-	do{
-		scanf(" %100[^\n]",strInput);
-		if (strlen(strInput)>100){
-			printf("Invalid name. Enter name again:\n");
-		}
-		else{
-			strcpy(patient->name,strInput);
-			valid=1;
-		}
-	} while(valid==0);
-	valid=0;
+	getValidInput(patient->name,4,0,0,0,0,0,0);
 		
 	// input age
 	printf("Enter new age: ");
-	do{
-		scanf("%d",&patient->age);
-		if (patient->age<=0){
-			printf("Invalid age. Enter valid age: \n");
-		}
-		else {
-			valid=1;
-		}
-	} while (valid==0);
-	valid=0;
+	getValidInput(&patient->age,1,0,200,0,0,0,0);
 
 	// input contact details
 	printf("Enter new phone number (+63 xxx-xxx-xxxx): ");
-	do{
-		scanf(" %17[^\n]",strInput);
-		if (strlen(strInput)!=16){
-			printf("Invalid details. Enter details again:\n");
-		}
-		else {
-			strcpy(patient->contact,strInput);
-			valid=1;
-		}
-	} while(valid==0);	
+	getValidInput(patient->contact,5,0,0,0,0,0,0);
 }
 
 // Delete patient
@@ -838,19 +716,10 @@ int findPatientByName (Patient *patients, int patientCount, char *input){
 
 void selectPatientID (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount){
 	int input, choice;
-	int index, valid=0;
+	int index;
 	
-	do{
-		printf("Enter Patient ID to select: ");
-		valid = scanf(" %d", &input);
-		if (valid != 1){
-			// invalid input
-			scanf("%*[^\n]");
-			printf("Invalid input.\n\n");
-			 // clear input
-		}
-	} while(valid==0);
-	
+	printf("Enter Patient ID to select: ");
+	getValidInput(&input,1,0,100,0,0,0,0);
 	
 	index = findPatientByID(patients,*patientCount,input);
 	
@@ -867,7 +736,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    printf("4. Refer Patient\n");
     	    printf("0. Exit\n");
     	    printf("Choice: ");
-    	    scanf(" %d", &choice);
+    	    getValidInput(&choice,1,1,4,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
@@ -894,12 +763,12 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 }
 
 void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount){
-	int choice,valid;
+	int choice;
 	int index;
 	char input[101];
 	char cInput;
 	printf("Enter name of patient to select: ");
-	scanf(" %100[^\n]s", input);
+	getValidInput(input,4,0,0,0,0,0,0);
 	
 	index = findPatientByName(patients,*patientCount,input);
 	
@@ -916,7 +785,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    printf("4. Refer Patient\n");
     	    printf("0. Exit\n");
     	    printf("Choice: ");
-    	    scanf(" %d", &choice);
+    	    getValidInput(&choice,1,0,4,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
@@ -925,25 +794,19 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					break;
     	    	case 2:
     	    		printf("Are you sure you want to delete patient #%d? (Y/N): ", patients[index].patientID);
-    	    		valid = 0;
-    	    		while (valid==0){
-    	    			valid = scanf(" %c", &cInput);
-    	    			if (valid==0){
+    	    		
+    	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
+					
+					switch (cInput){
+    	    			case 'Y':
+    	    			case 'y':
+							deletePatient(patients,patientCount,index);
+    	    				break;
+    	    			case 'N':
+    	    			case 'n':
+    	    				break;
+    	    			default:
     	    				printf("Invalid input.\n");
-						}
-						else{
-							switch (cInput){
-    	    					case 'Y':
-    	    					case 'y':
-									deletePatient(patients,patientCount,index);
-    	    						break;
-    	    					case 'N':
-    	    					case 'n':
-    	    						break;
-    	    					default:
-    	    						printf("Invalid input.\n");
-							}
-						}
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
 					break;
@@ -959,5 +822,14 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    		printf("Invalid input.\n");
 			}
 		} while(choice!=0);
+	}
+}
+
+void updateGender (Patient *patient){
+	if (patient->gender == 'm'){
+		patient->gender = 'M';
+	}
+	else if (patient->gender == 'f'){
+		patient->gender = 'F';
 	}
 }

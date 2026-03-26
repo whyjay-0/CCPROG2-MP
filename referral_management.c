@@ -6,7 +6,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	// select patient by entering name,,, would search by strcmp name and strcmp role
 	// select specialist by entering name,,, would search by strcmp name and strcmp role
 	// save referral
-	int found=0,choice=-1, index, valid=0, input;
+	int found=0,choice=-1, index, input;
 	char strInput[101];
 	Referral newReferral;
 	User specialist;
@@ -19,20 +19,14 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	
 	printf("Referring Patient: %s\n", newReferral.patientName);
 	if (currentPatient->isDiagnosed=='Y'){
-		printf("Enter details of specialist by:\n1. ID\n2. Name\nChoice: ");
-		scanf(" %d", &choice);
+		printf("Enter details of specialist by:\n[1] ID\n[2] Name\nChoice: ");
+		getValidInput(&choice,1,1,2,0,0,0,0);
 		switch(choice){
 			case 1:
-				do{
-					// show users func, lists all users but only specialists.
-					printf("Enter user ID to select: ");
-					valid = scanf(" %d", &input);
-					if (valid != 1){
-						// invalid input
-						printf("Invalid input.\n");
-						scanf("%*s"); // clear input
-					}
-				} while(valid==0);
+				// show users func, lists all users but only specialists.
+				printUsers(users,userCount,"Specialist");
+				printf("Enter user ID to select: ");
+				getValidInput(&input,1,0,500,0,0,0,0);
 			
 				index = findUserByID(users,userCount,input); // index of user
 				if (index!=-1){
@@ -43,7 +37,8 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 			case 2:
 				// show users func, lists all users but only specialists.
 				printf("Enter name of user to select: ");
-				scanf(" %100[^\n]s", strInput);
+				getValidInput(strInput,4,0,0,0,0,0,0);
+				
 				index = findUserByName(users,userCount,strInput);
 				if (index!=-1){
 					found=1;
@@ -56,6 +51,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 		if (found){
 			newReferral.specialistID = specialist.userID; // found specialist
 			newReferral.gpID = currentUser.userID; // assumed current user is GP
+			newReferral.patientID = currentPatient->patientID;
 				
 			strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
 				
@@ -74,8 +70,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 }
 
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount){
-    int i, j,found=0;
-    User gp, specialist;
+    int i, found=0;
 	
     printf("\n===== REFERRALS =====\n");
     for (i=0;i<referralCount;i++){
@@ -98,19 +93,6 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
                 found=1;
             }
         }
-        else if (strcmp(currentUser->role,"Patient")==0){
-        	if (strcmp(referrals[i].patientName,currentUser->name) == 0){
-        		for (j=0;j<MAX_USERS;j++){ // search name by userID GP
-        			if (referrals[i].gpID == users[j].userID){
-        				gp = users[j];
-					}
-					if (referrals[i].specialistID == users[j].userID){
-						specialist = users[j];
-					}
-				}
-        		printf("%d | GP: %s | Specialist: %s", referrals[i].referralID, gp.name, specialist.name);
-			}
-		}
     }
 
     if (found==0){
@@ -118,29 +100,55 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     }
 }
 
+// Only for Patients
+void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser){
+	int index, i, j;
+	int gpIndex, spIndex;
+	// find index of the referral based on userID of patient
+	for (i=0;i<referralCount;i++){
+		for (j=0;j<patientCount;j++){
+			if (referrals[i].patientID == patients[j].userID){
+				index = i;
+			}
+		}
+	}
+	for (i=0;i<userCount;i++){
+		if (users[i].userID == referrals[index].gpID){
+			gpIndex = i;
+		}
+	}
+	for (i=0;i<userCount;i++){
+		if (users[i].userID == referrals[index].specialistID){
+			spIndex = i;
+		}
+	}
+	// print the ff
+	printf("\n=== Referral Status ===\n");
+	printf("Referral ID: %d\n",referrals[index].referralID);
+	printf("Patient Name: %s\n\n",referrals[index].patientName);
+	printf("Referred By (GP): %s\n",users[gpIndex].name);
+	printf("Assigned Specialist: %s\n\n",users[spIndex].name);
+	printf("Status: %s\n\n", referrals[index].status);
+}
+
 void editReferral (Referral *referral){
-	int choice, valid;
+	int choice;
     printf("[1] Accept\n[2] Complete\n[3] Reject\nChoice: ");
-    valid = scanf("%d",&choice);
+    getValidInput(&choice,1,1,3,0,0,0,0);
 	
-	if (valid){
-		switch(choice){
-        	case 1:
-       	     strcpy(referral->status,"Accepted");
-        	    break;
-        	case 2:
-        	    strcpy(referral->status,"Completed");
-        	    break;
-        	case 3:
-        	    strcpy(referral->status,"Rejected");
-        	    break;
-        	default:
-        	    printf("Invalid choice.\n");
-    	}
-	}
-	else {
-		printf("Invalid input.\n\n");
-	}
+	switch(choice){
+        case 1:
+       	strcpy(referral->status,"Accepted");
+            break;
+        case 2:
+            strcpy(referral->status,"Completed");
+            break;
+        case 3:
+            strcpy(referral->status,"Rejected");
+            break;
+        default:
+            printf("Invalid choice.\n");
+    }
 }
 
 void deleteReferral (Referral *referrals, int *referralCount, int index){
@@ -162,9 +170,10 @@ int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *
     }
     else{
         for (i=0;i<referralCount;i++){
-        	fprintf(fp, "%d,%d,%s,%d,%s\n",
+        	fprintf(fp, "%d, %d, %d, %s, %d, %s\n",
             	referrals[i].referralID,
             	referrals[i].gpID,
+            	referrals[i].patientID,
             	referrals[i].patientName,
             	referrals[i].specialistID,
             	referrals[i].status);
@@ -186,9 +195,10 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
         while(flag){
             Referral temp;
 
-            result = fscanf(fp, "%d,%d,%100[^,],%d,%30[^\n]",
+            result = fscanf(fp, "%d, %d, %d, %100[^,], %d, %30[^\n]",
                 &temp.referralID,
                 &temp.gpID,
+                &temp.patientID,
                 temp.patientName,
                 &temp.specialistID,
                 temp.status);
@@ -272,18 +282,11 @@ int findReferralByID (Referral *referrals, int referralCount, int input){
 
 void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users){
 	int input, choice;
-	int index, valid=0;
+	int index;
 	char cInput;
 	
-	do{
-		printf("Enter Referral ID to select: ");
-		valid = scanf(" %d", &input);
-		if (valid==0){
-			scanf("%*[^\n]"); // clear inputs until newline
-			printf("Invalid input.\n\n");
-		}
-	} while(valid==0);
-	
+	printf("Enter Referral ID to select: ");
+	getValidInput(&input,1,0,100,0,0,0,0);
 	
 	index = findReferralByID(referrals,*referralCount,input);
 	
@@ -297,30 +300,22 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 			printf("1. Delete Referral\n");
 			printf("0. Exit\n");
 			printf("Choice: ");
-    	    scanf(" %d", &choice);
+    	    getValidInput(&choice,1,0,1,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
     	    		printf("Are you sure you want to delete referral #%d? (Y/N): ", referrals[index].referralID);
-    	    		valid = 0;
-    	    		while (valid==0){
-    	    			valid = scanf(" %c", &cInput);
-    	    			if (valid==0){
+    	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
+					switch (cInput){
+    	    			case 'Y':
+    	    			case 'y':
+							deleteReferral(referrals,referralCount,index);
+    	    				break;
+    	    			case 'N':
+    	    			case 'n':
+    	    				break;
+    	    			default:
     	    				printf("Invalid input.\n");
-						}
-						else{
-							switch (cInput){
-    	    					case 'Y':
-    	    					case 'y':
-									deleteReferral(referrals,referralCount,index);
-    	    						break;
-    	    					case 'N':
-    	    					case 'n':
-    	    						break;
-    	    					default:
-    	    						printf("Invalid input.\n");
-							}
-						}
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
@@ -338,7 +333,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    printf("2. Delete referral\n");
     	    printf("0. Exit\n");
     	    printf("Choice: ");
-    	    scanf(" %d", &choice);
+    	    getValidInput(&choice,1,0,2,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
@@ -347,25 +342,17 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    		break;
     	    	case 2:
     	    		printf("Are you sure you want to delete referral #%d? (Y/N): ", referrals[index].referralID);
-    	    		valid = 0;
-    	    		while (valid==0){
-    	    			valid = scanf(" %c", &cInput);
-    	    			if (valid==0){
+    	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
+					switch (cInput){
+    	    			case 'Y':
+    	    			case 'y':
+							deleteReferral(referrals,referralCount,index);
+    	    				break;
+    	    			case 'N':
+    	    			case 'n':
+    	    				break;
+    	    			default:
     	    				printf("Invalid input.\n");
-						}
-						else{
-							switch (cInput){
-    	    					case 'Y':
-    	    					case 'y':
-									deleteReferral(referrals,referralCount,index);
-    	    						break;
-    	    					case 'N':
-    	    					case 'n':
-    	    						break;
-    	    					default:
-    	    						printf("Invalid input.\n");
-							}
-						}
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
     	    		break;
@@ -378,29 +365,3 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 		} while(choice!=0);
 	}
 }
-
-
-
-
-
-// utility funcs, sorting and searching of diff types by diff means
-/*
-User findUserByName (){ //this function would search for the user that matches the search you made by name
-	// would find the specific user that matches the role searching for,,, 
-	// will be used for createReferral so its easier to find IDs for the referral struct
-	printf("temp\n");
-}
-
-User findUserByID (int userID){ // returns User being searched for
-	printf("temp\n");
-} // can be used when printing records of referrals, binary search maybe
-// we need search and sort functions also, but the sort should only be visual, it will not change any of their data
-// So it could be sort by userID, by name, or by role
-// we could apply it sa specialist? maybe they could see all users? or better if may admin acc
-// we could also apply to list of patients within patient_management.c
-// and referral list,,, this is where referral date might be good
-*/
-
-/*
-2D arrays will be implemented through computation averages of BMI and CardioRisk for Specialists
-*/

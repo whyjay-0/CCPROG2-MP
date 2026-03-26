@@ -1,5 +1,111 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 
+// Utility
+// clears everything inputted, for validation checking when invalid
+void clearInput(){
+	while (scanf("%*s") == 1); // while scanf is detecting string, disregard/clear '*'
+}
+
+/*
+This function accepts an input where type is passed and min and max if there are limits
+TYPES:
+1 - int
+2 - float
+3 - char
+4 - string 100
+5 - string 16
+6 - string 15
+@param void *input - this parameter accepts the memory address of any type and stores it
+@param type - this param determines which type of validation will be done
+@param min - minimum accepted number
+@param max - max accepted number, if out of min/max = invalid
+@param limit1 - char limitation to 1 or 2 character only.
+@param limit2 - ^^^^
+@param limit3/4 - smaller case letters for limit1 and 2
+*/
+int getValidInput(void *input, int type, int min, int max, char limit1, char limit2, char limit3, char limit4){
+	int valid = 0;
+	int scan = 0; // since scanf has a return for amt of scanned values, it can be used for valid checking of input
+	
+	while(valid==0){
+		switch(type){
+			case 1: // int
+				scan = scanf("%d", (int*)input); // (int*)var, transforms the type of var into a pointer to an int
+				if (scan != 1){
+					printf("Invalid input. Enter an integer:\n");
+					clearInput();
+				}
+				else if (*(int*)input < min || *(int*)input > max){ // *(int*)var , value inside the pointer to int
+					printf("Out of range (%d-%d). Try again:\n", min, max);
+				}
+				else 
+					valid=1;
+				break;
+			case 2: // float
+				scan = scanf("%f", (float*)input);
+				if (scan != 1){
+					printf("Invalid input. Enter an float:\n");
+					clearInput();
+				}
+				else if (*(float*)input < min || *(float*)input > max){
+					printf("Out of range (%d-%d). Try again:\n");
+				}
+				else
+					valid=1;
+				break;
+			case 3: // char
+				scan = scanf(" %c", (char*)input);
+				if (scan != 1){
+					printf("Invalid input. Enter a character:\n");
+					clearInput();
+				}
+				else if (*(char*)input != limit1 && *(char*)input != limit2 && *(char*)input != limit3 && *(char*)input != limit4)
+					printf("Invalid input. Enter %c or %c:\n", limit1, limit2);
+				else
+					valid=1;
+				break;
+			case 4: // string 100
+				scan = scanf(" %100[^\n]", (char*)input);
+				if (scan != 1){
+					printf("Invalid input.\n");
+					clearInput();
+				}
+				else if (strlen((char*)input)==0){
+					printf("Empty input. Try again:\n");
+				}
+				else
+					valid=1;
+				break;
+			case 5: // string 16
+				scan = scanf(" %16[^\n]", (char*)input);
+				if (scan != 1){
+					printf("Invalid input.\n");
+					clearInput();
+				}
+				else if (strlen((char*)input)==0){
+					printf("Empty input. Try again:\n");
+				}
+				else
+					valid=1;
+				break;
+			case 6: // string 15
+				scan = scanf(" %15[^\n]", (char*)input);
+				if (scan != 1){
+					printf("Invalid input.\n");
+					clearInput();
+				}
+				else if (strlen((char*)input)==0){
+					printf("Empty input. Try again:\n");
+				}
+				else
+					valid=1;
+				break;
+		}
+	}
+	return 1;
+}
+
+
 // User management
 /* Registers a user; returns flag if valid or not
 
@@ -23,48 +129,39 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 			do{
 				validUser=0;
 				printf("\nPlease enter desired username (100 Characters): \n");
-				scanf(" %100[^\n]", input);
-				if (strlen(input)>100){
-					printf("Invalid input\n");
+				getValidInput(input,4,0,0,0,0,0,0);
+				
+				similar=0;
+				for(i=0;i<*userCount;i++){
+					if (strcmp(users[i].username,input)==0){
+						similar+=1;
+					}
+				}
+				if (similar){
+					printf("Invalid Username.\n");
 				}
 				else {
-					similar=0;
-					for(i=0;i<*userCount;i++){
-						if (strcmp(users[i].username,input)==0){
-							similar+=1;
-						}
-					}
-					if (similar){
-						printf("Invalid Username\n");
-					}
-					else {
-						strcpy(newUser.username, input);
-						validUser=1;
-					}
+					strcpy(newUser.username, input);
+					validUser=1;
 				}
 			} while (validUser==0);
 			
 			do{
 				validName=0;
 				printf("\nPlease enter your full name (100 Characters): \n");
-				scanf(" %100[^\n]", input);
-				if (strlen(input)>100){
-					printf("Invalid input\n");
-				}
-				else {
-					strcpy(newUser.name, input);
-					validName=1;
-				}
+				getValidInput(input,4,0,0,0,0,0,0);
+				strcpy(newUser.name, input);
+				validName=1;
 			} while (validName==0);
 			
 			printf("\nPlease enter password: \n");
-			scanf(" %100[^\n]", input);
+			getValidInput(input,4,0,0,0,0,0,0);
 			hashPassword(input, &newUser.passwordHash);
 			
 			do{
 				validChoice=0;
 				printf("\nIndicate your role:\n1 - Patient\n2 - General Practitioner\n3 - Specialist\nChoice: ");
-				scanf("%d", &choice);
+				getValidInput(&choice,1,1,3,0,0,0,0);
 					
 				switch (choice){
 					case 1: 
@@ -73,7 +170,7 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 						pIndex = findPatientByName(patients,patientCount,newUser.name);
 						if (pIndex!=-1){
 							printf("A patient record already exists with a similar name.\nDo you want to link this account to your patient record? (Y/N): ");
-							scanf(" %c", &cInput);
+							getValidInput(&cInput,3,0,0,'Y','N','y','n');
 							switch(cInput){
 								case 'Y':
 								case 'y':
@@ -110,6 +207,11 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 						validChoice=0;
 				}
 			} while (validChoice==0);
+			
+			printf("Select a security question:\n  [1] What is your favorite food?\n  [2] What is your favorite color?\n  [3] What is your favorite animal/pet?\n");
+			getValidInput(&newUser.questType,1,1,3,0,0,0,0);
+			printf("Answer: ");
+			getValidInput(newUser.answer,4,0,0,0,0,0,0);
 		}
 		users[*userCount] = newUser; //set the array of struct at index *userCount to the newUser made
 		index = *userCount; //the index of the user before it is incremented
@@ -132,7 +234,7 @@ User* loginUser (User *users, int userCount){
 	do{
 		do{
 			printf("Enter your username: ");
-			scanf(" %100[^\n]", username);
+			getValidInput(username,4,0,0,0,0,0,0);
 			found=0;
 			for (i=0;i<userCount;i++){
 				if (strcmp(users[i].username,username)==0){
@@ -140,12 +242,10 @@ User* loginUser (User *users, int userCount){
 					i=userCount; // end loop
 				}
 			}
-			if (strlen(username)==0 || strlen(username)>100)
-				printf("Invalid input.\n");
-			else if (found==0){
+			if (found==0){
 				printf("Username not found.\n");
 			}
-			else {
+			else if (found){
 				validUser=1;
 			}
 		} while (validUser==0);
@@ -154,11 +254,9 @@ User* loginUser (User *users, int userCount){
 				printf("Confirm your password.\n");
 			else
 				printf("Enter your password. If you have forgotten, input 0.\n");
-			scanf(" %100[^\n]",password);
-			
-			if ((strlen(password)==0 || strlen(password)>100) && password[0]!='0')
-				printf("Invalid input.\n");
+			getValidInput(password,4,0,0,0,0,0,0);
 			hashPassword(password,&inputHash);
+			
 			matching=0;
 			for (i=0;i<userCount;i++){
 				if (strcmp(users[i].username,username)==0 && users[i].passwordHash == inputHash){
@@ -177,11 +275,11 @@ User* loginUser (User *users, int userCount){
 				}
 			}
 			else if (matching==0){
-				printf("Invalid password.\n");
+				printf("Wrong password.\n");
 			}
 			else {
 				validPass=1;
-				printf("Logged in successfully!\n");
+				printf("Logged in successfully!\n\n");
 			}
 		} while (validPass==0);
 	} while (validUser == 0 || validPass == 0);
@@ -218,7 +316,7 @@ int saveAllUsersToFile (User *users, int userCount, const char *filename){
 	}
 	else {
 		for (i=0;i<userCount;i++){
-			fprintf(fp, "%d, %s, %lu, %s, %s\n", users[i].userID, users[i].username, users[i].passwordHash, users[i].role, users[i].name);
+			fprintf(fp, "%d, %s, %lu, %s, %s, %d, %s\n", users[i].userID, users[i].username, users[i].passwordHash, users[i].role, users[i].name, users[i].questType, users[i].answer);
 		}
 		flag=1;
 		fclose(fp);
@@ -237,9 +335,9 @@ int loadUsersFromFile (User *users, const char *filename){
 		while (flag){
 			User temp;
 			
-			result = fscanf(fp, "%d, %100[^,], %lu, %100[^,], %100[^\n]", &temp.userID, temp.username, &temp.passwordHash, temp.role, temp.name);
-			// since fscanf outputs the amount of input items, we can use it to check if scanf was successful
-			if (result==5 && count < MAX_USERS){
+			result = fscanf(fp, "%d, %100[^,], %lu, %100[^,], %100[^,], %d, %100[^\n]", &temp.userID, temp.username, &temp.passwordHash, temp.role, temp.name, &temp.questType, temp.answer);
+			// since fscanf outputs the amount of input items, we can use it to check if fscanf was successful
+			if (result==7 && count < MAX_USERS){
 				users[count]=temp;
 				count++;
 			}
@@ -257,16 +355,48 @@ int loadUsersFromFile (User *users, const char *filename){
 @return 0 or 1 if success or not
 */
 int forgotPassword (User *users, int userCount, const char *username){
-	int flag=0,i;
+	int flag=0,i,valid=0;
 	char newPass[101];
+	char input[101];
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
-			printf("Please enter password: ");
-			scanf(" %100[^\n]", newPass);
-			hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
-			printf("Successfully Changed Password!\n");
-			saveAllUsersToFile(users, userCount, "users.txt"); // save new password
-			flag = 1;
+			
+			if (users->questType == 1){
+				printf("What is your favorite food?\nAnswer: ");
+				getValidInput(input,4,0,0,0,0,0,0);
+				
+				if (strcmp(input,users->answer)==0){
+					valid=1;
+				}
+			}
+			else if (users->questType == 2){
+				printf("What is your favorite color?\nAnswer: ");
+				getValidInput(input,4,0,0,0,0,0,0);
+				
+				if (strcmp(input,users->answer)==0){
+					valid=1;
+				}
+			}
+			else if (users->questType == 3){
+				printf("What is your favorite animal/pet?\nAnswer: ");
+				getValidInput(input,4,0,0,0,0,0,0);
+				
+				if (strcmp(input,users->answer)==0){
+					valid=1;
+				}
+			}
+			
+			if (valid){
+				printf("Please enter new password: ");
+				getValidInput(newPass,4,0,0,0,0,0,0);
+				hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
+				printf("Successfully Changed Password!\n");
+				saveAllUsersToFile(users, userCount, "users.txt"); // save new password
+				flag = 1;
+			}
+			else {
+				printf("Invalid answer. Exiting...\n\n");
+			}
 		}
 	}
 	return flag;
@@ -314,7 +444,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
         printf("[4] Compute Averages (BMI + Cardio Risk)\n");
         printf("[0] Logout\n");
         printf("Choice: ");
-        scanf(" %d",&choice);
+		getValidInput(&choice,1,0,4,0,0,0,0);
 		
         switch(choice){
             case 1:
@@ -337,7 +467,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             		printf("[4] Sort patient by name\n");
             		printf("[0] Exit\n");
             		printf("Choice: ");
-            		scanf(" %d",&pchoice);
+					getValidInput(&pchoice,1,0,4,0,0,0,0);
             		
             		switch(pchoice){
             			case 1:
@@ -348,12 +478,12 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 							break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, *patientCount, order);
             				break;
             			case 4:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, *patientCount, order);
             				break;
             			case 0:
@@ -375,22 +505,20 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             		printf("[0] Exit\n");
             		printf("Choice: ");
             		
-            		scanf(" %d",&rchoice);
+            		getValidInput(&rchoice,1,0,3,0,0,0,0);
             		
             		switch(rchoice){
             			case 1:
-            				/* TODO (#2#): selectReferralID and other CRUD */
-							// selectReferralIDbyGP();
-							// after selecting GP should be able to their own referrals
+            				selectReferralID(currentUser,referrals,referralCount,users);
 							break;
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByID(referrals,*referralCount,order);
             				break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByStatus(referrals,*referralCount,order);
             				break;
             			case 0:
@@ -427,7 +555,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
         printf("[3] Compute Averages (BMI + Cardio Risk)\n");
         printf("[0] Logout\n");
         printf("Choice: ");
-        scanf(" %d",&choice);
+        getValidInput(&choice,1,0,3,0,0,0,0);
         
         switch(choice){
             case 1:
@@ -439,23 +567,20 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             		printf("[3] Sort referrals by Status\n");
             		printf("[0] Exit\n");
             		printf("Choice: ");
-            		
-            		scanf(" %d",&rchoice);
+            		getValidInput(&rchoice,1,0,3,0,0,0,0);
             		
             		switch(rchoice){
             			case 1:
-            				/* TODO (#2#): selectReferralID and other CRUD */
-							// selectReferralIDbyGP();
-							// after selecting Specialist should be able to edit, delete, 
+            				selectReferralID(currentUser,referrals,&referralCount,users);
 							break;
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByID(referrals,referralCount,order);
             				break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByStatus(referrals,referralCount,order);
             				break;
             			case 0:
@@ -477,7 +602,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             		printf("[4] Sort patient by name\n");
             		printf("[0] Exit\n");
             		printf("Choice: ");
-            		scanf(" %d",&pchoice);
+            		getValidInput(&pchoice,1,0,4,0,0,0,0);
             		
             		switch(pchoice){
             			case 1:
@@ -488,12 +613,12 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				break;
             			case 3:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, patientCount,order);
             				break;
             			case 4:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
-            				scanf(" %d",&order);
+            				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, patientCount, order);
             				break;
             			case 0:
@@ -528,10 +653,10 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
     	printf("\n==== PATIENT DASHBOARD ====\n");
     	printf("[1] Add self as patient\n");
     	printf("[2] View diagnosis reports\n");
-    	printf("[3] View referrals");
+    	printf("[3] View my referral\n");
     	printf("[0] Logout\n");
     	printf("Choice: ");
-    	scanf(" %d",&choice);
+    	getValidInput(&choice,1,0,3,0,0,0,0);
     	
     	switch(choice){
     		case 1:
@@ -557,7 +682,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
     			}
     			break;
     		case 3:
-    			showReferrals(currentUser, users, referrals, referralCount);
+    			viewReferralStatus(users,userCount,referrals,referralCount,patients,*patientCount,currentUser);
     			break;
     		case 0:
     			printf("Logging out...\n\n");
@@ -592,5 +717,16 @@ int findUserByName (User *users, int userCount, char *input){
 }
 
 void printUsers (User *users, int userCount, char *filter){ // filter will be like "Specialist" "Patient" "*" or "GP"
-	printf("USERS HERE");
+	int i;
+	printf("=== List of Users ===");
+	for (i=0;i<userCount;i++){
+		if (strcmp(filter,users[i].role)==0){
+			printf("%d | %s | %s | %s\n", users[i].userID,users[i].username,users[i].name,users[i].role);
+		}
+		else if (strcmp(filter,"*")==0){
+			printf("%d | %s | %s | %s\n", users[i].userID,users[i].username,users[i].name,users[i].role);
+		}
+	}
 }
+
+

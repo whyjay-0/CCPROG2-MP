@@ -12,6 +12,8 @@ typedef struct {
     unsigned long passwordHash; // When placed into TXT it will be a long + integer
     char role[30];   // "GP", "Specialist", "Patient"
     char name[101]; // Full name
+    int questType;
+    char answer[101];
 } User;
 typedef struct {
 	int patientID;
@@ -43,6 +45,7 @@ typedef struct {
 typedef struct {
 	int referralID; // Referral ID
 	int gpID; // GP user ID
+	int patientID; // Patient's patientID
 	char patientName[101]; // Patient Name
 	int specialistID; // Specialist user ID
 	char status[31]; // "Pending" "Accepted" "Completed" "Rejected"
@@ -51,6 +54,8 @@ typedef struct {
 } Referral;
 
 // === Function Prototypes ===
+void clearInput();
+int getValidInput(void *input, int type, int min, int max, char limit1, char limit2, char limit3, char limit4);
 int registerUser (User *users, int *userCount, Patient *patients, int patientCount);
 User* loginUser (User *users, int userCount);
 void hashPassword (const char *password, unsigned long *outputHash);
@@ -85,9 +90,11 @@ int findPatientByID (Patient *patients, int patientCount, int input);
 int findPatientByName (Patient *patients, int patientCount, char *input);
 void selectPatientID (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
 void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
+void updateGender (Patient *patient);
 
 void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
+void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser);
 void editReferral (Referral *referral);
 void deleteReferral (Referral *referrals, int *referralCount, int index);
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
