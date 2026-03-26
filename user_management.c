@@ -32,11 +32,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 1: // int
 				scan = scanf("%d", (int*)input); // (int*)var, transforms the type of var into a pointer to an int
 				if (scan != 1){
-					printf("Invalid input. Enter an integer:\n");
+					printf("Invalid input. Enter an integer: ");
 					clearInput();
 				}
 				else if (*(int*)input < min || *(int*)input > max){ // *(int*)var , value inside the pointer to int
-					printf("Out of range (%d-%d). Try again:\n", min, max);
+					printf("Out of range (%d-%d). Try again: ", min, max);
 				}
 				else 
 					valid=1;
@@ -44,11 +44,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 2: // float
 				scan = scanf("%f", (float*)input);
 				if (scan != 1){
-					printf("Invalid input. Enter an float:\n");
+					printf("Invalid input. Enter an float: ");
 					clearInput();
 				}
 				else if (*(float*)input < min || *(float*)input > max){
-					printf("Out of range (%d-%d). Try again:\n");
+					printf("Out of range (%d-%d). Try again: ");
 				}
 				else
 					valid=1;
@@ -56,11 +56,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 3: // char
 				scan = scanf(" %c", (char*)input);
 				if (scan != 1){
-					printf("Invalid input. Enter a character:\n");
+					printf("Invalid input. Enter a character: ");
 					clearInput();
 				}
 				else if (*(char*)input != limit1 && *(char*)input != limit2 && *(char*)input != limit3 && *(char*)input != limit4)
-					printf("Invalid input. Enter %c or %c:\n", limit1, limit2);
+					printf("Invalid input. Enter %c or %c:", limit1, limit2);
 				else
 					valid=1;
 				break;
@@ -71,7 +71,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again:\n");
+					printf("Empty input. Try again: ");
 				}
 				else
 					valid=1;
@@ -79,11 +79,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 5: // string 16
 				scan = scanf(" %16[^\n]", (char*)input);
 				if (scan != 1){
-					printf("Invalid input.\n");
+					printf("Invalid input.");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again:\n");
+					printf("Empty input. Try again: ");
 				}
 				else
 					valid=1;
@@ -91,11 +91,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 6: // string 15
 				scan = scanf(" %15[^\n]", (char*)input);
 				if (scan != 1){
-					printf("Invalid input.\n");
+					printf("Invalid input.");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again:\n");
+					printf("Empty input. Try again: ");
 				}
 				else
 					valid=1;
@@ -729,4 +729,54 @@ void printUsers (User *users, int userCount, char *filter){ // filter will be li
 	}
 }
 
-
+void printMainMenu (int height, int width){
+	int padding,i;
+	char *title[] = {
+        " ____         _    _               _     ____         __                          _ ",
+        "|  _ \\  __ _ | |_ (_)  ___  _ __  | |_  |  _ \\  ___  / _|  ___  _ __  _ __  __ _ | |",
+        "| |_) |/ _` || __|| | / _ \\| '_ \\ | __| | |_) |/ _ \\| |_  / _ \\| '__|| '__|/ _` || |",
+        "|  __/| (_| || |_ | ||  __/| | | || |_  |  _ <|  __/|  _||  __/| |   | |  | (_| || |",
+        "|_|    \\__,_| \\__||_| \\___||_| |_| \\__| |_| \\_\\\\___||_|   \\___||_|   |_|   \\__,_||_|",
+        "            __  __                                                            _                ",
+        "            |  \\/  |  __ _  _ __    __ _   __ _   ___  _ __ ___    ___  _ __  | |_               ",
+        "            | |\\/| | / _` || '_ \\  / _` | / _` | / _ \\| '_ ` _ \\  / _ \\| '_ \\ | __|              ",
+        "            | |  | || (_| || | | || (_| || (_| ||  __/| | | | | ||  __/| | | || |_               ",
+        "            |_|  |_| \\__,_||_| |_| \\__,_| \\__, | \\___||_| |_| |_| \\___||_| |_| \\__|              ",
+        "                    ____               _  |___/                                                  ",
+        "                          / ___|  _   _  ___ | |_  ___  _ __ ___                                               ",
+        "                          \\___ \\ | | | |/ __|| __|/ _ \\| '_ ` _ \\                                              ",
+        "                           ___) || |_| |\\__ \\| |_|  __/| | | | | |                                             ",
+        "                          |____/  \\__, ||___/ \\__|\\___||_| |_| |_|                                             ",
+        "                                  |___/                                                                        "
+    };
+	int lines = 16;
+	
+	for (i=0;i<width;i++){
+		printf("=");
+	}
+	printf("\n");
+	printf("\n");
+	padding = (width - 14) / 2;
+	printf("%*sWelcome To The\n",padding,"");
+	for (i=0;i<lines;i++){
+		padding = (width - strlen(title[i])) / 2;
+		printf("%*s%s\n",padding,"",title[i]);
+	}
+	printf("\n");
+	printf("%15s","");
+	for (i=0;i<width-30;i++){
+		printf("=");
+	}
+	printf("\n");
+	printf("%55s[1] Register account\n","");
+	printf("%61s[2] Login\n","");
+	printf("%57s[3] Exit program\n","");
+	printf("%15s","");
+	for (i=0;i<width-30;i++){
+		printf("=");
+	}
+	for(i=0;i<13;i++){
+		printf("\n");
+	}
+	printf("%58sInput choice: ","");
+}

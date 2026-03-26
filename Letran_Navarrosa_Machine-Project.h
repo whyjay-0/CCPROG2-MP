@@ -3,6 +3,8 @@
 #include <math.h>
 
 #define MAX_USERS 100
+#define HEIGHT 38
+#define WIDTH 130
 // STRUCTS
 
 // User struct for login/authentication
@@ -69,6 +71,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
 int findUserByID (User *users, int userCount, int input);
 int findUserByName (User *users, int userCount, char *input);
 void printUsers (User *users, int userCount, char *filter);
+void printMainMenu (int height, int width);
 
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);

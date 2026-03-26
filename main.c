@@ -16,12 +16,11 @@ int main () {
 	// 2D array here, for bmi and risk computation, averages.
 	// printf("User count: %d\n", userCount);
 	do{
-		// design for main menu/login screen here
-		printf("[1] Register account\n");
-		printf("[2] Login\n");
-		printf("[3] Exit program\n");
-		printf("Input choice: "); // design nalang later
+		printf("\033[8;%d;%dt", HEIGHT, WIDTH);// resize terminal
+		
+		printMainMenu(HEIGHT,WIDTH);
 		getValidInput(&choice,1,1,3,0,0,0,0);
+		
 		switch (choice){
 			case 1: // Registration
 				newUser = registerUser(users, &userCount, patients, patientCount); // registerUser returns -1 if not valid registration
