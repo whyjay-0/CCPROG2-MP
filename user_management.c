@@ -234,24 +234,28 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 */
 User* loginUser (User *users, int userCount){
 	User *user=NULL;
-	int i, validUser=0,validPass=0, found=0, matching=0, passChange=0;
+	int i, validUser=0,validPass=0, found=-1, matching=-1, passChange=0;
 	unsigned long inputHash=0;
 	char username[101],password[101];
 	do{
 		do{
+			clearScreen();
 			printCentered("Enter your username.");
+			if (found==0){
+				printf("\n%55sUsername not found.","");
+			}
+			
 			getValidInput(username,4,0,0,0,0,0,0);
 			found=0;
+			
 			for (i=0;i<userCount;i++){
 				if (strcmp(users[i].username,username)==0){
 					found=1;
 					i=userCount; // end loop
 				}
 			}
-			if (found==0){
-				printCentered("Username not found.");
-			}
-			else if (found){
+			
+			if (found){
 				validUser=1;
 			}
 		} while (validUser==0);
@@ -260,6 +264,9 @@ User* loginUser (User *users, int userCount){
 				printCentered("Confirm your password.");
 			else
 				printCentered("Enter your password. If you have forgotten, input 0.");
+			if (matching==0){
+				printf("\n%57sWrong password.","");
+			}
 			getValidInput(password,4,0,0,0,0,0,0);
 			hashPassword(password,&inputHash);
 			
@@ -271,7 +278,7 @@ User* loginUser (User *users, int userCount){
 				}
 			}
 			
-			if (password[0]=='0'){
+			if (password[0]=='0' && strlen(password)==1){
 				if (forgotPassword(users, userCount, username)==0){
 					printCentered("Invalid username.");
 				}
@@ -280,10 +287,7 @@ User* loginUser (User *users, int userCount){
 					validPass=0; // reenter pass
 				}
 			}
-			else if (matching==0){
-				printCentered("Wrong password.");
-			}
-			else {
+			if (matching==1) {
 				validPass=1;
 				printCentered("Logged in successfully!");
 			}

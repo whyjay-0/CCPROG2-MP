@@ -909,7 +909,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    printf("%56s[2] Delete Patient\n","");
     	    printf("%55s[3] Diagnose Patient\n","");
     	    printf("%56s[4] Refer Patient\n","");
-    	    printf("%61s[5] Exit\n","");
+    	    printf("%61s[0] Exit\n","");
     	    getValidInput(&choice,1,0,4,0,0,0,0);
     	    
     	    switch(choice){
@@ -946,6 +946,9 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    		clearScreen();
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					break;
+				case 0:
+					printCentered("Exiting...");
 					break;
     	    	default:
     	    		printf("Invalid input.\n");
