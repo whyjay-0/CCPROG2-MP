@@ -506,12 +506,12 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				selectPatientName(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
 							break;
             			case 3:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, *patientCount, order);
             				break;
             			case 4:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, *patientCount, order);
             				break;
@@ -551,12 +551,12 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				selectReferralID(currentUser,referrals,referralCount,users,userCount,patients,*patientCount);
 							break;
             			case 2:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByID(referrals,*referralCount,order);
             				break;
             			case 3:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByStatus(referrals,*referralCount,order);
             				break;
@@ -637,13 +637,13 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 							break;
             			case 2:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByID(referrals,referralCount,order);
             				break;
             			case 3:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByStatus(referrals,referralCount,order);
             				break;
@@ -690,13 +690,13 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				break;
             			case 3:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, patientCount,order);
             				break;
             			case 4:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending");
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, patientCount, order);
             				break;
