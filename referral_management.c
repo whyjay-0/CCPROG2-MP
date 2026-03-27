@@ -125,8 +125,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     }
 
     if (found==0){
-        printCentered("No referrals found.\n");
-        waitForInput();
+        printf("\n\n%56sNo referrals found\n","");
     }
 }
 
@@ -345,7 +344,7 @@ int findReferralByID (Referral *referrals, int referralCount, int input){
 
 void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users, int userCount, Patient *patients, int patientCount){
 	int input, choice;
-	int index, i;
+	int index, i, id;
 	char cInput;
 	
 	printCentered("Enter Referral ID to select");
@@ -379,6 +378,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    switch(choice){
     	    	case 1:
     	    		clearScreen();
+    	    		
+    	    		id = referrals[index].referralID;
+    	    		
 					printf("%38sAre you sure you want to delete referral #%02d? [Y/N]", "", referrals[index].referralID);
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
 					switch (cInput){
@@ -394,6 +396,11 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    				waitForInput();
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					
+					printf("%47sSuccessfully deleted Referral #%02d","",id);
+					waitForInput();
+					
+					choice = 0;
 					break;
 				case 0:
     	    		printf("Exiting...\n\n");
@@ -432,6 +439,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    		break;
     	    	case 2:
     	    		clearScreen();
+    	    		
+    	    		id = referrals[index].referralID;
+    	    		
 					printf("%38sAre you sure you want to delete referral #%02d? [Y/N]", "", referrals[index].referralID);
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
 					switch (cInput){
@@ -446,6 +456,11 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    				printf("Invalid input.\n");
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					
+					printf("%47sSuccessfully deleted Referral #%02d","",id);
+					waitForInput();
+					
+					choice = 0;
     	    		break;
     	    	case 0:
     	    		printf("Exiting...\n\n");

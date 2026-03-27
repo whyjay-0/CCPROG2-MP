@@ -178,62 +178,62 @@ void diagnosePatient (Patient *patient){
 	
 	// Ask user for needed info
 	// Cholesterol values
-	printCentered("Enter Total Cholesterol (mg/dL): ");
+	printCentered("Enter Total Cholesterol (mg/dL)");
 	getValidInput(&currentPatient->totalChol,2,0,1000,0,0,0,0);
-	printCentered("Enter HDL Cholesterol (mg/dL): ");
+	printCentered("Enter HDL Cholesterol (mg/dL)");
 	getValidInput(&currentPatient->hdlChol,2,0,1000,0,0,0,0);
 	
 	// eGFR value, estimated Glomerular Filtration Rate
-	printCentered("Enter eGFR (mL/min/1.73m^2): ");
+	printCentered("Enter eGFR (mL/min/1.73m^2)");
 	getValidInput(&currentPatient->eGFR,1,0,1000,0,0,0,0);
 	
 	// BP Treatment and Values
 	if (strcmp(currentPatient->bp,"0")==0){
-		printCentered("Enter blood pressure (SYS/DIA mmHg): ");
+		printCentered("Enter blood pressure [SYS/DIA mmHg]");
 		getValidInput(currentPatient->bp,6,0,0,0,0,0,0);
 	}
 	
-	printCentered("Is patient using anti-hypertensive medication? (Y/N): ");
+	printCentered("Is patient using anti-hypertensive medication? [Y/N]");
 	getValidInput(&currentPatient->htMed,3,0,0,'Y','N','y','n');
 	
 	// CVD
-	printCentered("Does patient have any known cardiovascular disease? (Y/N): ");
+	printCentered("Does patient have any known cardiovascular disease? [Y/N]");
 	getValidInput(&currentPatient->currentCVD,3,0,0,'Y','N','y','n');
 	
 	// Blood sugar
 	if (currentPatient->bloodSugar==0){
-		printCentered("Enter blood sugar (mg/dL): ");
+		printCentered("Enter blood sugar (mg/dL)");
 		getValidInput(&currentPatient->bloodSugar,2,0,1000,0,0,0,0);
 	}
 	
 	// LDL treatment
-	printCentered("Is patient using statins? (Y/N): ");
+	printCentered("Is patient using statins? [Y/N]");
 	getValidInput(&currentPatient->statins,3,0,0,'Y','N','y','n');
 	
 	// Smoking
-	printCentered("Is patient a regular smoker? (Y/N): ");
+	printCentered("Is patient a regular smoker? [Y/N]");
 	getValidInput(&currentPatient->smoking,3,0,0,'Y','N','y','n');
 	
 	// Diabetes
-	printCentered("Does patient have diabetes? (Y/N): ");
+	printCentered("Does patient have diabetes? [Y/N]");
 	getValidInput(&currentPatient->diabetes,3,0,0,'Y','N','y','n');
 	
 	// Creatinine
-	printCentered("Enter Serum Creatinine of patient (mg/dL): ");
+	printCentered("Enter Serum Creatinine of patient (mg/dL)");
 	getValidInput(&currentPatient->creatinine,2,0,1000,0,0,0,0);
 	
 	// Family History CVD
-	printCentered("Does patient have family history of CVD? (Y/N): ");
+	printCentered("Does patient have family history of CVD? [Y/N]");
 	getValidInput(&currentPatient->cvdFamily,3,0,0,'Y','N','y','n');
 	
 	// Diet/Exercise
-	printCentered("Does patient exercise regularly? (Y/N): ");
+	printCentered("Does patient exercise regularly? [Y/N]");
 	getValidInput(&currentPatient->exercise,3,0,0,'Y','N','y','n');
-	printCentered("Does patient have a high-fat/sugar diet? (Y/N): ");
+	printCentered("Does patient have a high-fat/sugar diet? [Y/N]");
 	getValidInput(&currentPatient->diet,3,0,0,'Y','N','y','n');
 	
 	// Alcohol
-	printCentered("Does patient consume alcohol regularly? (Y/N): ");
+	printCentered("Does patient consume alcohol regularly? [Y/N]"); 
 	getValidInput(&currentPatient->alcohol,3,0,0,'Y','N','y','n');
 	
 	// Calculate Cardio Risk,, Can only be done on adults ages 30-79 without past CVD (This is assumed to be true).
@@ -316,10 +316,21 @@ void showPatientDetails (Patient *currentPatient){
 	printf("%62sAge: %d\n%61sGender: %c\n", "", currentPatient->age, "", currentPatient->gender);
 	padding = (WIDTH - 12 - strlen(currentPatient->bmiCat)) / 2;
 	printf("%*sBMI: %.2f, %s\n", padding, "", currentPatient->bmi, currentPatient->bmiCat);
-	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
-	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	if (strcmp(currentPatient->bp,"0")==0){
+		printf("%55sBlood Pressure: TBD\n","");
+	}
+	else {
+		padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
+		printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	}
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+	if (currentPatient->bloodSugar==0){
+		printf("%57sBlood Sugar: TBD\n","");
+	}
+	else {
+		printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+	}
+	
 }
 
 
@@ -327,7 +338,7 @@ void showPatientDetails (Patient *currentPatient){
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
 	int i;
 	
-	printf("%25s","");
+	printf("%27s","");
 	for (i=0;i<WIDTH-100;i++){
 		printf("%c",205);
 	}
@@ -654,7 +665,7 @@ void deletePatient (Patient *patients, int *patientCount, int index){
 void showPatients (Patient *patient, int count){
 	int i=0;
 	if(count==0)
-		printf("No patients found.\n");
+		printf("%56sNo patients found\n","");
 	else {
 		printf("----------------------------------------");
     	printf("----------------------------------------");
@@ -813,7 +824,7 @@ int findPatientByName (Patient *patients, int patientCount, char *input){
 
 void selectPatientID (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount){
 	int input, i;
-	int choice;
+	int choice, id;
 	int index;
 	char cInput;
 	
@@ -824,7 +835,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 	index = findPatientByID(patients,*patientCount,input);
 	
 	if (index == -1){
-		printCentered("Patient not found.\n");
+		printCentered("Patient not found.");
 		waitForInput();
 	}
 	else {
@@ -854,6 +865,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    	case 1:
     	    		clearScreen();
 					showDiagnosisReport(&patients[index]);
+					waitForInput();
     	    		break;
 				case 2:
    		     		clearScreen();
@@ -862,7 +874,9 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    		break;
     	    	case 3:
     	    		clearScreen();
+    	    		id = patients[index].patientID;
     	    		printf("%40sAre you sure you want to delete patient #%02d? [Y/N]", "", patients[index].patientID);
+    	    		
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
 					
 					switch (cInput){
@@ -877,12 +891,19 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    				printf("Invalid input.\n");
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		
+    	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
+    	    		waitForInput();
+    	    		
+    	    		choice=0;
     	    		break;
     	    	case 4:
+    	    		clearScreen();
     	    		diagnosePatient(&patients[index]);
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
     	    	case 5:
+    	    		clearScreen();
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
@@ -898,19 +919,20 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 }
 
 void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount){
-	int choice, i;
+	int choice, i, id;
 	int index;
 	char input[101];
 	char cInput;
 	
-	printf("Enter name of patient to select: ");
+	printCentered("Enter name of patient to select: ");
 	getValidInput(input,4,0,0,0,0,0,0);
 	// do while index==-1 show patients
 	
 	index = findPatientByName(patients,*patientCount,input);
 	
 	if (index == -1){
-		printf("Patient not found.\n");
+		printCentered("Patient not found.");
+		waitForInput();
 	}
 	else {
 		do{
@@ -939,6 +961,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    	case 1:
     	    		clearScreen();
 					showDiagnosisReport(&patients[index]);
+					waitForInput();
     	    		break;
     	    	case 2:
     	    		clearScreen();
@@ -947,6 +970,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					break;
     	    	case 3:
     	    		clearScreen();
+    	    		id = patients[index].patientID;
     	    		printf("%40sAre you sure you want to delete patient #%02d? [Y/N]", "", patients[index].patientID);
     	    		
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
@@ -963,6 +987,11 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    				printf("Invalid input.\n");
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		
+    	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
+    	    		waitForInput();
+    	    		
+    	    		choice=0;
 					break;
     	    	case 4:
     	    		clearScreen();

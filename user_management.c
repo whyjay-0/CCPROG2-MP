@@ -36,11 +36,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 1: // int
 				scan = scanf("%d", (int*)input); // (int*)var, transforms the type of var into a pointer to an int
 				if (scan != 1){
-					printCentered("Invalid input. Enter an integer.");
+					printCentered("Invalid input. Enter an integer");
 					clearInput();
 				}
 				else if (*(int*)input < min || *(int*)input > max){ // *(int*)var , value inside the pointer to int
-					printf("%50sOut of range (%d-%d). Try again.", "", min, max);
+					printf("%50sOut of range (%d-%d). Try again", "", min, max);
 				}
 				else 
 					valid=1;
@@ -48,11 +48,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 2: // float
 				scan = scanf("%f", (float*)input);
 				if (scan != 1){
-					printCentered("Invalid input. Enter an float.");
+					printCentered("Invalid input. Enter a float");
 					clearInput();
 				}
 				else if (*(float*)input < min || *(float*)input > max){
-					printf("%50sOut of range (%d-%d). Try again.", "", min, max);
+					printf("%50sOut of range (%d-%d). Try again", "", min, max);
 				}
 				else
 					valid=1;
@@ -64,18 +64,18 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 					clearInput();
 				}
 				else if (*(char*)input != limit1 && *(char*)input != limit2 && *(char*)input != limit3 && *(char*)input != limit4)
-					printf("Invalid input. Enter %c or %c:", limit1, limit2);
+					printf("Invalid input. Enter %c or %c", limit1, limit2);
 				else
 					valid=1;
 				break;
 			case 4: // string 100
 				scan = scanf(" %100[^\n]", (char*)input);
 				if (scan != 1){
-					printf("Invalid input.\n");
+					printf("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again: ");
+					printf("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -83,11 +83,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 5: // string 16
 				scan = scanf(" %16[^\n]", (char*)input);
 				if (scan != 1){
-					printf("Invalid input.");
+					printf("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again: ");
+					printf("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -95,11 +95,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 6: // string 15
 				scan = scanf(" %15[^\n]", (char*)input);
 				if (scan != 1){
-					printf("Invalid input.");
+					printf("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again: ");
+					printf("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -122,10 +122,11 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 	User newUser;
 	char input[101];
 	char cInput;
-	int choice, complete=0, validUser=0, validName=0, validChoice=0, index, pIndex;
+	int choice, complete=0, validUser=0, index, pIndex;
 	
 	if (*userCount >= MAX_USERS){
-		printCentered("Max User Limit reached.");
+		printCentered("Max User Limit reached");
+		waitForInput();
 		index=-1;
 	}
 	else {
@@ -150,69 +151,58 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 				}
 			} while (validUser==0);
 			
-			do{
-				validName=0;
-				printCentered("Please enter your full name [100 Characters Max].");
-				getValidInput(input,4,0,0,0,0,0,0);
-				strcpy(newUser.name, input);
-				validName=1;
-			} while (validName==0);
+			printCentered("Please enter your full name [100 Characters Max].");
+			getValidInput(input,4,0,0,0,0,0,0);
+			strcpy(newUser.name, input);
 			
 			printCentered("Please enter password.");
 			getValidInput(input,4,0,0,0,0,0,0);
 			hashPassword(input, &newUser.passwordHash);
 			
-			do{
-				validChoice=0;
-				clearScreen();
-				printf("%55sIndicate your role:\n%59s[1] Patient\n%53s[2] General Practitioner\n%58s[3] Specialist","","","","");
-				getValidInput(&choice,1,1,3,0,0,0,0);
-					
-				switch (choice){
-					case 1: 
-						strcpy(newUser.role, "Patient");
-						// find if full name is in patient record/array
-						pIndex = findPatientByName(patients,patientCount,newUser.name);
-						if (pIndex!=-1){
-							clearScreen();
-							printf("%39sA patient record already exists with a similar name.\n%34sDo you want to link this account to your patient record? [Y/N]","","");
-							getValidInput(&cInput,3,0,0,'Y','N','y','n');
-							switch(cInput){
-								case 'Y':
-								case 'y':
-									newUser.userID = patients[pIndex].userID;
-									break;
-								case 'N':
-								case 'n':
-									newUser.userID = getUserID(users,patients);
-									break;
-								default:
-									printCentered("Invalid input.");	
-							}
+			clearScreen();
+			printf("%55sIndicate your role:\n%59s[1] Patient\n%53s[2] General Practitioner\n%58s[3] Specialist","","","","");
+			getValidInput(&choice,1,1,3,0,0,0,0);
+				
+			switch (choice){
+				case 1: 
+					strcpy(newUser.role, "Patient");
+					// find if full name is in patient record/array
+					pIndex = findPatientByName(patients,patientCount,newUser.name);
+					if (pIndex!=-1){
+						clearScreen();
+						printf("%39sA patient record already exists with a similar name.\n%34sDo you want to link this account to your patient record? [Y/N]","","");
+						getValidInput(&cInput,3,0,0,'Y','N','y','n');
+						switch(cInput){
+							case 'Y':
+							case 'y':
+								newUser.userID = patients[pIndex].userID;
+								break;
+							case 'N':
+							case 'n':
+								newUser.userID = getUserID(users,patients);
+								break;
+							default:
+								printCentered("Invalid input.");	
 						}
-						else {
-							newUser.userID = getUserID(users,patients);
-						}
-						validChoice=1; 
-						complete=1; 
-						break;
-					case 2: 
-						strcpy(newUser.role, "GP"); 
-						newUser.userID = getUserID(users,patients); // set the userID of new user to highest userID found + 1
-						validChoice=1; 
-						complete=1; 
-						break;
-					case 3: 
-						strcpy(newUser.role, "Specialist");
+					}
+					else {
 						newUser.userID = getUserID(users,patients);
-						validChoice=1; 
-						complete=1; 
-						break;
-					default: 
-						printCentered("Invalid input.");
-						validChoice=0;
-				}
-			} while (validChoice==0);
+					}
+					complete=1; 
+					break;
+				case 2: 
+					strcpy(newUser.role, "GP"); 
+					newUser.userID = getUserID(users,patients); // set the userID of new user to highest userID found + 1
+					complete=1; 
+					break;
+				case 3: 
+					strcpy(newUser.role, "Specialist");
+					newUser.userID = getUserID(users,patients);
+					complete=1; 
+					break;
+				default: 
+					printCentered("Invalid input.");
+			}
 			clearScreen();
 			printf("%51sSelect a security question:\n%49s[1] What is your favorite food?\n%49s[2] What is your favorite color?\n%46s[3] What is your favorite animal/pet?\n","","","","");
 			getValidInput(&newUser.questType,1,1,3,0,0,0,0);
@@ -264,7 +254,7 @@ User* loginUser (User *users, int userCount){
 				printCentered("Confirm your password");
 			else
 				printCentered("Enter your password. If you have forgotten, input 0");
-			if (matching==0){
+			if (matching==0 && passChange==0){
 				printf("\n%57sWrong password","");
 			}
 			getValidInput(password,4,0,0,0,0,0,0);
@@ -365,37 +355,49 @@ int loadUsersFromFile (User *users, const char *filename){
 @return 0 or 1 if success or not
 */
 int forgotPassword (User *users, int userCount, const char *username){
-	int flag=0,i,valid=0;
+	int flag=0,i,valid=0,count=0;
 	char newPass[101];
 	char input[101];
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
-			
-			if (users[i].questType == 1){
-				printCentered("What is your favorite food?");
-				getValidInput(input,4,0,0,0,0,0,0);
-				
-				if (strcmp(input,users[i].answer)==0){
-					valid=1;
+			do{
+				if (users[i].questType == 1){
+					printCentered("What is your favorite food?");
+					if (count==1)
+						printf("\n%58sInvalid answer","");
+					getValidInput(input,4,0,0,0,0,0,0);
+					
+					if (strcmp(input,users[i].answer)==0){
+						valid=1;
+					}
+					else {
+						valid=0;
+					}
 				}
-			}
-			else if (users[i].questType == 2){
-				printCentered("What is your favorite color?");
-				getValidInput(input,4,0,0,0,0,0,0);
-				
-				if (strcmp(input,users[i].answer)==0){
-					valid=1;
+				else if (users[i].questType == 2){
+					printCentered("What is your favorite color?");
+					getValidInput(input,4,0,0,0,0,0,0);
+					
+					if (strcmp(input,users[i].answer)==0){
+						valid=1;
+					}
+					else {
+						valid=0;
+					}
 				}
-			}
-			else if (users[i].questType == 3){
-				printCentered("What is your favorite animal/pet?");
-				getValidInput(input,4,0,0,0,0,0,0);
-				
-				if (strcmp(input,users[i].answer)==0){
-					valid=1;
+				else if (users[i].questType == 3){
+					printCentered("What is your favorite animal/pet?");
+					getValidInput(input,4,0,0,0,0,0,0);
+					
+					if (strcmp(input,users[i].answer)==0){
+						valid=1;
+					}
+					else {
+						valid=0;
+					}
 				}
-			}
-			
+				count=1;
+			} while (valid==0);
 			if (valid){
 				printCentered("Please enter new password.");
 				getValidInput(newPass,4,0,0,0,0,0,0);
@@ -403,9 +405,6 @@ int forgotPassword (User *users, int userCount, const char *username){
 				printCentered("Successfully Changed Password!");
 				saveAllUsersToFile(users, userCount, "users.txt"); // save new password
 				flag = 1;
-			}
-			else {
-				printCentered("Invalid answer. Exiting...");
 			}
 		}
 	}
@@ -458,11 +457,11 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 			printf("%c",205);
 		}
 		printf("\n");
-        printf("%57s[1] Add Patient\n","");
-        printf("%56s[2] Show Patients\n","");
-        printf("%56s[3] Show Referrals\n",""); 
-        printf("%44s[4] Compute Averages (BMI and Cardio Risk)\n","");
-        printf("%60s[0] Logout","");
+        printf("%50s[1] Add Patient\n","");
+        printf("%50s[2] Show Patients\n","");
+        printf("%50s[3] Show Referrals\n",""); 
+        printf("%50s[4] Compute Averages (BMI and Cardio Risk)\n","");
+        printf("%50s[0] Logout","");
 		getValidInput(&choice,1,0,4,0,0,0,0);
 		
         switch(choice){
@@ -471,8 +470,10 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                     patients[*patientCount] = addPatient(currentUser,patients,*patientCount,users,userCount);
                     (*patientCount)++;
                 }
-                else
-                	printCentered("Reached max patient count.");
+                else{
+                	printCentered("Reached max patient count");
+                	waitForInput();
+				}
                 saveAllPatientsToFile(patients,*patientCount,"patients.txt");
                 break;
 			
@@ -491,27 +492,31 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 					}
 					printf("\n");
 					
-            		printf("%49s[1] Select patient by patientID\n","");
+            		printf("%52s[1] Select patient by patientID\n","");
             		printf("%52s[2] Select patient by name\n","");
             		printf("%52s[3] Sort patient by userID\n","");
-            		printf("%53s[4] Sort patient by name\n","");
-            		printf("%61s[0] Exit","");
+            		printf("%52s[4] Sort patient by name\n","");
+            		printf("%52s[0] Exit","");
 					getValidInput(&pchoice,1,0,4,0,0,0,0);
             		
             		switch(pchoice){
             			case 1:
-            				selectPatientID(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
+            				clearScreen();
+							selectPatientID(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
 							break;
             			case 2:
-            				selectPatientName(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
+            				clearScreen();
+							selectPatientName(patients,patientCount,referrals,users,currentUser,userCount,referralCount);
 							break;
             			case 3:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+            				clearScreen();
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, *patientCount, order);
             				break;
             			case 4:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+            				clearScreen();
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, *patientCount, order);
             				break;
@@ -540,23 +545,26 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 					printf("\n");
 					
             		printf("%52s[1] Select referrals by ID\n","");
-            		printf("%53s[2] Sort referrals by ID\n","");
-            		printf("%51s[3] Sort referrals by Status\n","");
-            		printf("%61s[0] Exit","");
+            		printf("%52s[2] Sort referrals by ID\n","");
+            		printf("%52s[3] Sort referrals by Status\n","");
+            		printf("%52s[0] Exit","");
             		
             		getValidInput(&rchoice,1,0,3,0,0,0,0);
             		
             		switch(rchoice){
             			case 1:
-            				selectReferralID(currentUser,referrals,referralCount,users,userCount,patients,*patientCount);
+            				clearScreen();
+							selectReferralID(currentUser,referrals,referralCount,users,userCount,patients,*patientCount);
 							break;
             			case 2:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+            				clearScreen();
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByID(referrals,*referralCount,order);
             				break;
             			case 3:
-            				printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+            				clearScreen();
+							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortReferralsByStatus(referrals,*referralCount,order);
             				break;
@@ -757,7 +765,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
                     (*patientCount)++;
                 }
                 else{
-                	printCentered("Max patient count reached.");
+                	printCentered("Reached max patient count");
                 	waitForInput();
 				}
 				saveAllPatientsToFile(patients,*patientCount,"patients.txt");
@@ -781,7 +789,6 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
 			    }
 			    if (!found){
     			    printCentered("No record found.");
-    			    waitForInput();
     			}
     			waitForInput();
     			break;
