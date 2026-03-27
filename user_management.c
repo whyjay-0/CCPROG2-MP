@@ -718,7 +718,7 @@ int findUserByName (User *users, int userCount, char *input){
 
 void printUsers (User *users, int userCount, char *filter){ // filter will be like "Specialist" "Patient" "*" or "GP"
 	int i;
-	printf("=== List of Users ===");
+	printf("=== List of Users ===\n");
 	for (i=0;i<userCount;i++){
 		if (strcmp(filter,users[i].role)==0){
 			printf("%d | %s | %s | %s\n", users[i].userID,users[i].username,users[i].name,users[i].role);
@@ -730,7 +730,23 @@ void printUsers (User *users, int userCount, char *filter){ // filter will be li
 }
 
 void printMainMenu (int height, int width){
-	int padding,i;
+	int i;
+	printTitle(height,width);
+	
+	printf("%55s[1] Register account\n","");
+	printf("%61s[2] Login\n","");
+	printf("%57s[3] Exit program\n","");
+	printf("%15s","");
+	for (i=0;i<width-30;i++){
+		printf("=");
+	}
+	for(i=0;i<13;i++){
+		printf("\n");
+	}
+	printf("%58sInput choice: ","");
+}
+
+void printTitle(int height, int width){
 	char *title[] = {
         " ____         _    _               _     ____         __                          _ ",
         "|  _ \\  __ _ | |_ (_)  ___  _ __  | |_  |  _ \\  ___  / _|  ___  _ __  _ __  __ _ | |",
@@ -742,20 +758,19 @@ void printMainMenu (int height, int width){
         "            | |\\/| | / _` || '_ \\  / _` | / _` | / _ \\| '_ ` _ \\  / _ \\| '_ \\ | __|              ",
         "            | |  | || (_| || | | || (_| || (_| ||  __/| | | | | ||  __/| | | || |_               ",
         "            |_|  |_| \\__,_||_| |_| \\__,_| \\__, | \\___||_| |_| |_| \\___||_| |_| \\__|              ",
-        "                    ____               _  |___/                                                  ",
-        "                          / ___|  _   _  ___ | |_  ___  _ __ ___                                               ",
-        "                          \\___ \\ | | | |/ __|| __|/ _ \\| '_ ` _ \\                                              ",
-        "                           ___) || |_| |\\__ \\| |_|  __/| | | | | |                                             ",
-        "                          |____/  \\__, ||___/ \\__|\\___||_| |_| |_|                                             ",
-        "                                  |___/                                                                        "
+        "                    ____               _ |___/                                                  ",
+        "                            / ___|  _   _  ___ | |_  ___  _ __ ___                                               ",
+        "                            \\___ \\ | | | |/ __|| __|/ _ \\| '_ ` _ \\                                              ",
+        "                             ___) || |_| |\\__ \\| |_|  __/| | | | | |                                             ",
+        "                            |____/  \\__, ||___/ \\__|\\___||_| |_| |_|                                             ",
+        "                                    |___/                                                                        "
     };
-	int lines = 16;
+	int lines = 16, padding, i;
 	
 	for (i=0;i<width;i++){
 		printf("=");
 	}
-	printf("\n");
-	printf("\n");
+	printf("\n\n");
 	padding = (width - 14) / 2;
 	printf("%*sWelcome To The\n",padding,"");
 	for (i=0;i<lines;i++){
@@ -768,15 +783,4 @@ void printMainMenu (int height, int width){
 		printf("=");
 	}
 	printf("\n");
-	printf("%55s[1] Register account\n","");
-	printf("%61s[2] Login\n","");
-	printf("%57s[3] Exit program\n","");
-	printf("%15s","");
-	for (i=0;i<width-30;i++){
-		printf("=");
-	}
-	for(i=0;i<13;i++){
-		printf("\n");
-	}
-	printf("%58sInput choice: ","");
 }

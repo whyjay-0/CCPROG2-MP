@@ -43,6 +43,7 @@ typedef struct {
 	char alcohol; // For other information in diagnosis report
 	double cardioRisk;  // For cvdRisk
 	char isDiagnosed; // Will show if patient has been diagnosed or not
+	int isReferred; // patients should only be referred once
 } Patient;
 typedef struct {
 	int referralID; // Referral ID
@@ -72,6 +73,7 @@ int findUserByID (User *users, int userCount, int input);
 int findUserByName (User *users, int userCount, char *input);
 void printUsers (User *users, int userCount, char *filter);
 void printMainMenu (int height, int width);
+void printTitle(int height, int width);
 
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);
@@ -102,6 +104,7 @@ void editReferral (Referral *referral);
 void deleteReferral (Referral *referrals, int *referralCount, int index);
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename);
 int loadReferralsFromFile (Referral *referrals, const char *filename);
+int getReferralID (Referral *referrals, int referralCount);
 void sortReferralsByID (Referral *referrals, int referralCount, int order);
 void sortReferralsByStatus (Referral *referrals, int referralCount, int order);
 int findReferralByID (Referral *referrals, int referralCount, int input);

@@ -18,7 +18,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 	strcpy(newReferral.patientName,currentPatient->name);
 	
 	printf("Referring Patient: %s\n", newReferral.patientName);
-	if (currentPatient->isDiagnosed=='Y'){
+	if (currentPatient->isDiagnosed=='Y' && currentPatient->isReferred<1){
 		printf("Enter details of specialist by:\n[1] ID\n[2] Name\nChoice: ");
 		getValidInput(&choice,1,1,2,0,0,0,0);
 		switch(choice){
@@ -29,7 +29,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 				getValidInput(&input,1,0,500,0,0,0,0);
 			
 				index = findUserByID(users,userCount,input); // index of user
-				if (index!=-1){
+				if (index!=-1 && strcmp(users[index].role,"Specialist")==0){
 					found=1;
 					specialist = users[index];
 				}
@@ -40,7 +40,7 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 				getValidInput(strInput,4,0,0,0,0,0,0);
 				
 				index = findUserByName(users,userCount,strInput);
-				if (index!=-1){
+				if (index!=-1 && strcmp(users[index].role,"Specialist")==0){
 					found=1;
 					specialist = users[index];
 				}
@@ -56,12 +56,17 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 			strcpy(newReferral.status,"Pending"); // req will be sent to specialist, where they will need to accept or complete or reject
 				
 			// setting new ID for referral
-			newReferral.referralID = *referralCount + 1; // set the referralID of new referral to old referralCount + 1
+			newReferral.referralID = getReferralID(referrals,*referralCount); // set the referralID of new referral to old referralCount + 1
 			referrals[*referralCount] = newReferral; //set the array of struct at index *referrakCount to the newReferral made
 			// index = *userCount; // can be used if we want to return ID of the new referral
 			(*referralCount)++; // increase amount of referrals
 			
 			saveAllReferralsToFile(referrals, *referralCount, "referrals.txt");
+			
+			currentPatient->isReferred = 1;
+		}
+		if (found==0) {
+			printf("Specialist not found.\n");
 		}
 	}
 	else {
@@ -75,7 +80,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     printf("\n===== REFERRALS =====\n");
     for (i=0;i<referralCount;i++){
         if (strcmp(currentUser->role,"GP")==0){
-            if (referrals[i].gpID == currentUser->userID){
+            if (referrals[i].gpID == currentUser->userID){ // show own referrals made
                 printf("%d | %s | Specialist ID: %d | %s\n",
                     referrals[i].referralID,
                     referrals[i].patientName,
@@ -85,7 +90,7 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
             }
         }
         else if (strcmp(currentUser->role,"Specialist")==0){
-            if (referrals[i].specialistID == currentUser->userID){
+            if (referrals[i].specialistID == currentUser->userID){ // show referrals assigned to specialist
                 printf("%d | %s | Status: %s\n",
                     referrals[i].referralID,
                     referrals[i].patientName,
@@ -102,33 +107,49 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
 
 // Only for Patients
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser){
-	int index, i, j;
+	int index=-1, i, j, found=0;
 	int gpIndex, spIndex;
-	// find index of the referral based on userID of patient
+	// search index of the referral based on userID of patient
 	for (i=0;i<referralCount;i++){
 		for (j=0;j<patientCount;j++){
-			if (referrals[i].patientID == patients[j].userID){
+			if (referrals[i].patientID == patients[j].patientID){
 				index = i;
+				found+=1;
+				i=referralCount;
 			}
 		}
 	}
+	// search gp
 	for (i=0;i<userCount;i++){
 		if (users[i].userID == referrals[index].gpID){
 			gpIndex = i;
+			found+=1;
+			i=userCount;
 		}
 	}
+	// search specialist
 	for (i=0;i<userCount;i++){
 		if (users[i].userID == referrals[index].specialistID){
 			spIndex = i;
+			found+=1;
+			i=userCount;
 		}
 	}
-	// print the ff
-	printf("\n=== Referral Status ===\n");
-	printf("Referral ID: %d\n",referrals[index].referralID);
-	printf("Patient Name: %s\n\n",referrals[index].patientName);
-	printf("Referred By (GP): %s\n",users[gpIndex].name);
-	printf("Assigned Specialist: %s\n\n",users[spIndex].name);
-	printf("Status: %s\n\n", referrals[index].status);
+	if (index==-1){
+		found=0;
+	}
+	// print
+	if (found==3){
+		printf("\n=== Referral Status ===\n");
+		printf("Referral ID: %d\n",referrals[index].referralID);
+		printf("Patient Name: %s\n\n",referrals[index].patientName);
+		printf("Referred By (GP): %s\n",users[gpIndex].name);
+		printf("Assigned Specialist: %s\n\n",users[spIndex].name);
+		printf("Status: %s\n\n", referrals[index].status);
+	}
+	else if(found==0){
+		printf("No Referral found.\n");
+	}
 }
 
 void editReferral (Referral *referral){
@@ -153,12 +174,13 @@ void editReferral (Referral *referral){
 
 void deleteReferral (Referral *referrals, int *referralCount, int index){
     int i;
+	int id = referrals[index].referralID;
 	
     for (i=index;i<*referralCount-1;i++){
         referrals[i] = referrals[i+1];
         }
 	(*referralCount)--;
-	printf("\nSucessfully deleted referral #%d\n", referrals[i].referralID);
+	printf("\nSucessfully deleted referral #%d\n", id);
 }
 
 int saveAllReferralsToFile (Referral *referrals, int referralCount, const char *filename){
@@ -203,7 +225,7 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
                 &temp.specialistID,
                 temp.status);
 
-            if (result==5){
+            if (result==6){
                 referrals[count] = temp;
                 count++;
             }
@@ -215,6 +237,16 @@ int loadReferralsFromFile (Referral *referrals, const char *filename){
     }
 
     return count;
+}
+
+int getReferralID (Referral *referrals, int referralCount){
+	int i,max=0;
+	for (i=0;i<referralCount;i++){
+		if (referrals[i].referralID > max){
+			max = referrals[i].referralID;
+		}
+	}
+	return max + 1;
 }
 
 void sortReferralsByID (Referral *referrals, int referralCount, int order){
@@ -291,7 +323,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	index = findReferralByID(referrals,*referralCount,input);
 	
 	if (index == -1){
-		printf("Patient not found.\n");
+		printf("Referral not found.\n");
 	}
 	else if (strcmp(currentUser->role,"GP")==0 && index!=-1){
 		do{
