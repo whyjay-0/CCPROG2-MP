@@ -509,7 +509,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             		
             		switch(rchoice){
             			case 1:
-            				selectReferralID(currentUser,referrals,referralCount,users);
+            				selectReferralID(currentUser,referrals,&referralCount,users,userCount,patients,patientCount);
 							break;
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
@@ -571,7 +571,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             		
             		switch(rchoice){
             			case 1:
-            				selectReferralID(currentUser,referrals,&referralCount,users);
+            				selectReferralID(currentUser,referrals,&referralCount,users,userCount,patients,patientCount);
 							break;
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");

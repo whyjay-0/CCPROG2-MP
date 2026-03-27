@@ -140,7 +140,7 @@ void viewReferralStatus(User *users, int userCount, Referral *referrals, int ref
 	}
 	// print
 	if (found==3){
-		printf("\n=== Referral Status ===\n");
+		printf("\n=== Referral %d Status ===\n",referrals[index].referralID);
 		printf("Referral ID: %d\n",referrals[index].referralID);
 		printf("Patient Name: %s\n\n",referrals[index].patientName);
 		printf("Referred By (GP): %s\n",users[gpIndex].name);
@@ -312,7 +312,7 @@ int findReferralByID (Referral *referrals, int referralCount, int input){
 	return index;
 }
 
-void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users){
+void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users, int userCount, Patient *patients, int patientCount){
 	int input, choice;
 	int index;
 	char cInput;
@@ -327,7 +327,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	}
 	else if (strcmp(currentUser->role,"GP")==0 && index!=-1){
 		do{
-			showReferrals(currentUser,users,referrals,*referralCount);
+			viewReferralStatus(users,userCount,referrals,*referralCount,patients,patientCount, currentUser);
 			printf("\n==== Referral CRUD ====\n");
 			printf("1. Delete Referral\n");
 			printf("0. Exit\n");
@@ -359,7 +359,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	}
 	else if (strcmp(currentUser->role,"Specialist")==0 && index!=-1){
 		do{
-			showReferrals(currentUser,users,referrals,*referralCount);
+			viewReferralStatus(users,userCount,referrals,*referralCount,patients,patientCount, currentUser);
 			printf("\n==== Referral CRUD ====\n");
 			printf("1. Edit status of referral\n");
     	    printf("2. Delete referral\n");

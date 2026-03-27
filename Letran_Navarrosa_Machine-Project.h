@@ -108,4 +108,4 @@ int getReferralID (Referral *referrals, int referralCount);
 void sortReferralsByID (Referral *referrals, int referralCount, int order);
 void sortReferralsByStatus (Referral *referrals, int referralCount, int order);
 int findReferralByID (Referral *referrals, int referralCount, int input);
-void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users);
+void selectReferralID (User *currentUser, Referral *referrals, int *referralCount, User *users, int userCount, Patient *patients, int patientCount);
