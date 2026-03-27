@@ -509,7 +509,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             		
             		switch(rchoice){
             			case 1:
-            				selectReferralID(currentUser,referrals,&referralCount,users,userCount,patients,patientCount);
+            				selectReferralID(currentUser,referrals,referralCount,users,userCount,patients,*patientCount);
 							break;
             			case 2:
             				printf("Order:\n1. Ascending\n0. Descending\nChoice: ");
@@ -768,7 +768,7 @@ void printTitle(int height, int width){
 	int lines = 16, padding, i;
 	
 	for (i=0;i<width;i++){
-		printf("=");
+		printf("%c",205);
 	}
 	printf("\n\n");
 	padding = (width - 14) / 2;
@@ -780,7 +780,7 @@ void printTitle(int height, int width){
 	printf("\n");
 	printf("%15s","");
 	for (i=0;i<width-30;i++){
-		printf("=");
+		printf("%c",205);
 	}
 	printf("\n");
 }
