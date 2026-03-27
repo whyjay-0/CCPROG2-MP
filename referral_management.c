@@ -373,7 +373,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 			printf("\n");
 			
 			printf("%55s[1] Delete Referral\n","");
-			printf("%61s[0] Exit","");
+			printf("%55s[0] Exit","");
     	    getValidInput(&choice,1,0,1,0,0,0,0);
     	    
     	    switch(choice){
@@ -419,9 +419,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 			}
 			printf("\n");
 			
-			printf("%51s[1] Edit status of referral\n","");
+			printf("%55s[1] Edit status of referral\n","");
     	    printf("%55s[2] Delete referral\n","");
-    	    printf("%61s[0] Exit","");
+    	    printf("%55s[0] Exit","");
     	    getValidInput(&choice,1,0,2,0,0,0,0);
     	    
     	    switch(choice){

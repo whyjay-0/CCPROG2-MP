@@ -85,6 +85,7 @@ void waitForInput();
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);
 void diagnosePatient (Patient *patient);
+void showPatientDetails (Patient *currentPatient);
 void showDiagnosisReport (Patient *currentPatient);
 int getPatientID (Patient *patients, int patientCount);
 void calculateBMI (Patient *patient, const float weight, const float height);

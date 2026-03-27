@@ -602,10 +602,10 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 		}
 		printf("\n");
 		
-        printf("%56s[1] Show Referrals\n","");
-        printf("%54s[2] Show patient list.\n","");
-        printf("%45s[3] Compute Averages (BMI + Cardio Risk)\n","");
-        printf("%60s[0] Logout","");
+        printf("%50s[1] Show Referrals\n","");
+        printf("%50s[2] Show patient list.\n","");
+        printf("%50s[3] Compute Averages (BMI + Cardio Risk)\n","");
+        printf("%50s[0] Logout","");
         getValidInput(&choice,1,0,3,0,0,0,0);
         
         switch(choice){
@@ -625,9 +625,9 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 					printf("\n");
 					
             		printf("%52s[1] Select referrals by ID\n","");
-            		printf("%53s[2] Sort referrals by ID\n","");
-            		printf("%51s[3] Sort referrals by Status\n","");
-            		printf("%61s[0] Exit","");
+            		printf("%52s[2] Sort referrals by ID\n","");
+            		printf("%52s[3] Sort referrals by Status\n","");
+            		printf("%52s[0] Exit","");
             		getValidInput(&rchoice,1,0,3,0,0,0,0);
             		
             		switch(rchoice){
@@ -637,14 +637,14 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 							break;
             			case 2:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
-            				getValidInput(&order,1,0,1,0,0,0,0);
+							printf("%59sOrder:\n%59s  [1] Ascending\n%59s  [2] Descending","","","");
+            				getValidInput(&order,1,1,2,0,0,0,0);
             				sortReferralsByID(referrals,referralCount,order);
             				break;
             			case 3:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
-            				getValidInput(&order,1,0,1,0,0,0,0);
+							printf("%59sOrder:\n%59s  [1] Ascending\n%59s  [2] Descending","","","");
+            				getValidInput(&order,1,1,2,0,0,0,0);
             				sortReferralsByStatus(referrals,referralCount,order);
             				break;
             			case 0:
@@ -671,11 +671,11 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 					}
 					printf("\n");
 					
-            		printf("%49s[1] Select patient by patientID\n","");
+            		printf("%52s[1] Select patient by patientID\n","");
             		printf("%52s[2] Select patient by name\n","");
             		printf("%52s[3] Sort patient by userID\n","");
-            		printf("%53s[4] Sort patient by name\n","");
-            		printf("%61s[0] Exit","");
+            		printf("%52s[4] Sort patient by name\n","");
+            		printf("%52s[0] Exit","");
             		
             		getValidInput(&pchoice,1,0,4,0,0,0,0);
             		
@@ -690,14 +690,14 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				break;
             			case 3:
             				clearScreen();
-							printf("%58sOrder:\n%58s  [1] Ascending\n%58s  [2] Descending","","","");
-            				getValidInput(&order,1,0,1,0,0,0,0);
+							printf("%59sOrder:\n%59s  [1] Ascending\n%59s  [2] Descending","","","");
+            				getValidInput(&order,1,1,2,0,0,0,0);
             				sortPatientsByID(patients, patientCount,order);
             				break;
             			case 4:
             				clearScreen();
-							printf("%58sOrder:\n%58s  [1] Ascending\n%58s  [2] Descending","","","");
-            				getValidInput(&order,1,0,1,0,0,0,0);
+							printf("%59sOrder:\n%59s  [1] Ascending\n%59s  [2] Descending","","","");
+            				getValidInput(&order,1,1,2,0,0,0,0);
             				sortPatientsByName(patients, patientCount, order);
             				break;
             			case 0:
@@ -744,9 +744,9 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
 		printf("\n");
     	
     	printf("%53s[1] Add self as patient\n","");
-    	printf("%52s[2] View diagnosis report\n","");
-    	printf("%55s[3] View my referral\n","");
-    	printf("%60s[0] Logout","");
+    	printf("%53s[2] View diagnosis report\n","");
+    	printf("%53s[3] View my referral\n","");
+    	printf("%53s[0] Logout","");
     	
     	getValidInput(&choice,1,0,3,0,0,0,0);
     	switch(choice){

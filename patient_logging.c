@@ -261,7 +261,7 @@ void diagnosePatient (Patient *patient){
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
 	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %f mg/dL\n", "", currentPatient->bloodSugar);
+	printf("%52sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
@@ -298,6 +298,31 @@ void diagnosePatient (Patient *patient){
 	waitForInput();
 }
 
+void showPatientDetails (Patient *currentPatient){
+	int i;
+	
+	printf("%25s","");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	printf("  PATIENT DETAILS  ");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	printf("\n");
+	// Details
+	int padding = (WIDTH - 9 - strlen(currentPatient->name)) / 2;
+	printf("%*sPatient: %s\n", padding, "", currentPatient->name);
+	printf("%62sAge: %d\n%61sGender: %c\n", "", currentPatient->age, "", currentPatient->gender);
+	padding = (WIDTH - 12 - strlen(currentPatient->bmiCat)) / 2;
+	printf("%*sBMI: %.2f, %s\n", padding, "", currentPatient->bmi, currentPatient->bmiCat);
+	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
+	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	padding = (WIDTH - 22) / 2;
+	printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+}
+
+
 // printing diagnosis report
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
 	char choice;
@@ -321,51 +346,40 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
 	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %f mg/dL\n", "", currentPatient->bloodSugar);
+	printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	
 	if (currentPatient->isDiagnosed=='Y'){
-		printf("Show most recent diagnosis? (Y/N) ");
-		getValidInput(&choice,3,0,0,'Y','N','y','n');
-		switch (choice){
-			case 'Y':
-			case 'y':
-				if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
-					// Cardio Risk
-					printBorder();
-					printf("\n%48s10-Year Cardiovasular Risk: %.2lf%%\n", "", currentPatient->cardioRisk * 100);
-					// Risk Level Classification
-					if(currentPatient->cardioRisk < 0.05)
-						printf("%55sRisk Level: Low Risk\n\n","");
-					else if(currentPatient->cardioRisk >= 0.05 && currentPatient->cardioRisk <= 0.074)
-						printf("%51s   Risk Level: Borderline Risk\n\n","");
-					else if(currentPatient->cardioRisk >= 0.075 && currentPatient->cardioRisk <= 0.199)
-						printf("%50sRisk Level: Intermediate Risk\n\n","");
-					else
-						printf("%52sRisk Level: Very High Risk\n\n","");
-				}
-				// Other data and suggestions
-				printBorder();
-					printf("\n%40sData and Suggestions:\n","");
-					if (currentPatient->bmi>30)
-						printf("%40s   - Suggestion: Consider weight loss through diet and exercise.\n","");
-					if (currentPatient->creatinine>1.2)
-						printf("%40s   - Kidney Function is decreased. Consider further renal evaluation.\n","");
-					if (currentPatient->cvdFamily=='Y')
-						printf("%40s   - Increased risk of cardiovascular disease due to family history.\n","");
-					if (currentPatient->diet=='Y')
-						printf("%40s   - Modify diet to lower fat and sugar intake\n","");
-					if (currentPatient->exercise=='Y')
-						printf("%40s   - Continue regular physical activity\n","");
-					if (currentPatient->alcohol=='Y')
-						printf("%40s   - Limit alcohol intake to reduce cardiovascular risk.\n","");
-				break;
-			case 'N':
-			case 'n':
-				break;
-			default:
-				printf("%58sInvalid choice.\n","");
+		if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
+			// Cardio Risk
+			printBorder();
+			printf("\n%48s10-Year Cardiovasular Risk: %.2lf%%\n", "", currentPatient->cardioRisk * 100);
+			// Risk Level Classification
+			if(currentPatient->cardioRisk < 0.05)
+				printf("%55sRisk Level: Low Risk\n\n","");
+			else if(currentPatient->cardioRisk >= 0.05 && currentPatient->cardioRisk <= 0.074)
+				printf("%51s   Risk Level: Borderline Risk\n\n","");
+			else if(currentPatient->cardioRisk >= 0.075 && currentPatient->cardioRisk <= 0.199)
+				printf("%50sRisk Level: Intermediate Risk\n\n","");
+			else
+				printf("%52sRisk Level: Very High Risk\n\n","");
+		}
+		// Other data and suggestions
+		printBorder();
+			printf("\n%40sData and Suggestions:\n","");
+			if (currentPatient->bmi>30)
+				printf("%40s   - Suggestion: Consider weight loss through diet and exercise.\n","");
+			if (currentPatient->creatinine>1.2)
+				printf("%40s   - Kidney Function is decreased. Consider further renal evaluation.\n","");
+			if (currentPatient->cvdFamily=='Y')
+				printf("%40s   - Increased risk of cardiovascular disease due to family history.\n","");
+			if (currentPatient->diet=='Y')
+				printf("%40s   - Modify diet to lower fat and sugar intake\n","");
+			if (currentPatient->exercise=='Y')
+				printf("%40s   - Continue regular physical activity\n","");
+			if (currentPatient->alcohol=='Y')
+				printf("%40s   - Limit alcohol intake to reduce cardiovascular risk.\n","");
 		}
 	}
 	else {
@@ -807,6 +821,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 	
 	printCentered("Enter Patient ID to select: ");
 	getValidInput(&input,1,0,100,0,0,0,0);
+	// do while getValidInput==0,,, show patients
 	
 	index = findPatientByID(patients,*patientCount,input);
 	
@@ -817,7 +832,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 	else {
 		do{
 			clearScreen();
-			showDiagnosisReport(&patients[index]);
+			showPatientDetails(&patients[index]);
 			
 			printf("%28s","");
 			for (i=0;i<WIDTH-100;i++){
@@ -829,22 +844,27 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 			}
 			printf("\n");
 			
-			printf("%57s[1] Edit Patient\n","");
-    	    printf("%56s[2] Delete Patient\n","");
-    	    printf("%55s[3] Diagnose Patient\n","");
-    	    printf("%56s[4] Refer Patient\n","");
-    	    printf("%61s[0] Exit\n","");
-    	    getValidInput(&choice,1,0,4,0,0,0,0);
+			printf("%57s[1] Show most recent diagnosis\n","");
+			printf("%57s[2] Edit Patient\n","");
+    	    printf("%57s[3] Delete Patient\n","");
+    	    printf("%57s[4] Diagnose Patient\n","");
+    	    printf("%57s[5] Refer Patient\n","");
+    	    printf("%57s[0] Exit\n","");
+    	    getValidInput(&choice,1,0,5,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
+    	    		clearScreen();
+					showDiagnosisReport(&patients[index]);
+    	    		break;
+				case 2:
    		     		clearScreen();
 					editPatient(&patients[index]);
    		     		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
-    	    	case 2:
+    	    	case 3:
     	    		clearScreen();
-    	    		printf("%40sAre you sure you want to delete patient #%d? [Y/N]", "", patients[index].patientID);
+    	    		printf("%40sAre you sure you want to delete patient #%02d? [Y/N]", "", patients[index].patientID);
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
 					
 					switch (cInput){
@@ -860,11 +880,11 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
-    	    	case 3:
+    	    	case 4:
     	    		diagnosePatient(&patients[index]);
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		break;
-    	    	case 4:
+    	    	case 5:
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
@@ -887,6 +907,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 	
 	printf("Enter name of patient to select: ");
 	getValidInput(input,4,0,0,0,0,0,0);
+	// do while index==-1 show patients
 	
 	index = findPatientByName(patients,*patientCount,input);
 	
@@ -908,22 +929,27 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 			}
 			printf("\n");
 			
-			printf("%57s[1] Edit Patient\n","");
-    	    printf("%56s[2] Delete Patient\n","");
-    	    printf("%55s[3] Diagnose Patient\n","");
-    	    printf("%56s[4] Refer Patient\n","");
-    	    printf("%61s[0] Exit\n","");
-    	    getValidInput(&choice,1,0,4,0,0,0,0);
+			printf("%57s[1] Show most recent diagnosis\n","");
+			printf("%57s[2] Edit Patient\n","");
+    	    printf("%57s[3] Delete Patient\n","");
+    	    printf("%57s[4] Diagnose Patient\n","");
+    	    printf("%57s[5] Refer Patient\n","");
+    	    printf("%57s[0] Exit\n","");
+    	    getValidInput(&choice,1,0,5,0,0,0,0);
     	    
     	    switch(choice){
     	    	case 1:
     	    		clearScreen();
+					showDiagnosisReport(&patients[index]);
+    	    		break;
+    	    	case 2:
+    	    		clearScreen();
    		     		editPatient(&patients[index]);
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
 					break;
-    	    	case 2:
+    	    	case 3:
     	    		clearScreen();
-    	    		printf("%40sAre you sure you want to delete patient #%d? [Y/N]", "", patients[index].patientID);
+    	    		printf("%40sAre you sure you want to delete patient #%02d? [Y/N]", "", patients[index].patientID);
     	    		
     	    		getValidInput(&cInput,3,0,0,'Y','N','y','n');
 					
@@ -940,12 +966,12 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
 					break;
-    	    	case 3:
+    	    	case 4:
     	    		clearScreen();
     	    		diagnosePatient(&patients[index]);
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
 					break;
-    	    	case 4:
+    	    	case 5:
     	    		clearScreen();
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
