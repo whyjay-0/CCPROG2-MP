@@ -261,7 +261,7 @@ void diagnosePatient (Patient *patient){
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
 	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %d mg/dL\n", "", currentPatient->bloodSugar);
+	printf("%54sBlood Sugar: %f mg/dL\n", "", currentPatient->bloodSugar);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	if (currentPatient->age>=30 && currentPatient->age<=79 && currentPatient->currentCVD=='N'){
@@ -321,7 +321,7 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
 	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %d mg/dL\n", "", currentPatient->bloodSugar);
+	printf("%54sBlood Sugar: %f mg/dL\n", "", currentPatient->bloodSugar);
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	
@@ -653,8 +653,7 @@ void showPatients (Patient *patient, int count){
     	printf("----------------------------------------");
     	printf("----------------------------------------");
     	printf("----------\n");
-    	printf("|  |   |   |\n",
-    	       "","","");
+    	printf("|  |   |   |\n"); // categories
     	printf("----------------------------------------");
     	printf("----------------------------------------");
     	printf("----------------------------------------");
