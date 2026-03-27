@@ -915,7 +915,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 	else {
 		do{
 			clearScreen();
-			showDiagnosisReport(&patients[index]);
+			showPatientDetails(&patients[index]);
 			
 			printf("%28s","");
 			for (i=0;i<WIDTH-100;i++){
