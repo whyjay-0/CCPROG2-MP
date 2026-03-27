@@ -325,7 +325,6 @@ void showPatientDetails (Patient *currentPatient){
 
 // printing diagnosis report
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
-	char choice;
 	int i;
 	
 	printf("%25s","");
@@ -380,7 +379,6 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 				printf("%40s   - Continue regular physical activity\n","");
 			if (currentPatient->alcohol=='Y')
 				printf("%40s   - Limit alcohol intake to reduce cardiovascular risk.\n","");
-		}
 	}
 	else {
 		printf("\n%49sCurrent patient is not diagnosed.\n","");
