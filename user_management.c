@@ -444,9 +444,19 @@ int getUserID (User *users, Patient *patients){
 // GP Dashboard
 void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]){
 	int i, choice = -1, pchoice = -1, rchoice = -1, order = -1;
+	int padding;
 	
     do{
         clearScreen();
+        
+        padding = WIDTH - strlen(currentUser->username) - strlen(currentUser->role) - 23;
+        if (padding < 0)
+        	padding=0;
+        printf("%*sLogged in as: %s | Role: %s\n", padding, "", currentUser->username, currentUser->role);
+        
+        for (i=0;i<25;i++){
+        	printf("\n");
+		}
         
         printf("%27s","");
 		for (i=0;i<WIDTH-100;i++){
@@ -597,8 +607,19 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 
 void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]){
 	int i, choice=-1, pchoice=-1, rchoice=-1, order=-1;
+	int padding;
+	
     do{
         clearScreen();
+        
+        padding = WIDTH - strlen(currentUser->username) - strlen(currentUser->role) - 23;
+        if (padding < 0)
+        	padding=0;
+        printf("%*sLogged in as: %s | Role: %s\n", padding, "", currentUser->username, currentUser->role);
+        
+        for (i=0;i<25;i++){
+        	printf("\n");
+		}
         
         printf("%24s","");
 		for (i=0;i<WIDTH-100;i++){
@@ -737,9 +758,19 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 
 void patientDashboard(User *currentUser, User *users, int userCount, Patient *patients, int *patientCount, Referral *referrals, int referralCount){
     int i, found=0, choice=-1;
+    int padding;
 
     do{
     	clearScreen();
+    	
+    	padding = WIDTH - strlen(currentUser->username) - strlen(currentUser->role) - 23;
+        if (padding < 0)
+        	padding=0;
+        printf("%*sLogged in as: %s | Role: %s\n", padding, "", currentUser->username, currentUser->role);
+        
+        for (i=0;i<26;i++){
+        	printf("\n");
+		}
     	
     	printf("%25s","");
 		for (i=0;i<WIDTH-100;i++){
@@ -893,6 +924,8 @@ void printTitle(int height, int width){
 	}
 	printf("\n\n");
 	padding = (width - 14) / 2;
+	if (padding < 0)
+		padding = 0;
 	printf("%*sWelcome To The\n",padding,"");
 	for (i=0;i<lines;i++){
 		padding = (width - strlen(title[i]) + 4) / 2;
