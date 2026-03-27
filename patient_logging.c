@@ -365,11 +365,11 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 			case 'n':
 				break;
 			default:
-				printf("Invalid choice.\n");
+				printf("%58sInvalid choice.\n","");
 		}
 	}
 	else {
-		printf("\nCurrent patient is not diagnosed.\n");
+		printf("\n%49sCurrent patient is not diagnosed.\n","");
 	}
 }
 
@@ -833,7 +833,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    printf("%56s[2] Delete Patient\n","");
     	    printf("%55s[3] Diagnose Patient\n","");
     	    printf("%56s[4] Refer Patient\n","");
-    	    printf("%61s[5] Exit\n","");
+    	    printf("%61s[0] Exit\n","");
     	    getValidInput(&choice,1,0,4,0,0,0,0);
     	    
     	    switch(choice){
@@ -868,8 +868,12 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
+				case 0:
+					printCentered("Exiting...");
+					break;
     	    	default:
-    	    		printf("Invalid input.\n");
+    	    		printCentered("Invalid input.");
+    	    		waitForInput();
 			}
 		} while(choice!=0);
 	}
@@ -950,7 +954,8 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					printCentered("Exiting...");
 					break;
     	    	default:
-    	    		printf("Invalid input.\n");
+    	    		printCentered("Invalid input.");
+    	    		waitForInput();
 			}
 		} while(choice!=0);
 	}

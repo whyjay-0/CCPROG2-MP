@@ -214,7 +214,7 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 				}
 			} while (validChoice==0);
 			clearScreen();
-			printf("%51sSelect a security question:\n%49s  [1] What is your favorite food?\n%49s  [2] What is your favorite color?\n%46s  [3] What is your favorite animal/pet?\n","","","","");
+			printf("%51sSelect a security question:\n%49s[1] What is your favorite food?\n%49s[2] What is your favorite color?\n%46s[3] What is your favorite animal/pet?\n","","","","");
 			getValidInput(&newUser.questType,1,1,3,0,0,0,0);
 			printCentered("Input answer to security question.");
 			getValidInput(newUser.answer,4,0,0,0,0,0,0);
@@ -261,11 +261,11 @@ User* loginUser (User *users, int userCount){
 		} while (validUser==0);
 		do{
 			if (passChange==1)
-				printCentered("Confirm your password.");
+				printCentered("Confirm your password");
 			else
-				printCentered("Enter your password. If you have forgotten, input 0.");
+				printCentered("Enter your password. If you have forgotten, input 0");
 			if (matching==0){
-				printf("\n%57sWrong password.","");
+				printf("\n%57sWrong password","");
 			}
 			getValidInput(password,4,0,0,0,0,0,0);
 			hashPassword(password,&inputHash);
@@ -280,7 +280,7 @@ User* loginUser (User *users, int userCount){
 			
 			if (password[0]=='0' && strlen(password)==1){
 				if (forgotPassword(users, userCount, username)==0){
-					printCentered("Invalid username.");
+					printCentered("Invalid username");
 				}
 				else {
 					passChange=1;
@@ -371,27 +371,27 @@ int forgotPassword (User *users, int userCount, const char *username){
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
 			
-			if (users->questType == 1){
+			if (users[i].questType == 1){
 				printCentered("What is your favorite food?");
 				getValidInput(input,4,0,0,0,0,0,0);
 				
-				if (strcmp(input,users->answer)==0){
+				if (strcmp(input,users[i].answer)==0){
 					valid=1;
 				}
 			}
-			else if (users->questType == 2){
+			else if (users[i].questType == 2){
 				printCentered("What is your favorite color?");
 				getValidInput(input,4,0,0,0,0,0,0);
 				
-				if (strcmp(input,users->answer)==0){
+				if (strcmp(input,users[i].answer)==0){
 					valid=1;
 				}
 			}
-			else if (users->questType == 3){
+			else if (users[i].questType == 3){
 				printCentered("What is your favorite animal/pet?");
 				getValidInput(input,4,0,0,0,0,0,0);
 				
-				if (strcmp(input,users->answer)==0){
+				if (strcmp(input,users[i].answer)==0){
 					valid=1;
 				}
 			}
@@ -690,13 +690,13 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				break;
             			case 3:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+							printf("%58sOrder:\n%58s  [1] Ascending\n%58s  [2] Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByID(patients, patientCount,order);
             				break;
             			case 4:
             				clearScreen();
-							printf("%61sOrder:\n%59s  1. Ascending\n%58s  0. Descending","","","");
+							printf("%58sOrder:\n%58s  [1] Ascending\n%58s  [2] Descending","","","");
             				getValidInput(&order,1,0,1,0,0,0,0);
             				sortPatientsByName(patients, patientCount, order);
             				break;

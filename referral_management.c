@@ -177,7 +177,6 @@ void viewReferralStatus(User *users, int userCount, Referral *referrals, int ref
 	}
 	else {
 		printCentered("No Referral found.\n");
-		waitForInput();
 	}
 }
 
@@ -399,6 +398,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 				case 0:
     	    		printf("Exiting...\n\n");
     	    		break;
+    	    	default:
+    	    		printCentered("Invalid input.");
+    	    		waitForInput();
 			}
 		} while (choice!=0);
 	}
@@ -449,7 +451,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    		printf("Exiting...\n\n");
     	    		break;
     	    	default:
-    	    		printCentered("Invalid input.\n");
+    	    		printCentered("Invalid input.");
     	    		waitForInput();
 			}
 		} while(choice!=0);
