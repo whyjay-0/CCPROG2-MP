@@ -74,6 +74,13 @@ int findUserByName (User *users, int userCount, char *input);
 void printUsers (User *users, int userCount, char *filter);
 void printMainMenu (int height, int width);
 void printTitle(int height, int width);
+void clearScreen();
+void inputText();
+void centerText();
+void printBorder();
+void printDivider();
+void printCentered(char* text);
+void waitForInput();
 
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);
@@ -92,10 +99,12 @@ void computeAverages(double data[][2], int patientCount);
 void sortPatientsByID (Patient *patients, int patientCount, int order);
 void sortPatientsByName (Patient *patients, int patientCount, int order);
 int findPatientByID (Patient *patients, int patientCount, int input);
+int findPatientByUserID (Patient *patients, int patientCount, int input);
 int findPatientByName (Patient *patients, int patientCount, char *input);
 void selectPatientID (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
 void selectPatientName (Patient *patients, int *patientCount, Referral *referrals, User *users, User *currentUser, int userCount, int *referralCount);
 void updateGender (Patient *patient);
+void printDiagnosing(Patient *currentPatient);
 
 void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);

@@ -105,41 +105,30 @@ void showReferrals (User *currentUser, User *users, Referral *referrals, int ref
     }
 }
 
-// Only for Patients
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser){
-	int index=-1, i, j, found=0;
+	int index=-1, i, j;
 	int gpIndex, spIndex;
 	// search index of the referral based on userID of patient
+	
+	// identify the user's role
 	for (i=0;i<referralCount;i++){
 		for (j=0;j<patientCount;j++){
-			if (referrals[i].patientID == patients[j].patientID){
+			if ((strcmp(currentUser->role,"Patient")==0 && referrals[i].patientID == patients[j].patientID) || 
+				(strcmp(currentUser->role,"GP")==0 && referrals[i].gpID == currentUser->userID) || 
+				(strcmp(currentUser->role,"Specialist")==0 && referrals[i].specialistID == currentUser->userID)){
 				index = i;
-				found+=1;
 				i=referralCount;
 			}
 		}
 	}
-	// search gp
-	for (i=0;i<userCount;i++){
-		if (users[i].userID == referrals[index].gpID){
-			gpIndex = i;
-			found+=1;
-			i=userCount;
-		}
-	}
-	// search specialist
-	for (i=0;i<userCount;i++){
-		if (users[i].userID == referrals[index].specialistID){
-			spIndex = i;
-			found+=1;
-			i=userCount;
-		}
-	}
-	if (index==-1){
-		found=0;
-	}
+	
+	// search gp index
+	gpIndex = findUserByID(users,userCount,referrals[index].gpID);
+	// search sp index
+	spIndex = findUserByID(users,userCount,referrals[index].specialistID);
+	
 	// print
-	if (found==3){
+	if (index!=-1){
 		printf("\n=== Referral %d Status ===\n",referrals[index].referralID);
 		printf("Referral ID: %d\n",referrals[index].referralID);
 		printf("Patient Name: %s\n\n",referrals[index].patientName);
@@ -147,7 +136,7 @@ void viewReferralStatus(User *users, int userCount, Referral *referrals, int ref
 		printf("Assigned Specialist: %s\n\n",users[spIndex].name);
 		printf("Status: %s\n\n", referrals[index].status);
 	}
-	else if(found==0){
+	else {
 		printf("No Referral found.\n");
 	}
 }
@@ -359,7 +348,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	}
 	else if (strcmp(currentUser->role,"Specialist")==0 && index!=-1){
 		do{
-			viewReferralStatus(users,userCount,referrals,*referralCount,patients,patientCount, currentUser);
+			viewReferralStatus(users,userCount,referrals,*referralCount,patients,patientCount,currentUser);
 			printf("\n==== Referral CRUD ====\n");
 			printf("1. Edit status of referral\n");
     	    printf("2. Delete referral\n");

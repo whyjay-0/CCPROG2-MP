@@ -26,14 +26,14 @@ int main () {
 				newUser = registerUser(users, &userCount, patients, patientCount); // registerUser returns -1 if not valid registration
 				if (newUser != -1){
 					saveAllUsersToFile(users, userCount, "users.txt");
-					printf("User saved successfully!\n");
+					printCentered("User saved successfully!");
 				}
 				break;
 			case 2: // Login and dashboard
 				currentUser = loginUser(users,userCount);
 					
 				if (currentUser == NULL){
-				    printf("Login failed.\n");
+					printCentered("Login failed.");
 				}
 				else {
 					if (strcmp(currentUser->role,"GP")==0){
@@ -58,16 +58,17 @@ int main () {
 						// 3 to edit their details
 					}
 					else{
-						printf("Invalid role\n");
+						printCentered("Invalid role.");
 					}
 				}
 				break;
 			case 3: // Exit
-				printf("Exiting program...\n");
+				printCentered("Exiting program...");
+				centerText();
 				exit=1;
 				break;
-			default: 
-				printf("Invalid choice.\n");
+			default:
+				printCentered("Invalid choice.");
 		}
 	} while(exit==0);
 	
