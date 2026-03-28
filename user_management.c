@@ -60,6 +60,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 3: // char
 				scan = scanf(" %c", (char*)input);
 				if (scan != 1){
+					((char*)input)[0] = '\0';
 					printf("Invalid input. Enter a character: ");
 					clearInput();
 				}
@@ -71,6 +72,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 4: // string 100
 				scan = scanf(" %100[^\n]", (char*)input);
 				if (scan != 1){
+					((char*)input)[0] = '\0';
 					printf("Invalid input");
 					clearInput();
 				}
@@ -83,6 +85,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 5: // string 16
 				scan = scanf(" %16[^\n]", (char*)input);
 				if (scan != 1){
+					((char*)input)[0] = '\0';
 					printf("Invalid input");
 					clearInput();
 				}
@@ -95,6 +98,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 			case 6: // string 15
 				scan = scanf(" %15[^\n]", (char*)input);
 				if (scan != 1){
+					((char*)input)[0] = '\0';
 					printf("Invalid input");
 					clearInput();
 				}
@@ -143,7 +147,8 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 					}
 				}
 				if (similar){
-					printCentered("Invalid Username.");
+					printCentered("Username is already in use");
+					waitForInput();
 				}
 				else {
 					strcpy(newUser.username, input);
@@ -182,26 +187,35 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 								newUser.userID = getUserID(users,patients);
 								break;
 							default:
-								printCentered("Invalid input.");	
+								printCentered("Invalid input.");
+								waitForInput();
 						}
 					}
 					else {
 						newUser.userID = getUserID(users,patients);
 					}
+					strcpy(newUser.hospital, "N/A");
 					complete=1; 
 					break;
 				case 2: 
 					strcpy(newUser.role, "GP"); 
 					newUser.userID = getUserID(users,patients); // set the userID of new user to highest userID found + 1
+					strcpy(newUser.hospital, "N/A");
+					
 					complete=1; 
 					break;
 				case 3: 
 					strcpy(newUser.role, "Specialist");
 					newUser.userID = getUserID(users,patients);
+					
+					printCentered("Enter the name of the hospital you are affiliated with");
+					getValidInput(newUser.hospital,4,0,0,0,0,0,0);
+					
 					complete=1; 
 					break;
 				default: 
 					printCentered("Invalid input.");
+					waitForInput();
 			}
 			clearScreen();
 			printf("%51sSelect a security question:\n%49s[1] What is your favorite food?\n%49s[2] What is your favorite color?\n%46s[3] What is your favorite animal/pet?\n","","","","");
@@ -238,7 +252,11 @@ User* loginUser (User *users, int userCount){
 			getValidInput(username,4,0,0,0,0,0,0);
 			found=0;
 			
+			printf("userCount = %d\n", userCount);
+			
 			for (i=0;i<userCount;i++){
+				printf("Input: '%s' (len=%lu)\n", username, strlen(username));
+				printf("Stored: '%s' (len=%lu)\n", users[i].username, strlen(users[i].username));
 				if (strcmp(users[i].username,username)==0){
 					found=1;
 					i=userCount; // end loop
@@ -271,6 +289,7 @@ User* loginUser (User *users, int userCount){
 			if (password[0]=='0' && strlen(password)==1){
 				if (forgotPassword(users, userCount, username)==0){
 					printCentered("Invalid username");
+					waitForInput();
 				}
 				else {
 					passChange=1;
@@ -307,6 +326,135 @@ void hashPassword (const char *password, unsigned long *outputHash){
 		*outputHash = ((*outputHash << 5) + *outputHash + c); //bitwise left shift by 5 (<< 5)
 	}
 }
+
+void editUserDetails (User *currentUser, int userCount, User *users){
+	int i, padding, choice=-1, similar=0, complete=0;
+	char sInput[101], sConfirm[101], sUser[101];
+	unsigned long confirm=0, newPass=0;
+	
+	padding = WIDTH - strlen(currentUser->username) - strlen(currentUser->role) - 23;
+    if (padding < 0)
+    	padding=0;
+    printf("%*sLogged in as: %s | Role: %s\n", padding, "", currentUser->username, currentUser->role);
+    
+    for (i=0;i<25;i++){
+       	printf("\n");
+	}
+        
+    printf("%27s","");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	printf("  Edit Details  ");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	
+	printf("\n");
+    printf("%52s[1] Change Username\n","");
+    printf("%52s[2] Change Password\n","");
+    printf("%52s[3] Edit security question\n","");
+    printf("%52s[4] Edit full name\n","");
+	if (strcmp(currentUser->role, "Specialist")==0){
+		printf("%52s[5] Edit hospital information","");
+	} 
+    printf("%52s[0] Logout","");
+	getValidInput(&choice,1,0,5,0,0,0,0);
+	
+	switch (choice){
+		case 1:
+			do{
+				clearScreen();
+				complete=0;
+				printCentered("Enter new username [100 Characters Max]");
+				getValidInput(sUser,4,0,0,0,0,0,0);
+				
+				similar=0;
+				for (i=0;i<userCount;i++){
+					if (strcmp(users[i].username,sUser)==0){
+						similar += 1;
+					}
+				}
+				if (similar){
+					printCentered("Username is already used");
+					waitForInput();
+				}
+				else {
+					strcpy(currentUser->username,sUser);
+					complete=1;
+				}
+					
+			} while (complete==0);
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		case 2:
+			do {
+				printCentered("Enter new password");
+				getValidInput(sInput,4,0,0,0,0,0,0);
+				printCentered("Enter old password to confirm. Enter 0 to go back to dashboard");
+				getValidInput(sConfirm,4,0,0,0,0,0,0);
+				hashPassword(sConfirm,&confirm);
+				if (strcmp(sConfirm,"0")==0){
+					complete=1;
+				}
+				else if (confirm == currentUser->passwordHash){
+					hashPassword(sInput,&newPass);
+					currentUser->passwordHash = newPass;
+					complete=1;
+				}
+				else {
+					printCentered("Incorrect password. Try again");
+					waitForInput();
+				}
+			} while (complete==0);
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		case 3:
+			clearScreen();
+			printf("%49sSelect a new security question:\n%49s  [1] What is your favorite food?\n%49s  [2] What is your favorite color?\n%49s  [3] What is your favorite animal/pet?\n","","","","");
+			getValidInput(&currentUser->questType,1,1,3,0,0,0,0);
+			printCentered("Input answer to security question.");
+			getValidInput(currentUser->answer,4,0,0,0,0,0,0);
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		case 4:
+			printCentered("Enter your new full name");
+			getValidInput(currentUser->name,4,0,0,0,0,0,0);
+			padding = (WIDTH - 35 - strlen(currentUser->name)) / 2;
+			if (padding < 0)
+    			padding=0;
+			clearScreen();
+			printf("%*sAre you sure you want the new name %s", padding, "", currentUser->name);
+			waitForInput();
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		case 5:
+			if (strcmp(currentUser->role, "Specialist")==0){
+				printCentered("Enter new name of the hospital you are affiliated with");
+				getValidInput(currentUser->hospital,4,0,0,0,0,0,0);
+				padding = (WIDTH - 41 - strlen(currentUser->hospital)) / 2;
+				if (padding < 0)
+    				padding=0;
+				clearScreen();
+				printf("%*sAre you sure %s is your affiliated hospital", padding, "", currentUser->hospital);
+				waitForInput();
+			}
+			else {
+				printCentered("Invalid role.");
+				waitForInput();
+			}
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		case 0:
+			printCentered("Exiting...");
+			saveAllUsersToFile(users, userCount, "users.txt");
+			break;
+		default:
+			printCentered("Invalid input");
+			waitForInput();
+	}
+}
+
 // Save user to TXT file, return 1 if success, 0 otherwise
 int saveAllUsersToFile (User *users, int userCount, const char *filename){
 	FILE *fp;
@@ -316,7 +464,7 @@ int saveAllUsersToFile (User *users, int userCount, const char *filename){
 	}
 	else {
 		for (i=0;i<userCount;i++){
-			fprintf(fp, "%d, %s, %lu, %s, %s, %d, %s\n", users[i].userID, users[i].username, users[i].passwordHash, users[i].role, users[i].name, users[i].questType, users[i].answer);
+			fprintf(fp, "%d, %s, %lu, %s, %s, %d, %s, %s\n", users[i].userID, users[i].username, users[i].passwordHash, users[i].role, users[i].name, users[i].questType, users[i].answer, users[i].hospital);
 		}
 		flag=1;
 		fclose(fp);
@@ -335,9 +483,9 @@ int loadUsersFromFile (User *users, const char *filename){
 		while (flag){
 			User temp;
 			
-			result = fscanf(fp, "%d, %100[^,], %lu, %100[^,], %100[^,], %d, %100[^\n]", &temp.userID, temp.username, &temp.passwordHash, temp.role, temp.name, &temp.questType, temp.answer);
+			result = fscanf(fp, "%d, %100[^,], %lu, %100[^,], %100[^,], %d, %100[^,], %100[^\n]", &temp.userID, temp.username, &temp.passwordHash, temp.role, temp.name, &temp.questType, temp.answer, temp.hospital);
 			// since fscanf outputs the amount of input items, we can use it to check if fscanf was successful
-			if (result==7 && count < MAX_USERS){
+			if (result==8 && count < MAX_USERS){
 				users[count]=temp;
 				count++;
 			}
@@ -471,8 +619,9 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
         printf("%50s[2] Show Patients\n","");
         printf("%50s[3] Show Referrals\n",""); 
         printf("%50s[4] Compute Averages (BMI and Cardio Risk)\n","");
+        printf("%50s[5] Edit User Details\n","");
         printf("%50s[0] Logout","");
-		getValidInput(&choice,1,0,4,0,0,0,0);
+		getValidInput(&choice,1,0,5,0,0,0,0);
 		
         switch(choice){
             case 1:
@@ -596,6 +745,10 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 computeAverages(data,*patientCount);
                 waitForInput();
                 break;
+            case 5:
+            	clearScreen();
+            	editUserDetails(currentUser, userCount, users);
+            	break;
             case 0:
     			printCentered("Logging out...");
     			break;
@@ -632,10 +785,11 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 		printf("\n");
 		
         printf("%50s[1] Show Referrals\n","");
-        printf("%50s[2] Show patient list.\n","");
+        printf("%50s[2] Show Patients\n","");
         printf("%50s[3] Compute Averages (BMI + Cardio Risk)\n","");
+        printf("%50s[4] Edit User Details\n","");
         printf("%50s[0] Logout","");
-        getValidInput(&choice,1,0,3,0,0,0,0);
+        getValidInput(&choice,1,0,4,0,0,0,0);
         
         switch(choice){
             case 1:
@@ -747,6 +901,10 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             	computeAverages(data,patientCount);
             	waitForInput();
             	break;
+            case 4:
+            	clearScreen();
+            	editUserDetails(currentUser, userCount, users);
+            	break;
             case 0:
     			printCentered("Logging out...");
     			break;
@@ -782,12 +940,13 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
 		}
 		printf("\n");
     	
-    	printf("%53s[1] Add self as patient\n","");
-    	printf("%53s[2] View diagnosis report\n","");
-    	printf("%53s[3] View my referral\n","");
+    	printf("%53s[1] Add Self as Patient\n","");
+    	printf("%53s[2] View Diagnosis Report\n","");
+    	printf("%53s[3] View My Referral\n","");
+    	printf("%53s[4] Edit User Details\n","");
     	printf("%53s[0] Logout","");
     	
-    	getValidInput(&choice,1,0,3,0,0,0,0);
+    	getValidInput(&choice,1,0,4,0,0,0,0);
     	switch(choice){
     		case 1:
     			clearScreen();
@@ -828,6 +987,10 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
     			viewReferralStatus(users,userCount,referrals,referralCount,patients,*patientCount,currentUser);
     			waitForInput();
 				break;
+			case 4:
+            	clearScreen();
+            	editUserDetails(currentUser, userCount, users);
+            	break;
     		case 0:
     			printCentered("Logging out...");
     			break;
@@ -975,7 +1138,7 @@ void printDivider(){
 	}
 }
 
-void printCentered(char* text){
+void printCentered(const char* text){
 	int len = strlen(text);
 	int padding = (WIDTH - len) / 2;
 	if (padding < 0){ // avoid negative, ie. %-10s
@@ -987,6 +1150,60 @@ void printCentered(char* text){
 
 void waitForInput(){
 	char input[200];
-	printf("%47sEnter any key to confirm/go back...\n","");
+	printf("\n%47sEnter any key to confirm/go back...\n","");
 	getValidInput(input,4,0,0,0,0,0,0);
+}
+
+// For printing records/tables
+void printHeader (){
+	//int i,j;
+	
+	printf("%c", 201); // corner
+	//for (i=0;i<) // print how many times horizontally categoryCount
+	// for (j=0;j< // print how many ========= specifically?
+				   // categoryName length? width of category or longest string len value inside that category 
+		//print =
+	// if i < catCount - 1, print T
+	// \n
+	
+	// print values inside header
+	// for i=0 i<categoryCount
+		// print vertical bar then category name
+	// print vertical bar 
+	// \n
+	
+	// separator to rows
+	// print sideways T instead of corner
+	// similar with first row
+	// \n
+}
+
+void printRows (){
+	// i or row is passed as parameter
+	
+	// vertical bar
+	// for j j<catCount	... j = category
+		// width of category,,,width[j], value users[i].
+		// vertical bar
+	
+	// \n
+}
+
+void printFooter (){
+	// similar to logic inside header first row
+	
+	
+}
+
+// for calculating column and categories' widths
+void calculateWidth (){
+	// i and len of strings
+	
+	// multiple linear searching
+	
+	// set initial values for all widths/category
+	
+	// find the longest value in each category
+	// for (i=0;i<userCount;i++)
+		// 
 }

@@ -1,7 +1,6 @@
-1, Patient1, 193432059, Patient, Patient 1, 1, Adobo
-2, GP1, 193432059, GP, GP 1, 2, Purple
-3, Specialist1, 193432059, Specialist, Specialist 1, 3, Cat
-4, Patient2, 193432059, Patient, Patient 2, 1, Sinigang
-5, GP2, 193432059, GP, GP 2, 2, Blue
-6, Specialist2, 193432059, Specialist, Specialist2, 3, Dog
-7, WhyJay, 193432059, GP, YJ Navarrosa, 1, Sisig
+1, Patient1, 193432059, Patient, Patient 1, 2, Purple, N/A
+2, GP1, 193432059, GP, GP 1, 1, Sinigang, N/A
+3, Specialist1, 193432059, Specialist, Specialist 1, 3, Cat, Philippine General Hospital
+4, Patient2, 193432059, Patient, Patient 2, 1, Adobo, N/A
+5, GP2, 193432059, GP, GP 2, 2, Blue, N/A
+6, Specialist2, 193432059, Specialist, Specialist 2, 3, Cat, Makati Med

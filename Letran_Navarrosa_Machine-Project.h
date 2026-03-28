@@ -58,11 +58,13 @@ typedef struct {
 } Referral;
 
 // === Function Prototypes ===
+// Users
 void clearInput();
 int getValidInput(void *input, int type, int min, int max, char limit1, char limit2, char limit3, char limit4);
 int registerUser (User *users, int *userCount, Patient *patients, int patientCount);
 User* loginUser (User *users, int userCount);
 void hashPassword (const char *password, unsigned long *outputHash);
+void editUserDetails (User *currentUser, int userCount, User *users);
 int saveAllUsersToFile (User *users, int userCount, const char *filename);
 int loadUsersFromFile (User *users, const char *filename);
 int forgotPassword (User *users, int userCount, const char *username);
@@ -83,6 +85,13 @@ void printDivider();
 void printCentered(const char* text);
 void waitForInput();
 
+// Printing Tables/Records
+void printHeader();
+void printRows ();
+void printFooter ();
+void calculateWidth ();
+
+// Patient
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
 void initPatient (Patient *patient);
 void diagnosePatient (Patient *patient);
@@ -108,6 +117,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 void updateGender (Patient *patient);
 void printDiagnosing(Patient *currentPatient);
 
+// Referrals
 void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
 void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser);

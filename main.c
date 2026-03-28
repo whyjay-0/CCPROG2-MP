@@ -14,7 +14,7 @@ int main () {
 	int newUser; // userID of new users
 	double data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
 	// 2D array here, for bmi and risk computation, averages.
-	// printf("User count: %d\n", userCount);
+	printf("User count: %d\n", userCount);
 	do{
 		printf("\033[8;%d;%dt", HEIGHT, WIDTH);// resize terminal
 		
