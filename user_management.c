@@ -509,10 +509,11 @@ int forgotPassword (User *users, int userCount, const char *username){
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
 			do{
+				if (count==1)
+						printf("\n%58sWrong Answer","");
+
 				if (users[i].questType == 1){
 					printCentered("What is your favorite food?");
-					if (count==1)
-						printf("\n%58sInvalid answer","");
 					getValidInput(input,4,0,0,0,0,0,0);
 					
 					if (strcmp(input,users[i].answer)==0){
