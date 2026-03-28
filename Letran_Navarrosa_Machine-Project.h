@@ -16,6 +16,7 @@ typedef struct {
     char name[101]; // Full name
     int questType;
     char answer[101];
+    char hospital[101];
 } User;
 typedef struct {
 	int patientID;
@@ -69,17 +70,17 @@ int getUserID (User *users, Patient *patients);
 void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]);
 void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]);
 void patientDashboard(User *currentUser, User *users, int userCount, Patient *patients, int *patientCount, Referral *referrals, int referralCount);
-int findUserByID (User *users, int userCount, int input);
-int findUserByName (User *users, int userCount, char *input);
+int findUserByID (User *users, const int userCount, int input);
+int findUserByName (User *users, const int userCount, char *input);
 void printUsers (User *users, int userCount, char *filter);
-void printMainMenu (int height, int width);
-void printTitle(int height, int width);
+void printMainMenu (const int height, const int width);
+void printTitle(const int height, const int width);
 void clearScreen();
 void inputText();
 void centerText();
 void printBorder();
 void printDivider();
-void printCentered(char* text);
+void printCentered(const char* text);
 void waitForInput();
 
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
