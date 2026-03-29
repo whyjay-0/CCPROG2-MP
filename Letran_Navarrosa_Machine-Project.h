@@ -9,26 +9,26 @@
 
 // User struct for login/authentication
 typedef struct {
-    int userID;
-    char username[101];
+    int userID; // unique userID determined by the highest active user/patient
+    char username[101]; // unique username for each userID
     unsigned long passwordHash; // When placed into TXT it will be a long + integer
     char role[30];   // "GP", "Specialist", "Patient"
     char name[101]; // Full name
-    int questType;
-    char answer[101];
-    char hospital[101];
+    int questType; // Security question type
+    char answer[101]; // Answer to above
+    char hospital[101]; // N/A if not specialist, specialists will be prompted
 } User;
 typedef struct {
-	int patientID;
-	int userID; // if no userID should default add a new user ID
-	char name[101];
+	int patientID; // unique patient ID per patient, determined by highest ID active 
+	int userID; // if no userID should default add a new user ID, a patient is reserved a userID in the event they create an acc
+	char name[101]; // name
 	int age; // if age 30-79 cvdRisk is calculated
 	char gender; // M or F, used for cvdRisk
-	char contact[17];
-	float bmi;
-	char bmiCat[12];
+	char contact[17]; // contact details of patient
+	float bmi; // value of their bmi
+	char bmiCat[12]; // category of bmi
 	char bp[16]; // sys/dia mmHg, systolic blood pressure is parsed within calccvdRisk range: 90-200 mmHg
-	float bloodSugar;
+	float bloodSugar; // blood sugar
 	char currentCVD; // Shows if patient currently has CVD, cvdRisk can only be calculated when patient has no known CVD
 	float totalChol; // 130-320 mg/dL range, must conv to mmol to use for cvdRisk
 	float hdlChol; // High density lipoprotein cholesterol 20-100 mg/dL, must conv to mmol to use for cvdRisk
@@ -411,7 +411,7 @@ Description: Updates the gender field of a patient.
 void updateGender (Patient *patient);
 
 /*
-Description: Displays diagnosing interface/output for a patient.
+Description: Displays diagnosing output for a patient.
 */
 void printDiagnosing(Patient *currentPatient);
 
@@ -427,7 +427,7 @@ Description: Displays referral status for users.
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser);
 
 /*
-Description: Edits an existing referral.
+Description: Edits status of an existing referral.
 */
 void editReferral (Referral *referral);
 
