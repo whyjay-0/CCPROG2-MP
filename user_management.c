@@ -949,7 +949,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 						default:
             				printCentered("Invalid input.");
 					}
-				} while (uchoice!=0)
+				} while (uchoice!=0);
             	break;
             case 0:
     			printCentered("Logging out...");
