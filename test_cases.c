@@ -29,17 +29,20 @@ void setInput(const char *data) {
 void test_getValidInput() {
     int x; char c;
 
+    //test 1 - valid integer input
     setInput("25\n");
     getValidInput(&x,1,0,100,0,0,0,0);
     testInt("getValidInput",1,25,x);
 
+    //test 2 - above max, invalid, then valid
     setInput("150\n50\n");
     getValidInput(&x,1,0,100,0,0,0,0);
-    testInt("getValidInput",3,50,x);
+    testInt("getValidInput",2,50,x);
     
+    //test 3 - valid char
     setInput("M\n");
     getValidInput(&c,3,0,0,'M','F','m','f');
-    testInt("getValidInput",2,'M',c);
+    testInt("getValidInput",3,'M',c);
 }
 
 void test_registerUser() {
@@ -74,11 +77,14 @@ void test_loginUser() {
 
 void test_hashPassword() {
     unsigned long h1,h2;
+
+    //test 1 - same input
     hashPassword("abc",&h1);
     hashPassword("abc",&h2);
     printf("Hash Password: 1 - %lu, 2 - %lu\n", h1, h2);
     testInt("hashPassword",1,h1==h2,1);
 
+    //test 2 - different input
     hashPassword("abc",&h1);
     hashPassword("xyz",&h2);
     printf("Hash Password: 1 - %lu, 2 - %lu\n", h1, h2);
@@ -142,12 +148,12 @@ void test_getUserID() {
 void test_findUser() {
     //findUserByID
     //findUserByName
-    User u[2]={{1,"A",1,"GP"},{2,"B",1,"Patient"}};
+    User u[2]={{1,"A",1,"GP","Ash"},{2,"B",1,"Patient","Bat"}};
     testInt("findUserByID",1,1,findUserByID(u,2,2));
     testInt("findUserByID",2,-1,findUserByID(u,2,3));
     printf("\n");
-    testInt("findUserByName",1,-1,findUserByName(u,2,"A"));
-    testInt("findUserByName",2,-1,findUserByName(u,2,"C"));
+    testInt("findUserByName",1,0,findUserByName(u,2,"Ash"));
+    testInt("findUserByName",2,-1,findUserByName(u,2,"Cat"));
 }
 
 // PATIENT FUNCTIONS
@@ -527,14 +533,14 @@ int main(){
 
     // USER 
     //test_getValidInput(); 
-    test_registerUser(); 
+    //test_registerUser(); 
     //test_loginUser(); 
     //test_hashPassword(); 
     //test_editUserDetails(); 
     //test_userFile();
     //test_forgotPassword(); 
     //test_getUserID(); 
-    //test_findUser(); 
+    test_findUser(); 
 
     // PATIENT 
     //test_addPatient(); 
