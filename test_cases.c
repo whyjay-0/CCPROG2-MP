@@ -117,11 +117,11 @@ void test_forgotPassword() {
     User u[3]={{1,"A",1,"GP","A",1,"Adobo"},{2,"B",1,"GP","B",2,"Purple"},{3,"C",1,"GP","C",3,"Dog"}};
     
     //test 1 - valid usn -> questType=1
-    setInput("Adobo\nabc");
+    setInput("Adobo\nabc\nok\n");
     testInt("forgotPassword",1,1,forgotPassword(u, 3, "A"));
 
     //test 2 - valid usn -> questType=2
-    setInput("Adobo\nPurple\nabc");
+    setInput("Adobo\nPurple\nabc\nok\n");
     testInt("forgotPassword",2,1,forgotPassword(u, 3, "B"));
     //test 3 - invalid usn
     testInt("forgotPassword",3,0,forgotPassword(u, 3, "D"));
@@ -527,7 +527,7 @@ int main(){
 
     // USER 
     //test_getValidInput(); 
-    //test_registerUser(); 
+    test_registerUser(); 
     //test_loginUser(); 
     //test_hashPassword(); 
     //test_editUserDetails(); 
