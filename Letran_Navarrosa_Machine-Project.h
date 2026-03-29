@@ -69,12 +69,11 @@ int saveAllUsersToFile (User *users, int userCount, const char *filename);
 int loadUsersFromFile (User *users, const char *filename);
 int forgotPassword (User *users, int userCount, const char *username);
 int getUserID (User *users, Patient *patients);
-void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]);
-void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]);
+void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, float data[][2]);
+void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, float data[][2]);
 void patientDashboard(User *currentUser, User *users, int userCount, Patient *patients, int *patientCount, Referral *referrals, int referralCount);
 int findUserByID (User *users, const int userCount, int input);
 int findUserByName (User *users, const int userCount, char *input);
-void printUsers (User *users, int userCount, char *filter);
 void printMainMenu (const int height, const int width);
 void printTitle(const int height, const int width);
 void clearScreen();
@@ -86,10 +85,14 @@ void printCentered(const char* text);
 void waitForInput();
 
 // Printing Tables/Records
-void printHeader();
-void printRows ();
-void printFooter ();
-void calculateWidth ();
+void printHeader (int type, int widths[]);
+void printRows (int type, User *currentUser, User *users, Patient *patients, Referral *referrals, int count, int userCount, int widths[], int referralCount, char *filter);
+void printFooter (int type, int widths[]);
+void calculateWidths (int type, User *users, Patient *patients, Referral *referrals, int count, int userCount, int widths[]);
+
+void printUsers (User *currentUser, User *users, Patient *patients, Referral *referrals, int userCount, int referralCount, char *filter);
+void printPatients (User *currentUser, User *users, Patient *patients, Referral *referrals, int patientCount, int userCount, int referralCount, char *filter);
+void printReferrals (User *currentUser, User *users, Patient *patients, Referral *referrals, int referralCount, int userCount, char *filter);
 
 // Patient
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount);
@@ -105,8 +108,7 @@ int saveAllPatientsToFile (Patient *patients, int patientCount, const char *file
 int loadPatientsFromFile (Patient *patients, const char *filename);
 void editPatient (Patient *patient);
 void deletePatient (Patient *patients, int *patientCount, int index);
-void showPatients (Patient *patient, int count);
-void computeAverages(double data[][2], int patientCount);
+void computeAverages(float data[][2], int patientCount);
 void sortPatientsByID (Patient *patients, int patientCount, int order);
 void sortPatientsByName (Patient *patients, int patientCount, int order);
 int findPatientByID (Patient *patients, int patientCount, int input);
@@ -118,8 +120,7 @@ void updateGender (Patient *patient);
 void printDiagnosing(Patient *currentPatient);
 
 // Referrals
-void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount);
-void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount);
+void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount, Patient *patients);
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser);
 void editReferral (Referral *referral);
 void deleteReferral (Referral *referrals, int *referralCount, int index);

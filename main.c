@@ -12,9 +12,8 @@ int main () {
 	
 	int exit=0, choice=0;
 	int newUser; // userID of new users
-	double data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
+	float data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
 	// 2D array here, for bmi and risk computation, averages.
-	printf("User count: %d\n", userCount);
 	do{
 		printf("\033[8;%d;%dt", HEIGHT, WIDTH);// resize terminal
 		
@@ -32,7 +31,7 @@ int main () {
 			case 2: // Login and dashboard
 				currentUser = loginUser(users,userCount);
 					
-				if (currentUser == NULL){
+				if (currentUser == NULL){ // if empty/invalid
 					printCentered("Login failed.");
 				}
 				else {
@@ -74,28 +73,3 @@ int main () {
 	
 	return 0;
 }
-
-/* // registerUser function test
-	newUser = registerUser(users, &userCount);
-	if (newUser != -1){
-		if (saveUserToFile(&users[newUser],"users.txt")){
-			printf("User saved successfully");
-		}
-	}
-*/
-	
-/* // hashPassword function test
-	
-*/
-
-/* // loginUser function test
-
-*/
-
-/* // saveUserToFile function test
-
-*/
-
-/* // loadUsersFromFile function test
-
-*/

@@ -27,7 +27,7 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 			strcpy(newPatient.name,currentUser->name);
 			newPatient.userID = currentUser->userID;
 			newPatient.patientID = getPatientID(patients, patientCount);
-			padding = (HEIGHT - strlen(newPatient.name) - 14) / 2;
+			padding = (WIDTH - strlen(newPatient.name) - 14) / 2;
 			clearScreen();
 			printf("%*sPatient name: %s\n", padding, "", newPatient.name);
 			waitForInput();
@@ -242,6 +242,8 @@ void diagnosePatient (Patient *patient){
 	else
 		currentPatient->cardioRisk = -1.0; // This should mean invalid since outside of age range
 	
+	clearScreen();
+	
 	int i;
 	printf("%25s","");
 	for (i=0;i<WIDTH-100;i++){
@@ -325,10 +327,10 @@ void showPatientDetails (Patient *currentPatient){
 	}
 	padding = (WIDTH - 22) / 2;
 	if (currentPatient->bloodSugar==0){
-		printf("%57sBlood Sugar: TBD\n","");
+		printf("%57sBlood Sugar: TBD\n\n\n","");
 	}
 	else {
-		printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+		printf("%54sBlood Sugar: %.2f mg/dL\n\n\n", "", currentPatient->bloodSugar);
 	}
 	
 }
@@ -337,7 +339,7 @@ void showPatientDetails (Patient *currentPatient){
 // printing diagnosis report
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
 	int i;
-	
+	clearScreen();
 	printf("%27s","");
 	for (i=0;i<WIDTH-100;i++){
 		printf("%c",205);
@@ -354,9 +356,19 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	padding = (WIDTH - 12 - strlen(currentPatient->bmiCat)) / 2;
 	printf("%*sBMI: %.2f, %s\n", padding, "", currentPatient->bmi, currentPatient->bmiCat);
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
-	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	if (strcmp(currentPatient->bp,"0")==0){
+		printf("%55sBlood Pressure: TBD\n", "");
+	}
+	else {
+		printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	}
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+	if (currentPatient->bloodSugar==0){
+		printf("%57sBlood Sugar: TBD\n\n\n", "");
+	}
+	else {
+		printf("%54sBlood Sugar: %.2f mg/dL\n\n\n", "", currentPatient->bloodSugar);
+	}
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	
@@ -410,9 +422,13 @@ int getPatientID (Patient *patients, int patientCount){
 // Calculate BMI
 void calculateBMI (Patient *patient, const float weight, const float height){
 	float bmi = weight / (height * height);
+	
 	patient->bmi = bmi;
-
-	if(bmi<18.5)
+	if (height <= 0){
+		patient->bmi = 0;
+		strcpy(patient->bmiCat, "Invalid");
+	}
+	else if(bmi<18.5)
 		strcpy(patient->bmiCat, "Underweight");
 	else if(bmi<25.0)
 		strcpy(patient->bmiCat, "Healthy");
@@ -442,9 +458,9 @@ void calculateCardioRisk (Patient *patient){
 	double logor_10yr_CVD = 0;
 	// parse SBP
 	int SBP=0,i;
-	for (i=0;i<15 && patient->bp[i]!='/';i++){
-		if (patient->bp[i]>='0' && patient->bp[i]<='9'){
-			SBP = SBP * 10 + (patient->bp[i] - '0');
+	for (i=0;patient->bp[i] != '\0' && patient->bp[i]!= '/' ;i++){
+		if (patient->bp[i]>='0' && patient->bp[i]<='9'){ // digits found
+			SBP = SBP * 10 + (patient->bp[i] - '0'); // converting char to int
 		}
 	}
 	// Booleans
@@ -655,58 +671,17 @@ void editPatient (Patient *patient){
 // Delete patient
 void deletePatient (Patient *patients, int *patientCount, int index){
 	int i;
+	
 	for (i = index; i < *patientCount - 1;i++){
 		patients[i] = patients[i+1];
 	}
 	(*patientCount)--;
+	
+	patients[*patientCount] = (Patient){0};
 }
 
-// Print patient list
-void showPatients (Patient *patient, int count){
-	int i=0;
-	if(count==0)
-		printf("%56sNo patients found\n","");
-	else {
-		printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    	printf("PATIENT LIST\n");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    	printf("|  |   |   |\n"); // categories
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    
-    	for(i=0; i<count; i++) {
-        	printf("| %03d | %03d | %-25s | %-3d | %3c%3s | %16s |",
-           		i+1,
-           		patient[i].patientID,
-            	patient[i].name,
-            	patient[i].age,
-            	patient[i].gender, "",
-            	patient[i].contact);
-            if (patient[i].cardioRisk!=-1){
-            	printf("   %.2lf%%    |\n", patient[i].cardioRisk * 100);
-			}
-			else {
-				printf("   %-7s    |\n", "N/A");
-			}
-    	}
-    
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-	}
-}
-
-void computeAverages(double data[][2], int patientCount){ // param *data - 2D array containing BMI and CRisk data
-	double sumBMI=0, sumRisk=0, valid=0;
+void computeAverages(float data[][2], int patientCount){ // param *data - 2D array containing BMI and CRisk data
+	float sumBMI=0, sumRisk=0, valid=0;
 	int i;
 	
 	if (patientCount == 0){
@@ -720,15 +695,16 @@ void computeAverages(double data[][2], int patientCount){ // param *data - 2D ar
 				valid++;
 			}
 		}
+		
+		if (patientCount>0)
+			printf("%56sAverage BMI: %.2lf\n", "", sumBMI / patientCount);
+		else
+			printf("%57sAverage BMI: N/A\n", "");
+		if (valid>0)
+			printf("%44sAverage Cardiovascular Disease Risk: %.2lf\n", "", (sumRisk / valid) * 100);
+		else
+			printf("%45sAverage Cardiovascular Disease Risk: N/A\n", "");
 	}
-	if (patientCount>0)
-		printf("%56sAverage BMI: %.2lf\n", "", sumBMI / patientCount);
-	else
-		printf("%57sAverage BMI: N/A\n", "");
-	if (valid>0)
-		printf("%44sAverage Cardiovascular Disease Risk: %.2lf\n", "", (sumRisk / valid) * 100);
-	else
-		printf("%45sAverage Cardiovascular Disease Risk: N/A\n", "");
 }
 
 // selection sort of patientID of patients
@@ -828,7 +804,9 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 	int index;
 	char cInput;
 	
-	printCentered("Enter Patient ID to select: ");
+	printPatients(currentUser,users,patients,referrals,*patientCount,userCount,*referralCount,"*");
+	
+	printf("\n\n%52sEnter Patient ID to select","");
 	getValidInput(&input,1,0,100,0,0,0,0);
 	// do while getValidInput==0,,, show patients
 	
@@ -904,7 +882,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    		break;
     	    	case 5:
     	    		clearScreen();
-    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
+    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
 				case 0:
@@ -924,7 +902,9 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 	char input[101];
 	char cInput;
 	
-	printCentered("Enter name of patient to select: ");
+	printPatients(currentUser,users,patients,referrals,*patientCount,userCount,*referralCount,"*");
+	
+	printf("\n\n%49sEnter name of patient to select","");
 	getValidInput(input,4,0,0,0,0,0,0);
 	// do while index==-1 show patients
 	
@@ -1000,7 +980,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					break;
     	    	case 5:
     	    		clearScreen();
-    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
+    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
 				case 0:
