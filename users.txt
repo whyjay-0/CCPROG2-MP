@@ -5,3 +5,6 @@
 5, GP2, 193432059, GP, GP 2, 2, Blue, N/A
 6, Specialist2, 193432059, Specialist, Specialist 2, 3, Cat, Makati Med
 7, WhyJay, 2090766878, GP, YJ Navarrosa, 2, Purple, N/A
+9, Dummy1, 193432059, Patient, Dummy, 1, Sisig, N/A
+10, Dummy2, 193432059, Specialist, Dummy, 2, Grey, PGH
+8, MarcoRealAccount, 193432059, Patient, Marco Johnson, 3, Cat, N/A

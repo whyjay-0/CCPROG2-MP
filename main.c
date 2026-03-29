@@ -31,7 +31,7 @@ int main () {
 			case 2: // Login and dashboard
 				currentUser = loginUser(users,userCount);
 					
-				if (currentUser == NULL){
+				if (currentUser == NULL){ // if empty/invalid
 					printCentered("Login failed.");
 				}
 				else {
@@ -73,28 +73,3 @@ int main () {
 	
 	return 0;
 }
-
-/* // registerUser function test
-	newUser = registerUser(users, &userCount);
-	if (newUser != -1){
-		if (saveUserToFile(&users[newUser],"users.txt")){
-			printf("User saved successfully");
-		}
-	}
-*/
-	
-/* // hashPassword function test
-	
-*/
-
-/* // loginUser function test
-
-*/
-
-/* // saveUserToFile function test
-
-*/
-
-/* // loadUsersFromFile function test
-
-*/
