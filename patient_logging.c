@@ -1,11 +1,6 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Patient logging
-// Input patient details
-/*
-For patient to set their details.
-returns Patient* - for saving to the TXT file
-*/
 Patient addPatient (User *currentUser, Patient *patients, int patientCount, User *users, int userCount){
 	Patient newPatient;
 	int index, padding, existIndex;
@@ -142,7 +137,6 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 			waitForInput();
 		}
 	}
-	
 	return newPatient;
 }
 
@@ -165,9 +159,7 @@ void initPatient (Patient *patient){
 	patient->isDiagnosed='N';
 	patient->isReferred=0;
 }
-/*
-For GP to diagnose existing patients.
-*/
+
 // Diagnose a patient, will give suggestions and risk level based on the details that 
 // will be input here and from the addPatient function
 void diagnosePatient (Patient *patient){
@@ -334,7 +326,6 @@ void showPatientDetails (Patient *currentPatient){
 	}
 	
 }
-
 
 // printing diagnosis report
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
@@ -870,6 +861,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		
+    	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
     	    		waitForInput();
     	    		
@@ -968,6 +960,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
     	    		
+    	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
     	    		waitForInput();
     	    		

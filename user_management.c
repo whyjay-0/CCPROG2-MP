@@ -40,6 +40,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 					clearInput();
 				}
 				else if (*(int*)input < min || *(int*)input > max){ // *(int*)var , value inside the pointer to int
+					clearScreen();
 					printf("%50sOut of range (%d-%d). Try again", "", min, max);
 				}
 				else 
@@ -61,11 +62,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 				scan = scanf(" %c", (char*)input);
 				if (scan != 1){
 					((char*)input)[0] = '\0';
-					printf("Invalid input. Enter a character: ");
+					printCentered("Invalid input. Enter a character");
 					clearInput();
 				}
 				else if (*(char*)input != limit1 && *(char*)input != limit2 && *(char*)input != limit3 && *(char*)input != limit4)
-					printf("Invalid input. Enter %c or %c", limit1, limit2);
+					printf("%51sInvalid input. Enter %c or %c", "", limit1, limit2);
 				else
 					valid=1;
 				break;
@@ -73,11 +74,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 				scan = scanf(" %100[^\n]", (char*)input);
 				if (scan != 1){
 					((char*)input)[0] = '\0';
-					printf("Invalid input");
+					printCentered("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again");
+					printCentered("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -86,11 +87,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 				scan = scanf(" %16[^\n]", (char*)input);
 				if (scan != 1){
 					((char*)input)[0] = '\0';
-					printf("Invalid input");
+					printCentered("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again");
+					printCentered("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -99,11 +100,11 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 				scan = scanf(" %15[^\n]", (char*)input);
 				if (scan != 1){
 					((char*)input)[0] = '\0';
-					printf("Invalid input");
+					printCentered("Invalid input");
 					clearInput();
 				}
 				else if (strlen((char*)input)==0){
-					printf("Empty input. Try again");
+					printCentered("Empty input. Try again");
 				}
 				else
 					valid=1;
@@ -251,8 +252,6 @@ User* loginUser (User *users, int userCount){
 			
 			getValidInput(username,4,0,0,0,0,0,0);
 			found=0;
-			
-			printf("userCount = %d\n", userCount);
 			
 			for (i=0;i<userCount;i++){
 				if (strcmp(users[i].username,username)==0){
@@ -936,12 +935,15 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
 					switch(uchoice){
 						case 1:
 							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"Patient");
+							waitForInput();
 							break;
 						case 2:
 							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"Specialist");
+							waitForInput();
 							break;
 						case 3:
 							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"GP");
+							waitForInput();
 							break;
 						case 0:
 							printCentered("Exiting...");
@@ -1377,7 +1379,7 @@ void printRows (int type, User *currentUser, User *users, Patient *patients, Ref
 						186, widths[4], patients[i].bmiCat,
 						186, widths[5], patients[i].currentCVD,
 						186, widths[6], patients[i].diabetes,
-						186, widths[7], patients[i].cardioRisk,
+						186, widths[7], patients[i].cardioRisk * 100,
 						186, widths[8], patients[i].isDiagnosed,
 						186, widths[9], referred, 186);
 			}

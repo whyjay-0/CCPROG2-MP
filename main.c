@@ -1,16 +1,16 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 // gcc -Wall -std=c99 main.c user_management.c patient_logging.c referral_management.c
 int main () {
-	User users[MAX_USERS] = {0};
-	User *currentUser;
+	User users[MAX_USERS] = {0}; // init array of struc to 0 in all index
+	User *currentUser; // setup for currentUser
 	Patient patients[MAX_USERS] = {0};
 	Referral referrals[MAX_USERS] = {0};
 	
 	int userCount = loadUsersFromFile(users, "users.txt");
 	int patientCount = loadPatientsFromFile(patients, "patients.txt");
-	int referralCount = loadReferralsFromFile(referrals, "referrals.txt");
+	int referralCount = loadReferralsFromFile(referrals, "referrals.txt"); // loadReferrals/Patients/Users returns count of successful scans
 	
-	int exit=0, choice=0;
+	int exit=0, choice=0; // input for main menu/login screen
 	int newUser; // userID of new users
 	float data[MAX_USERS][2]; // [][0] = BMI, [][1] = CRisk
 	// 2D array here, for bmi and risk computation, averages.
