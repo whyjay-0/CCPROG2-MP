@@ -174,7 +174,7 @@ void test_addPatient() {
     //test 2 - GP adds patient
     setInput("John\n25\nM\n+63 912-345-6789\n70\n1.75\n120/80\n100\n");
 
-     p = addPatient(&u[1],arr,0,users,0);
+    p = addPatient(&u[1],arr,0,users,0);
 
     testStr("addPatient",2,"John",p.name);
     testInt("addPatient",2,25,p.age);
@@ -186,7 +186,8 @@ void test_initPatient() {
     testInt("initPatient",1,-1,p.userID);
     testDouble("initPatient",1,-1.0,p.cardioRisk);
     printf("\n");
-    //test 2 - struct eith garbage values
+
+    //test 2 - struct with garbage values
     Patient pt={1,1,"A",24,'M',"w",1.0,"q","as",4.0,.cardioRisk=9.0}; 
     initPatient(&pt);
     testInt("initPatient",2,-1,pt.userID);
@@ -540,7 +541,7 @@ int main(){
     //test_userFile();
     //test_forgotPassword(); 
     //test_getUserID(); 
-    test_findUser(); 
+    //test_findUser(); 
 
     // PATIENT 
     //test_addPatient(); 
