@@ -43,11 +43,33 @@ void test_getValidInput() {
 }
 
 void test_registerUser() {
+    User u[4]={{1,"Jess"},{2,"Sab"}};
+    Patient p[2];
+    int c=2;
 
+    //test 1 - valid registration: new patient
+    setInput("A\nAsh\nabc\n1\n1\nAdobo\n");
+    testInt("registerUser",1,2,registerUser(u,&c,p,0));
+    printf("Count: %d (Expected: 3)", c);
+
+    //test 2 - duplicate usn, gp
+    setInput("Jess\nok\nB\nBat\nxyz\n2\n3\nCat\n");
+    testInt("registerUser",1,3,registerUser(u,&c,p,0));
+    printf("Count: %d (Expected: 4)", c);
 }
 
 void test_loginUser() {
+    User u[1]={{1,"A",193485963}};
 
+    //test 1 - correct login
+    setInput("A\nabc\n");
+    User *user = loginUser(u,1);
+    testStr("loginUser",1,"A",user->username);
+
+    //test 2 - wrong password
+    setInput("A\nxyz\nabc\n");
+    User *user1 = loginUser(u,1);
+    testStr("loginUser",2,"A",user1->username);
 }
 
 void test_hashPassword() {
@@ -63,9 +85,32 @@ void test_hashPassword() {
     testInt("hashPassword",2,h1!=h2,1);
 }
 
+void test_editUserDetails() {
+    User u[1]={{1,"A",1,"GP","Jess",1,"Adobo","h"}};
+
+    //test 1 - change username
+    setInput("1\nSab\n");
+    editUserDetails(u,1,u);
+    testStr("editUserDeatils",1,"Sab",u[0].username);
+
+    //test 2 - edit security question
+    setInput("3\n2\nPurple\n");
+    editUserDetails(u,1,u);
+    testStr("editUserDeatils",2,"Purple",u[0].answer);
+}
+
 void test_userFile() {
     //saveAllUSersToFile
     //loadAllUsersFromFile
+    User u[3]={{1,"A",1,"GP","Ash",1,"Ad","A"},{2,"B",2,"Specialist","Bat",2,"Blue","B"},{3,"C",3,"Patient","Cat",3,"C","C"}};
+
+    //test 1 - valid
+    testInt("saveAllUsersToFile",1,1,saveAllUsersToFile(u,3,"u.txt"));
+    testInt("loadUsersFromFile",1,3,loadUsersFromFile(u,"u.txt"));
+
+    //test 2 - invalid
+    testInt("saveAllUsersToFile",2,0,saveAllUsersToFile(u,3,""));
+    testInt("loadUsersFromFile",2,0,loadUsersFromFile(u,""));
 }
 
 void test_forgotPassword() {
@@ -177,10 +222,6 @@ void test_diagnosePatient() {
         p.cardioRisk==-1 ? "PASS":"FAIL");
 }
 
-void test_showDiagnosisReport() {
-
-}
-
 void test_getPatientID() {
     //test 1 - normal list
     Patient p1[3]={{1},{2},{3}};
@@ -218,19 +259,52 @@ void test_mmol() {
 }
 
 void test_calculateCardioRisk() {
+    Patient p[1]={{1,1,"A",50,'M',"+63",2.0,"h","110/80",2.0,'N',150,80,1,'N','N','Y','N',2.0,'N','N','N','N',0,'N',1}};
 
+    //test 1 - valid
+    calculateCardioRisk(p);
+    testDouble("calculateCardioRisk",1,0.21,p[0].cardioRisk);
+
+    //test 2 - invalid age
+    p[0].age=20;
+    calculateCardioRisk(p);
+    testDouble("calculateCardioRisk",2,-1,p[0].cardioRisk);
+
+    //test 3 - has CVD
+    p[0].age=50;
+    p[0].currentCVD='Y';
+    calculateCardioRisk(p);
+    testDouble("calculateCardioRisk",3,-1,p[0].cardioRisk);
 }
 
 void test_patientFile() {
     //saveAllPatientsToFile
     //loadAllPatientsFromFile
-    Patient p[1]={0};
+    Patient p[1]={{1,1,"A",1,'M',"+63",2.0,"h","a",2.0,'N',3.0,2.0,1,'N','N','N','N',2.0,'N','N','N','N',2.0,'N',1}};
+    
+    //test 1 - valid 
     testInt("saveAllPatientsToFile",1,1,saveAllPatientsToFile(p,1,"p.txt"));
     testInt("loadPatientsFromFile",1,1,loadPatientsFromFile(p,"p.txt"));
+
+    //test 1 - valid 
+    testInt("saveAllPatientsToFile",2,0,saveAllPatientsToFile(p,1,""));
+    testInt("loadPatientsFromFile",2,0,loadPatientsFromFile(p,""));
 }
 
 void test_editPatient() {
+    Patient p[1]={{1,1,"Jess",18,'F',"+63 123-456-7890"}};
 
+    //test 1 - update all fields
+    setInput("Jessica\n20\n+63 098-765-4321\n");
+    editPatient(p);
+    printf("Expected: Jessica 20 +63 098-765-4321\n");
+    printf("Actual: %s %d %s\n", p[0].name,p[0].age,p[0].contact);
+
+    //test 1 - update age only
+    setInput("Jessica\n18\n+63 098-765-4321\n");
+    editPatient(p);
+    printf("Expected: Jessica 18 +63 098-765-4321\n");
+    printf("Actual: %s %d %s\n", p[0].name,p[0].age,p[0].contact);
 }
 
 void test_deletePatient() {
@@ -250,7 +324,15 @@ void test_deletePatient() {
 }
 
 void test_computeAverages() {
+    float data[2][2]={{20, 0.21}, {35,0}};
 
+    //test 1 - valid data
+    computeAverages(data,2);
+    printf("Expected: Avg BMI: 27.50 | Avg CRisk: 10.50");
+
+    //test 2 - no data
+    computeAverages(data,0);
+    printf("Expected: No data available.\n");
 }
 
 void test_sortPatients() {
@@ -310,6 +392,7 @@ void test_selectPatient() {
     //selectPatientName
 }
 
+
 void test_updateGender() {
     Patient p={.gender='m'};
     updateGender(&p);
@@ -328,49 +411,107 @@ void test_createReferral() {
 
 void test_editReferral() {
     Referral r;
+    
+    //test 1 - Accept
     setInput("1\n");
     editReferral(&r);
     testStr("editReferral",1,"Accepted",r.status);
+
+    //test 2 - Reject
+    setInput("3\n");
+    editReferral(&r);
+    testStr("editReferral",2,"Rejected",r.status);
+
+    //test 3 - Invalid then valid
+    setInput("4\n2\n");
+    editReferral(&r);
+    testStr("editReferral",3,"Completed",r.status);
 }
 
 void test_deleteReferral(){
-    Referral r[2]={{1},{2}};
-    int c=2;
-    deleteReferral(r,&c,0);
-    testInt("deleteReferral",1,1,c);
+    //test 1 - delete middle
+    Referral r[3]={{1},{2},{3}};
+    int c=3;
+    deleteReferral(r,&c,1);
+    printf("Actual: [%d,%d,%d]   |   Expected: [1,3,0]\n", r[0].referralID, r[1].referralID, r[2].referralID);
+    testInt("deleteReferral",1,2,c);
+
+    //test 2 - delete last
+    Referral r2[3]={{1},{2},{3}};
+    c=3;
+    deleteReferral(r2,&c,2);
+    printf("\nActual: [%d,%d,%d]   |   Expected: [1,2,0]\n", r2[0].referralID, r2[1].referralID, r2[2].referralID);
+    testInt("deleteReferral",2,2,c);
 }
 
 void test_referralFile(){
     //saveAllReferralsToFile
     //loadAllReferralsFromFile
-    Referral r[1]={{.referralID=1}};
-    saveAllReferralsToFile(r,1,"r.txt");
 
-    Referral l[1];
-    int c=loadReferralsFromFile(l,"r.txt");
+    //test 1 - save data and valid file
+    Referral r1[2]={{1,1,1,"John",1,"Completed"},{2,2,2,"Jess",2,"Rejected"}};
+    testInt("saveAllReferralsToFile",1,1,saveAllReferralsToFile(r1,2,"r.txt"));
+    testInt("loadAllReferralsFromFile",1,2,loadReferralsFromFile(r1,"r.txt"));
 
-    testInt("referralFile",1,1,c);
+     //test 1 - invalid path and missing file
+    Referral r2[2]={{1,1,1,"John",1,"Completed"},{2,2,2,"Jess",2,"Rejected"}};
+    testInt("saveAllReferralsToFile",2,0,saveAllReferralsToFile(r2,2,""));
+    testInt("loadAllReferralsFromFile",2,0,loadReferralsFromFile(r2,""));
+
 }
 
 void test_getReferralID(){
-    Referral r[2]={{1},{5}};
-    testInt("getReferralID",1,6,getReferralID(r,2));
+    //test 1 - Normal list
+    Referral r1[3]={{1},{2},{3}};
+    testInt("getReferralID",1,4,getReferralID(r1,3));
+    
+     //test 2 - non-sequential list
+    Referral r2[3]={{1},{5},{3}};
+    testInt("getReferralID",1,6,getReferralID(r2,3));
 }
 
 void test_sortReferrals(){
     //sortReferralByID
     //sortReferralByStatus
-    Referral r[2]={{2,0,0,"",0,"B"},{1,0,0,"",0,"A"}};
 
-    sortReferralsByID(r,2,1);
-    testInt("sortReferralsByID",1,1,r[0].referralID);
+    //test 1 - ascending
+    Referral r1[4]={{2,0,0,"",0,"Completed"},{1,0,0,"",0,"Accepted"},{4,0,0,"",0,"Pending"},{3,0,0,"",0,"Rejected"}};
+    sortReferralsByID(r1,4,1);
+    printf("sortReferralsById - Ascending\n");
+    printf("%d %s\n", r1[0].referralID, r1[0].status);
+    printf("%d %s\n", r1[1].referralID, r1[1].status);
+    printf("%d %s\n", r1[2].referralID, r1[2].status);
+    printf("%d %s\n\n", r1[3].referralID, r1[3].status);
+    sortReferralsByStatus(r1,4,1);
+    printf("sortReferralsByStatus - Ascending\n");
+    printf("%d %s\n", r1[0].referralID, r1[0].status);
+    printf("%d %s\n", r1[1].referralID, r1[1].status);
+    printf("%d %s\n", r1[2].referralID, r1[2].status);
+    printf("%d %s\n\n", r1[3].referralID, r1[3].status);
 
-    sortReferralsByStatus(r,2,1);
-    testStr("sortReferralsByStatus",2,"A",r[0].status);
+    //test 2 - descending
+    Referral r2[4]={{2,0,0,"",0,"Completed"},{1,0,0,"",0,"Accepted"},{4,0,0,"",0,"Pending"},{3,0,0,"",0,"Rejected"}};
+    sortReferralsByID(r2,4,2);
+    printf("sortReferralsById - Descending\n");
+    printf("%d %s\n", r2[0].referralID, r2[0].status);
+    printf("%d %s\n", r2[1].referralID, r2[1].status);
+    printf("%d %s\n", r2[2].referralID, r2[2].status);
+    printf("%d %s\n\n", r2[3].referralID, r2[3].status);
+    sortReferralsByStatus(r2,4,2);
+    printf("sortReferralsByStatus - Descending\n");
+    printf("%d %s\n", r2[0].referralID, r2[0].status);
+    printf("%d %s\n", r2[1].referralID, r2[1].status);
+    printf("%d %s\n", r2[2].referralID, r2[2].status);
+    printf("%d %s\n\n", r2[3].referralID, r2[3].status);
 }
 
 void test_findReferralByID() {
+    Referral r[4]={{1},{2},{3},{4}};
 
+    //test 1 - found
+    testInt("findReferralByID",1,1,findReferralByID(r,4,2));
+    //Test 2 - not found
+    testInt("findReferralByID",2,-1,findReferralByID(r,4,5));
 }
 
 void test_selectReferralID() {
@@ -383,14 +524,14 @@ int main(){
     printf("=== TEST RUNNER ===\n\n");
 
     //those with dot at the end is done with testing
-    
+
     // USER 
     //test_getValidInput(); .
-    //test_registerUser();
-    //test_loginUser;
+    //test_registerUser(); .
+    //test_loginUser(); .
     //test_hashPassword(); .
-    //test_editUserDetails();
-    //test_userFile();
+    //test_editUserDetails(); .
+    //test_userFile(); .
     //test_forgotPassword(); .
     //test_getUserID(); .
     //test_dashboards();
@@ -400,15 +541,14 @@ int main(){
     //test_addPatient(); .
     //test_initPatient(); .
     //test_diagnosePatient(); . 
-    //test_showDiagnosisReport();
     //test_getPatientID(); .
     //test_calculateBMI(); .
     //test_mmol(); .
-    //test_calculateCardioRisk();
-    //test_patientFile();
-    //test_editPatient();
+    //test_calculateCardioRisk(); .
+    //test_patientFile(); .
+    //test_editPatient(); .
     //test_deletePatient(); .
-    //test_computeAverages();
+    //test_computeAverages(); .
     //test_sortPatients(); .
     //test_findPatient(); .
     //test_selectPatient();
@@ -416,12 +556,12 @@ int main(){
 
     // REFERRALS 
     //test_createReferral();
-    //test_editReferral();
-    //test_deleteReferral();
-    //test_referralFile();
-    //test_getReferralID();
-    //test_sortReferrals();
-    //test_findReferralByID();
+    //test_editReferral(); .
+    //test_deleteReferral(); .
+    //test_referralFile(); .
+    //test_getReferralID(); .
+    //test_sortReferrals(); .
+    //test_findReferralByID(); .
     //test_selectReferralID();
 
     printf("\n=== END OF TESTS ===\n");
