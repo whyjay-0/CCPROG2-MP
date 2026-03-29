@@ -1371,7 +1371,7 @@ void printRows (int type, User *currentUser, User *users, Patient *patients, Ref
 			printf("%*s",(WIDTH-totalWidth)/2,"");
 			
 			if (patients[i].cardioRisk!=-1){
-				printf("%c %-*d %c %-*s %c %-*d %c %-*c %c %-*s %c %-*c %c %-*c %c %-*.2lf %c %-*c %c %-*c %c\n",
+				printf("%c %-*d %c %-*s %c %-*d %c %-*c %c %-*s %c %-*c %c %-*c %c %.2lf%-*c %c %-*c %c %-*c %c\n",
 						186, widths[0], patients[i].patientID,
 						186, widths[1], patients[i].name,
 						186, widths[2], patients[i].age,
@@ -1379,7 +1379,7 @@ void printRows (int type, User *currentUser, User *users, Patient *patients, Ref
 						186, widths[4], patients[i].bmiCat,
 						186, widths[5], patients[i].currentCVD,
 						186, widths[6], patients[i].diabetes,
-						186, widths[7], patients[i].cardioRisk * 100,
+						186, patients[i].cardioRisk * 100, widths[7]-4, 37,
 						186, widths[8], patients[i].isDiagnosed,
 						186, widths[9], referred, 186);
 			}
