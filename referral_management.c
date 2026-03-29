@@ -129,6 +129,9 @@ void viewReferralStatus(User *users, int userCount, Referral *referrals, int ref
 		printf("%*sReferred By (GP): %s\n", padding, "", users[gpIndex].name);
 		padding = (WIDTH - 21 - strlen(users[spIndex].name)) / 2;
 		printf("%*sAssigned Specialist: %s\n\n", padding, "", users[spIndex].name);
+		padding = (WIDTH - 42 - strlent(users[spIndex].hospital)) / 2;
+		printf("%*sAssigned Specialist's Affiliated Hospital:\n",padding,"");
+		printf("%*s     %s\n",padding,"",users[spIndex].hospital);
 		padding = (WIDTH - 8 - strlen(referrals[index].status)) / 2;
 		printf("%*sStatus: %s\n\n", padding, "", referrals[index].status);
 	}

@@ -763,7 +763,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
 }
 
 void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, float data[][2]){
-	int i, choice=-1, pchoice=-1, rchoice=-1, order=-1;
+	int i, choice=-1, pchoice=-1, rchoice=-1, uchoice=-1, order=-1;
 	int padding;
 	
     do{
@@ -792,8 +792,9 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
         printf("%50s[2] Show Patients\n","");
         printf("%50s[3] Compute Averages (BMI + Cardio Risk)\n","");
         printf("%50s[4] Edit User Details\n","");
+        printf("%50s[5] Search for Users\n","");
         printf("%50s[0] Logout","");
-        getValidInput(&choice,1,0,4,0,0,0,0);
+        getValidInput(&choice,1,0,5,0,0,0,0);
         
         switch(choice){
             case 1:
@@ -909,6 +910,46 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             case 4:
             	clearScreen();
             	editUserDetails(currentUser, userCount, users);
+            	break;
+            case 5:
+            	do{
+            		clearScreen();
+            		printUsers(currentUser,users,patients,referrals,userCount,referralCount,"*");
+            		
+            		printf("%27s","");
+					for (i=0;i<WIDTH-100;i++){
+						printf("%c",205);
+					}
+					printf("  Users CRUD  ");
+					for (i=0;i<WIDTH-100;i++){
+						printf("%c",205);
+					}
+					printf("\n");
+					
+					printf("%52s[1] Search For Patients\n","");
+            		printf("%52s[2] Search For Specialists\n","");
+            		printf("%52s[3] Search For GPs\n","");
+            		printf("%52s[0] Exit","");
+					
+					getValidInput(&uchoice,1,0,3,0,0,0,0);
+					
+					switch(uchoice){
+						case 1:
+							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"Patient");
+							break;
+						case 2:
+							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"Specialist");
+							break;
+						case 3:
+							printUsers(currentUser,users,patients,referrals,userCount,referralCount,"GP");
+							break;
+						case 0:
+							printCentered("Exiting...");
+							break;
+						default:
+            				printCentered("Invalid input.");
+					}
+				} while (uchoice!=0)
             	break;
             case 0:
     			printCentered("Logging out...");
