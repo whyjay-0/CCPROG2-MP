@@ -139,12 +139,6 @@ void test_getUserID() {
     testInt("getUserID",2,1,getUserID(user,patient));
 }
 
-void test_dashboards() {
-    //gpDashboard
-    //specialistDashboard
-    //patientDashboard
-}
-
 void test_findUser() {
     //findUserByID
     //findUserByName
@@ -387,12 +381,6 @@ void test_findPatient() {
     testInt("findPatientByName",2,-1,findPatientByName(p,4,"Den"));
 }
 
-void test_selectPatient() {
-    //selectPatientID
-    //selectPatientName
-}
-
-
 void test_updateGender() {
     Patient p={.gender='m'};
     updateGender(&p);
@@ -406,7 +394,25 @@ void test_updateGender() {
 // REFERRALS
 
 void test_createReferral() {
+    Referral r[100] = {0};
+    User u[3] = {{1,"A",1,"GP"},{2,"B",1,"Specialist"},{3,"C",1,"Patient"}};
+    Patient p[1] = {{1,6,"John",}};
+    int refCount = 0;
 
+    //test 1 - valid referral
+    p[0].isDiagnosed='Y';
+    p[0].isReferred=0;
+    setInput("1\n2\n");
+    createReferral(r,u, &p[0], u[0], 3, &refCount, p);
+    testInt("createReferral",1,1,refCount);
+    testStr("createReferral",1,"Pending",r[0].status);
+
+    // test 2 - not diagnosed
+    p[0].isDiagnosed = 'N';
+    p[0].isReferred = 0;
+    setInput("ok\n");
+    createReferral(r, u, &p[0], u[0], 3, &refCount, p);
+    testInt("createReferral",2,1,refCount);
 }
 
 void test_editReferral() {
@@ -514,55 +520,46 @@ void test_findReferralByID() {
     testInt("findReferralByID",2,-1,findReferralByID(r,4,5));
 }
 
-void test_selectReferralID() {
-
-}
-
 // MAIN 
 int main(){
 
     printf("=== TEST RUNNER ===\n\n");
 
-    //those with dot at the end is done with testing
-
     // USER 
-    //test_getValidInput(); .
-    //test_registerUser(); .
-    //test_loginUser(); .
-    //test_hashPassword(); .
-    //test_editUserDetails(); .
-    //test_userFile(); .
-    //test_forgotPassword(); .
-    //test_getUserID(); .
-    //test_dashboards();
-    //test_findUser(); .
+    //test_getValidInput(); 
+    //test_registerUser(); 
+    //test_loginUser(); 
+    //test_hashPassword(); 
+    //test_editUserDetails(); 
+    //test_userFile();
+    //test_forgotPassword(); 
+    //test_getUserID(); 
+    //test_findUser(); 
 
     // PATIENT 
-    //test_addPatient(); .
-    //test_initPatient(); .
-    //test_diagnosePatient(); . 
-    //test_getPatientID(); .
-    //test_calculateBMI(); .
-    //test_mmol(); .
-    //test_calculateCardioRisk(); .
-    //test_patientFile(); .
-    //test_editPatient(); .
-    //test_deletePatient(); .
-    //test_computeAverages(); .
-    //test_sortPatients(); .
-    //test_findPatient(); .
-    //test_selectPatient();
-    //test_updateGender(); .
+    //test_addPatient(); 
+    //test_initPatient(); 
+    //test_diagnosePatient(); 
+    //test_getPatientID(); 
+    //test_calculateBMI(); 
+    //test_mmol(); 
+    //test_calculateCardioRisk(); 
+    //test_patientFile(); 
+    //test_editPatient(); 
+    //test_deletePatient(); 
+    //test_computeAverages(); 
+    //test_sortPatients();
+    //test_findPatient(); 
+    //test_updateGender(); 
 
     // REFERRALS 
     //test_createReferral();
-    //test_editReferral(); .
-    //test_deleteReferral(); .
-    //test_referralFile(); .
-    //test_getReferralID(); .
-    //test_sortReferrals(); .
-    //test_findReferralByID(); .
-    //test_selectReferralID();
+    //test_editReferral(); 
+    //test_deleteReferral(); 
+    //test_referralFile(); 
+    //test_getReferralID(); 
+    //test_sortReferrals(); 
+    //test_findReferralByID(); 
 
     printf("\n=== END OF TESTS ===\n");
 
