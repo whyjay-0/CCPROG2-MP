@@ -84,15 +84,14 @@ void test_forgotPassword() {
 
 void test_getUserID() {
     //test 1 - normal case
-    User u[2]={{1},{2}};
-    Patient p[1]={{1,5}};
-    printf("%d", getUserID(u,p));
-    //testInt("getUserID",1,6,getUserID(u,p));
+    User u[100]={{1},{2}};
+    Patient p[100]={{1,5}};
+    testInt("getUserID",1,6,getUserID(u,p));
 
     //test 2 - empty
-    //User user[2];
-    //Patient patient[1];
-    //testInt("getUserID",2,0,getUserID(user,patient));
+    User user[100];
+    Patient patient[100];
+    testInt("getUserID",2,1,getUserID(user,patient));
 }
 
 void test_dashboards() {
@@ -106,45 +105,76 @@ void test_findUser() {
     //findUserByName
     User u[2]={{1,"A",1,"GP"},{2,"B",1,"Patient"}};
     testInt("findUserByID",1,1,findUserByID(u,2,2));
-    testInt("findUserByID",1,1,findUserByID(u,2,3));
-    testInt("findUserByName",2,-1,findUserByName(u,2,"A"));
+    testInt("findUserByID",2,-1,findUserByID(u,2,3));
+    printf("\n");
+    testInt("findUserByName",1,-1,findUserByName(u,2,"A"));
+    testInt("findUserByName",2,-1,findUserByName(u,2,"C"));
 }
 
 // PATIENT FUNCTIONS
 
 void test_addPatient() {
-    User u={1,"John",1,"Patient"};
-    Patient arr[1];
-    User users[1];
+    User u[2]={{1,"John",1,"Patient", "John"},{2,"Jess",1,"GP", "Jess"}};
+    Patient arr[100];
+    User users[100];
 
-    setInput("25\nM\n+63 912-345-6789\n70\n1.75\n120/80\n100\n");
+    //test 1 - patient self-add
+    setInput("k\n25\nM\n+63 912-345-6789\n70\n1.75\n120/80\n100\n");
 
-    Patient p = addPatient(&u,arr,0,users,0);
+    Patient p = addPatient(&u[0],arr,0,users,0);
 
     testStr("addPatient",1,"John",p.name);
+    testInt("addPatient",1,25,p.age);
+
+    //test 2 - GP adds patient
+    setInput("John\n25\nM\n+63 912-345-6789\n70\n1.75\n120/80\n100\n");
+
+     p = addPatient(&u[1],arr,0,users,0);
+
+    testStr("addPatient",2,"John",p.name);
     testInt("addPatient",2,25,p.age);
 }
 
 void test_initPatient() {
+    //test 1 - empty struct
     Patient p; initPatient(&p);
     testInt("initPatient",1,-1,p.userID);
+    testDouble("initPatient",1,-1.0,p.cardioRisk);
+    printf("\n");
+    //test 2 - struct eith garbage values
+    Patient pt={1,1,"A",24,'M',"w",1.0,"q","as",4.0,.cardioRisk=9.0}; 
+    initPatient(&pt);
+    testInt("initPatient",2,-1,pt.userID);
+    testDouble("initPatient",2,-1.0,pt.cardioRisk);
 }
 
 void test_diagnosePatient() {
     Patient p;
+    //test 1 - valid data
     strcpy(p.name,"Test");
     p.age=50; p.gender='M'; strcpy(p.bp,"120/80");
     p.bloodSugar=100;
 
     setInput(
-        "200\n50\n90\nY\nN\nN\nN\n1.0\nN\nY\nN\nN\n"
+        "200\n50\n90\nY\nN\nN\nN\nN\n1.0\nN\nY\nN\nN\nh\n"
     );
 
     diagnosePatient(&p);
-
-    printf("[diagnosePatient - Test 1] cardioRisk: %.2lf → %s\n",
+    printf("[diagnosePatient - Test 1] cardioRisk: %.2lf -> %s\n",
         p.cardioRisk,
         p.cardioRisk>=0 ? "PASS":"FAIL");
+    
+    //test 2 - invalid age
+    p.age=20;
+    
+    setInput(
+        "200\n50\n90\nY\nN\nN\nN\nN\n1.0\nN\nY\nN\nN\nh\n"
+    );
+
+    diagnosePatient(&p);
+    printf("[diagnosePatient - Test 2] cardioRisk: %.2lf -> %s\n",
+        p.cardioRisk,
+        p.cardioRisk==-1 ? "PASS":"FAIL");
 }
 
 void test_showDiagnosisReport() {
@@ -152,19 +182,39 @@ void test_showDiagnosisReport() {
 }
 
 void test_getPatientID() {
-    Patient p[2]={{.patientID=1},{.patientID=3}};
-    testInt("getPatientID",1,4,getPatientID(p,2));
+    //test 1 - normal list
+    Patient p1[3]={{1},{2},{3}};
+    testInt("getPatientID",1,4,getPatientID(p1,3));
+
+    //test 2 - non-sequential list
+    Patient p2[3]={{1},{5},{4}};
+    testInt("getPatientID",2,6,getPatientID(p2,3));
 }
 
 void test_calculateBMI() {
     Patient p;
+    //test 1 - normal
     calculateBMI(&p,70,1.75);
     testDouble("calculateBMI",1,22.86,p.bmi);
-    testStr("calculateBMI",2,"Healthy",p.bmiCat);
+    testStr("calculateBMI",1,"Healthy",p.bmiCat);
+
+    //test 2 - underweight
+    calculateBMI(&p,45,1.7);
+    testDouble("calculateBMI",2,15.57,p.bmi);
+    testStr("calculateBMI",2,"Underweight",p.bmiCat);
+
+    //test 3 - obese
+    calculateBMI(&p,100,1.8);
+    testDouble("calculateBMI",3,30.86,p.bmi);
+    testStr("calculateBMI",3,"Obese",p.bmiCat);
 }
 
 void test_mmol() {
+    //test 1 - convert
     testDouble("mmol_conv",1,2.58,mmol_conv(100));
+
+    //test 2 - zero input
+    testDouble("mmol_conv",1,0.00,mmol_conv(0));
 }
 
 void test_calculateCardioRisk() {
@@ -174,13 +224,9 @@ void test_calculateCardioRisk() {
 void test_patientFile() {
     //saveAllPatientsToFile
     //loadAllPatientsFromFile
-    Patient p[1]={{.patientID=1,.userID=1}};
-    saveAllPatientsToFile(p,1,"p.txt");
-
-    Patient l[1];
-    int c=loadPatientsFromFile(l,"p.txt");
-
-    testInt("patientFile",1,1,c);
+    Patient p[1]={0};
+    testInt("saveAllPatientsToFile",1,1,saveAllPatientsToFile(p,1,"p.txt"));
+    testInt("loadPatientsFromFile",1,1,loadPatientsFromFile(p,"p.txt"));
 }
 
 void test_editPatient() {
@@ -188,10 +234,19 @@ void test_editPatient() {
 }
 
 void test_deletePatient() {
-    Patient p[2]={{1},{2}};
-    int c=2;
-    deletePatient(p,&c,0);
-    testInt("deletePatient",1,1,c);
+    //test 1 - delete middle
+    Patient p1[3]={{1},{2},{3}};
+    int c=3;
+    deletePatient(p1,&c,1);
+    printf("[%d,%d]", p1[0].patientID, p1[1].patientID);
+    testInt("deletePatient",1,2,c);
+
+    //test 2 - delete first
+    Patient p2[3]={{1},{2},{3}};
+    c=3;
+    deletePatient(p2,&c,0);
+    printf("[%d,%d]", p2[0].patientID, p2[1].patientID);
+    testInt("deletePatient",2,2,c);
 }
 
 void test_computeAverages() {
@@ -201,21 +256,53 @@ void test_computeAverages() {
 void test_sortPatients() {
     //sortPatientsbyID
     //sortPatientsByName
-    Patient p[2]={{2,0,"Z"},{1,0,"A"}};
-    sortPatientsByID(p,2,1);
-    testInt("sortPatientsByID",1,1,p[0].patientID);
 
-    sortPatientsByName(p,2,1);
-    testStr("sortPatientsByName",1,"A",p[0].name);
+    //test 1 - ascending
+    Patient p[4]={{2,0,"L"},{3,0,"X"},{1,0,"A"},{4,0,"T"}};
+    sortPatientsByID(p,4,1);
+    printf("sortPatientsById - Ascending\n");
+    printf("%d %s\n", p[0].patientID, p[0].name);
+    printf("%d %s\n", p[1].patientID, p[1].name);
+    printf("%d %s\n", p[2].patientID, p[2].name);
+    printf("%d %s\n\n", p[3].patientID, p[3].name);
+    sortPatientsByName(p,4,1);
+    printf("sortPatientsByName - Ascending\n");
+    printf("%d %s\n", p[0].patientID, p[0].name);
+    printf("%d %s\n", p[1].patientID, p[1].name);
+    printf("%d %s\n", p[2].patientID, p[2].name);
+    printf("%d %s\n\n", p[3].patientID, p[3].name);
+
+    //test 2 - descending
+    Patient p2[4]={{2,0,"L"},{3,0,"X"},{1,0,"A"},{4,0,"T"}};
+    sortPatientsByID(p2,4,2);
+    printf("sortPatientsById - Descending\n");
+    printf("%d %s\n", p2[0].patientID, p2[0].name);
+    printf("%d %s\n", p2[1].patientID, p2[1].name);
+    printf("%d %s\n", p2[2].patientID, p2[2].name);
+    printf("%d %s\n\n", p2[3].patientID, p2[3].name);
+    sortPatientsByName(p2,4,2);
+    printf("sortPatientsByName - Descending\n");
+    printf("%d %s\n", p2[0].patientID, p2[0].name);
+    printf("%d %s\n", p2[1].patientID, p2[1].name);
+    printf("%d %s\n", p2[2].patientID, p2[2].name);
+    printf("%d %s\n\n", p2[3].patientID, p2[3].name);
 }
 
 void test_findPatient() {
     //findPatientByID
     //findPatientByUserID
     //findPatientByName
-    Patient p[2]={{1,0,"A"},{2,0,"B"}};
-    testInt("findPatientByID",1,1,findPatientByID(p,2,2));
-    testInt("findPatientByName",2,0,findPatientByName(p,2,"A"));
+    Patient p[4]={{1,2,"Jess"},{2,4,"Sab"},{3,6,"Kai"},{4,8,"Ri"}};
+
+    //test 1 - Found
+    testInt("findPatientByID",1,0,findPatientByID(p,4,1));
+    testInt("findPatientByUserID",1,3,findPatientByUserID(p,4,8));
+    testInt("findPatientByName",1,2,findPatientByName(p,4,"Kai"));
+
+    //test 2 - Not Found
+    testInt("findPatientByID",2,-1,findPatientByID(p,4,7));
+    testInt("findPatientByUserID",2,-1,findPatientByUserID(p,4,5));
+    testInt("findPatientByName",2,-1,findPatientByName(p,4,"Den"));
 }
 
 void test_selectPatient() {
@@ -295,35 +382,37 @@ int main(){
 
     printf("=== TEST RUNNER ===\n\n");
 
+    //those with dot at the end is done with testing
+    
     // USER 
-    //test_getValidInput();
+    //test_getValidInput(); .
     //test_registerUser();
     //test_loginUser;
-    //test_hashPassword();
+    //test_hashPassword(); .
     //test_editUserDetails();
     //test_userFile();
-    //test_forgotPassword();
-    test_getUserID();
+    //test_forgotPassword(); .
+    //test_getUserID(); .
     //test_dashboards();
-    //test_findUser();
+    //test_findUser(); .
 
     // PATIENT 
-    //test_addPatient();
-    //test_initPatient();
-    //test_diagnosePatient();
+    //test_addPatient(); .
+    //test_initPatient(); .
+    //test_diagnosePatient(); . 
     //test_showDiagnosisReport();
-    //test_getPatientID();
-    //test_calculateBMI();
-    //test_mmol();
+    //test_getPatientID(); .
+    //test_calculateBMI(); .
+    //test_mmol(); .
     //test_calculateCardioRisk();
     //test_patientFile();
     //test_editPatient();
-    //test_deletePatient();
+    //test_deletePatient(); .
     //test_computeAverages();
-    //test_sortPatients();
-    //test_findPatient();
+    //test_sortPatients(); .
+    //test_findPatient(); .
     //test_selectPatient();
-    //test_updateGender();
+    //test_updateGender(); .
 
     // REFERRALS 
     //test_createReferral();
