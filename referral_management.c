@@ -1,7 +1,7 @@
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Referral management
-void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount){ 
+void createReferral (Referral *referrals, User *users, Patient *currentPatient, User currentUser, int userCount, int *referralCount, Patient *patients){ 
 	// GP access only, currentpatient is patient being referred, user is GP
 	// select patient by entering name,,, would search by strcmp name and strcmp role
 	// select specialist by entering name,,, would search by strcmp name and strcmp role
@@ -27,9 +27,9 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 			case 1:
 				// show users func, lists all users but only specialists.
 				clearScreen();
-				printUsers(users,userCount,"Specialist");
+				printUsers(&currentUser,users,patients,referrals,userCount,*referralCount,"Specialist");
 				printf("\n\n");
-				printf("%53sEnter user ID to select.","");
+				printf("%53sEnter user ID to select","");
 				getValidInput(&input,1,0,500,0,0,0,0);
 			
 				index = findUserByID(users,userCount,input); // index of user
@@ -41,9 +41,9 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 			case 2:
 				// show users func, lists all users but only specialists.
 				clearScreen();
-				printUsers(users,userCount,"Specialist");
+				printUsers(&currentUser,users,patients,referrals,userCount,*referralCount,"Specialist");
 				printf("\n\n");
-				printf("%50sEnter name of user to select.","");
+				printf("%50sEnter name of user to select","");
 				getValidInput(strInput,4,0,0,0,0,0,0);
 				
 				index = findUserByName(users,userCount,strInput);
@@ -78,55 +78,9 @@ void createReferral (Referral *referrals, User *users, Patient *currentPatient, 
 		}
 	}
 	else {
-		printf("Patient is not yet diagnosed.\n");
+		printf("%50sPatient is not yet diagnosed.\n","");
 		waitForInput();
 	}
-}
-
-void showReferrals (User *currentUser, User *users, Referral *referrals, int referralCount){
-    int i, found=0;
-	
-	printf("%30s","");
-	for (i=0;i<WIDTH-100;i++){
-		printf("%c",205);
-	}
-	printf("  REFERRALS  ");
-	for (i=0;i<WIDTH-100;i++){
-		printf("%c",205);
-	}
-	printf("\n");
-	
-    for (i=0;i<referralCount;i++){
-        if (strcmp(currentUser->role,"GP")==0){
-            // categories
-			
-			
-			if (referrals[i].gpID == currentUser->userID){ // show own referrals made
-                printf("%d | %s | Specialist ID: %d | %s\n", // print specialist name instead of ID
-                    referrals[i].referralID,
-                    referrals[i].patientName,
-                    referrals[i].specialistID,
-                    referrals[i].status);
-                found=1;
-            }
-        }
-        else if (strcmp(currentUser->role,"Specialist")==0){
-        	// categories
-			
-			
-            if (referrals[i].specialistID == currentUser->userID){ // show referrals assigned to specialist
-                printf("%d | %s | Status: %s\n",
-                    referrals[i].referralID,
-                    referrals[i].patientName,
-                    referrals[i].status);
-                found=1;
-            }
-        }
-    }
-
-    if (found==0){
-        printf("\n\n%56sNo referrals found\n","");
-    }
 }
 
 void viewReferralStatus(User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, User *currentUser){
@@ -347,7 +301,9 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
 	int index, i, id;
 	char cInput;
 	
-	printCentered("Enter Referral ID to select");
+	printReferrals(currentUser,users,patients,referrals,*referralCount,userCount,"*");
+	
+	printf("\n\n%51sEnter Referral ID to select","");
 	getValidInput(&input,1,0,100,0,0,0,0);
 	
 	index = findReferralByID(referrals,*referralCount,input);

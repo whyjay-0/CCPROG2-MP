@@ -255,8 +255,6 @@ User* loginUser (User *users, int userCount){
 			printf("userCount = %d\n", userCount);
 			
 			for (i=0;i<userCount;i++){
-				printf("Input: '%s' (len=%lu)\n", username, strlen(username));
-				printf("Stored: '%s' (len=%lu)\n", users[i].username, strlen(users[i].username));
 				if (strcmp(users[i].username,username)==0){
 					found=1;
 					i=userCount; // end loop
@@ -509,11 +507,11 @@ int forgotPassword (User *users, int userCount, const char *username){
 	for (i=0;i<userCount;i++){
 		if (strcmp(users[i].username,username)==0){
 			do{
-				if (count==1)
-						printf("\n%58sWrong Answer","");
 
 				if (users[i].questType == 1){
 					printCentered("What is your favorite food?");
+					if (count==1)
+						printf("\n%58sWrong Answer","");
 					getValidInput(input,4,0,0,0,0,0,0);
 					
 					if (strcmp(input,users[i].answer)==0){
@@ -525,6 +523,8 @@ int forgotPassword (User *users, int userCount, const char *username){
 				}
 				else if (users[i].questType == 2){
 					printCentered("What is your favorite color?");
+					if (count==1)
+						printf("\n%58sWrong Answer","");
 					getValidInput(input,4,0,0,0,0,0,0);
 					
 					if (strcmp(input,users[i].answer)==0){
@@ -536,6 +536,8 @@ int forgotPassword (User *users, int userCount, const char *username){
 				}
 				else if (users[i].questType == 3){
 					printCentered("What is your favorite animal/pet?");
+					if (count==1)
+						printf("\n%58sWrong Answer","");
 					getValidInput(input,4,0,0,0,0,0,0);
 					
 					if (strcmp(input,users[i].answer)==0){
@@ -553,6 +555,7 @@ int forgotPassword (User *users, int userCount, const char *username){
 				hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
 				printCentered("Successfully Changed Password!");
 				saveAllUsersToFile(users, userCount, "users.txt"); // save new password
+				waitForInput();
 				flag = 1;
 			}
 		}
@@ -591,7 +594,7 @@ int getUserID (User *users, Patient *patients){
 
 // User Dashboards
 // GP Dashboard
-void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, double data[][2]){
+void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User *users, int userCount, Referral *referrals, int *referralCount, float data[][2]){
 	int i, choice = -1, pchoice = -1, rchoice = -1, order = -1;
 	int padding;
 	
@@ -640,7 +643,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             case 2:
                 do{
             		clearScreen();
-					showPatients(patients,*patientCount);
+					printPatients(currentUser,users,patients,referrals,*patientCount,userCount,*referralCount,"*");
             		
 					printf("%27s","");
 					for (i=0;i<WIDTH-100;i++){
@@ -692,7 +695,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             case 3:
                 do{
                 	clearScreen();
-					showReferrals(currentUser,users,referrals,*referralCount);
+					printReferrals(currentUser,users,patients,referrals,*referralCount,userCount,"*");
 					
 					printf("%27s","");
 					for (i=0;i<WIDTH-100;i++){
@@ -759,7 +762,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
     } while(choice!=0);
 }
 
-void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, double data[][2]){
+void specialistDashboard(User *currentUser, User *users, int userCount, Referral *referrals, int referralCount, Patient *patients, int patientCount, float data[][2]){
 	int i, choice=-1, pchoice=-1, rchoice=-1, order=-1;
 	int padding;
 	
@@ -796,7 +799,8 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             case 1:
                 do{
                 	clearScreen();
-					showReferrals(currentUser,users,referrals,referralCount);
+					// showReferrals(currentUser,users,referrals,referralCount);
+                	printReferrals(currentUser,users,patients,referrals,referralCount,userCount,"*");
                 	
 					printf("%27s","");
 					for (i=0;i<WIDTH-100;i++){
@@ -843,7 +847,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             case 2:
             	do{
             		clearScreen();
-					showPatients(patients,patientCount);
+					printPatients(currentUser,users,patients,referrals,patientCount,userCount,referralCount,"*");
 					
 					printf("%27s","");
 					for (i=0;i<WIDTH-100;i++){
@@ -1024,28 +1028,6 @@ int findUserByName (User *users, int userCount, char *input){
 	return index;
 }
 
-void printUsers (User *users, int userCount, char *filter){ // filter will be like "Specialist" "Patient" "*" or "GP"
-	int i;
-	clearScreen();
-	printf("%26s","");
-	for (i=0;i<WIDTH-100;i++){
-		printf("%c",205);
-	}
-	printf("  List of Users  ");
-	for (i=0;i<WIDTH-100;i++){
-		printf("%c",205);
-	}
-	printf("\n");
-	for (i=0;i<userCount;i++){
-		if (strcmp(filter,users[i].role)==0){
-			printf("%d | %s | %s | %s\n", users[i].userID,users[i].username,users[i].name,users[i].role);
-		}
-		else if (strcmp(filter,"*")==0){
-			printf("%d | %s | %s | %s\n", users[i].userID,users[i].username,users[i].name,users[i].role);
-		}
-	}
-}
-
 void printMainMenu (int height, int width){
 	int i;
 	printTitle(height,width);
@@ -1156,55 +1138,476 @@ void waitForInput(){
 }
 
 // For printing records/tables
-void printHeader (){
-	//int i,j;
+void printHeader (int type, int widths[]){
+	int i,j,k;
+	int totalWidth = 0;
 	
-	printf("%c", 201); // corner
-	//for (i=0;i<) // print how many times horizontally categoryCount
-	// for (j=0;j< // print how many ========= specifically?
-				   // categoryName length? width of category or longest string len value inside that category 
-		//print =
-	// if i < catCount - 1, print T
-	// \n
-	
-	// print values inside header
-	// for i=0 i<categoryCount
-		// print vertical bar then category name
-	// print vertical bar 
-	// \n
-	
-	// separator to rows
-	// print sideways T instead of corner
-	// similar with first row
-	// \n
+	if (type==1){
+		for (k=0;k<5;k++){
+			totalWidth += widths[k];
+		}
+		totalWidth += 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		if (totalWidth > WIDTH){
+			printf("\033[8;%d;%dt", HEIGHT, totalWidth); // resize terminal
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// header
+		printf("%c", 201);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",203);
+		}
+		printf("%c\n",187);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// titles
+		char *headers[5] = {"User ID", "Username", "Name", "Role", "Hospital"};
+		for (i=0;i<5;i++){
+			printf("%c %-*s",186,widths[i],headers[i]);
+		}
+		printf("%c\n",186);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// separator
+		printf("%c",204);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",206);
+		}
+		printf("%c\n",185);
+	}
+	else if (type==2){
+		for (k=0;k<10;k++){
+			totalWidth += widths[k];
+		}
+		totalWidth += 10 + 1 + 20;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		if (totalWidth > WIDTH){
+			printf("\033[8;%d;%dt", HEIGHT, totalWidth); // resize terminal
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// header
+		printf("%c", 201);
+		for (i=0;i<10;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<9)
+				printf("%c",203);
+		}
+		printf("%c\n",187);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// titles
+		char *headers[10] = {"Patient ID","Name","Age","Gender","BMI","CVD","Diabetes","CardioRisk","Diagnosed","Referred"};
+		for (i=0;i<10;i++){
+			printf("%c %-*s ",186,widths[i],headers[i]);
+		}
+		printf("%c\n",186);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// separator
+		printf("%c",204);
+		for (i=0;i<10;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<9)
+				printf("%c",206);
+		}
+		printf("%c\n",185);
+	}
+	else if (type==3){
+		for (k=0;k<5;k++){
+			totalWidth += widths[k];
+		}
+		totalWidth += 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		if (totalWidth > WIDTH){
+			printf("\033[8;%d;%dt", HEIGHT, totalWidth); // resize terminal
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// header
+		printf("%c", 201);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",203);
+		}
+		printf("%c\n",187);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// titles
+		char *headers[5] = {"Referral ID", "GP ID", "Patient Name", "Specialist Name", "Status"};
+		for (i=0;i<5;i++){
+			printf("%c %-*s ",186,widths[i],headers[i]);
+		}
+		printf("%c\n",186);
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// separator
+		printf("%c",204);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",206);
+		}
+		printf("%c\n",185);
+	}
 }
 
-void printRows (){
-	// i or row is passed as parameter
+void printRows (int type, User *currentUser, User *users, Patient *patients, Referral *referrals, int count, int userCount, int widths[], int referralCount, char *filter){
+	int i,index,j;
+	char referred;
+	int totalWidth = 0;
 	
-	// vertical bar
-	// for j j<catCount	... j = category
-		// width of category,,,width[j], value users[i].
-		// vertical bar
-	
-	// \n
+	if (type==1){
+		for (j=0;j<5;j++){
+			totalWidth+=widths[j];
+		}
+		totalWidth+= 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		for (i=0;i<count;i++){
+			printf("%*s",(WIDTH-totalWidth)/2,"");
+			
+			if (strcmp(filter,users[i].role)==0){
+				printf("%c %-*d %c %-*s %c %-*s %c %-*s %c %-*s %c\n",
+					186, widths[0], users[i].userID,
+					186, widths[1], users[i].username,
+					186, widths[2], users[i].name,
+					186, widths[3], users[i].role,
+					186, widths[4], users[i].hospital, 186);
+			}
+			else if (strcmp(filter,"*")==0){
+				printf("%c %-*d %c %-*s %c %-*s %c %-*s %c %-*s %c\n",
+					186, widths[0], users[i].userID,
+					186, widths[1], users[i].username,
+					186, widths[2], users[i].name,
+					186, widths[3], users[i].role,
+					186, widths[4], users[i].hospital, 186);
+			}
+		}
+	}
+	else if (type==2){
+		for (j=0;j<10;j++){
+			totalWidth+=widths[j];
+		}
+		totalWidth+= 10 + 1 + 20;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		for (i=0;i<count;i++){
+			if (patients[i].isReferred == 0){
+				referred = 'N';
+			}
+			else if (patients[i].isReferred == 1){
+				referred = 'Y';
+			}
+			
+			
+			printf("%*s",(WIDTH-totalWidth)/2,"");
+			
+			if (patients[i].cardioRisk!=-1){
+				printf("%c %-*d %c %-*s %c %-*d %c %-*c %c %-*s %c %-*c %c %-*c %c %-*.2lf %c %-*c %c %-*c %c\n",
+						186, widths[0], patients[i].patientID,
+						186, widths[1], patients[i].name,
+						186, widths[2], patients[i].age,
+						186, widths[3], patients[i].gender,
+						186, widths[4], patients[i].bmiCat,
+						186, widths[5], patients[i].currentCVD,
+						186, widths[6], patients[i].diabetes,
+						186, widths[7], patients[i].cardioRisk,
+						186, widths[8], patients[i].isDiagnosed,
+						186, widths[9], referred, 186);
+			}
+			else {
+				printf("%c %-*d %c %-*s %c %-*d %c %-*c %c %-*s %c %-*c %c %-*c %c %-*s %c %-*c %c %-*c %c\n",
+						186, widths[0], patients[i].patientID,
+						186, widths[1], patients[i].name,
+						186, widths[2], patients[i].age,
+						186, widths[3], patients[i].gender,
+						186, widths[4], patients[i].bmiCat,
+						186, widths[5], patients[i].currentCVD,
+						186, widths[6], patients[i].diabetes,
+						186, widths[7], "N/A",
+						186, widths[8], patients[i].isDiagnosed,
+						186, widths[9], referred, 186);
+			}
+			
+		}
+	}
+	else if (type==3){
+		for (j=0;j<5;j++){
+			totalWidth+=widths[j];
+		}
+		totalWidth+= 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		for (i=0;i<count;i++){
+			printf("%*s",(WIDTH-totalWidth)/2,"");
+			
+			if (strcmp(currentUser->role,"GP")==0){
+				if (referrals[i].gpID == currentUser->userID){
+					index = findUserByID(users,userCount,referrals[i].specialistID);
+					printf("%c %-*d %c %-*d %c %-*s %c %-*s %c %-*s %c\n",
+							186, widths[0], referrals[i].referralID,
+							186, widths[1], referrals[i].gpID,
+							186, widths[2], referrals[i].patientName,
+							186, widths[3], users[index].name,
+							186, widths[4], referrals[i].status, 186);
+				}
+			}
+			else if (strcmp(currentUser->role,"Specialist")==0){
+				if (referrals[i].specialistID == currentUser->userID){
+					index = findUserByID(users,userCount,referrals[i].specialistID);
+					printf("%c %-*d %c %-*d %c %-*s %c %-*s %c %-*s %c\n",
+							186, widths[0], referrals[i].referralID,
+							186, widths[1], referrals[i].gpID,
+							186, widths[2], referrals[i].patientName,
+							186, widths[3], users[index].name,
+							186, widths[4], referrals[i].status, 186);
+				}
+			}
+		}
+	}
 }
 
-void printFooter (){
-	// similar to logic inside header first row
+void printFooter (int type, int widths[]){
+	int i,j,k;
+	int totalWidth = 0;
 	
-	
+	if (type==1){
+		for (k=0;k<5;k++){
+			totalWidth+=widths[k];
+		}
+		totalWidth += 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// footer
+		printf("%c", 200);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",202);
+		}
+		printf("%c\n",188);
+	}
+	else if (type==2){
+		for (k=0;k<10;k++){
+			totalWidth+=widths[k];
+		}
+		totalWidth += 10 + 1 + 20;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// footer
+		printf("%c", 200);
+		for (i=0;i<10;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<9)
+				printf("%c",202);
+		}
+		printf("%c\n",188);
+	}
+	else if (type==3){
+		for (k=0;k<5;k++){
+			totalWidth+=widths[k];
+		}
+		totalWidth += 5 + 1 + 10;
+		if ((WIDTH-totalWidth)/2 < 0){
+			totalWidth=WIDTH;
+		}
+		
+		printf("%*s",(WIDTH-totalWidth)/2,"");
+		// footer
+		printf("%c", 200);
+		for (i=0;i<5;i++){
+			for (j=0;j<widths[i]+2;j++){
+				printf("%c",205);
+			}
+			if (i<4)
+				printf("%c",202);
+		}
+		printf("%c\n",188);
+	}
 }
 
 // for calculating column and categories' widths
-void calculateWidth (){
-	// i and len of strings
+// type determines what type to run
+// count is amt of rows to be printed,,, referralCount, patientCount, userCount
+void calculateWidths (int type, User *users, Patient *patients, Referral *referrals, int count, int userCount, int widths[]){
+	int i;
+	int index;
 	
-	// multiple linear searching
+	if (type==1){ // Users
+		widths[0] = strlen("user ID");
+		widths[1] = strlen("username");
+		widths[2] = strlen("name");
+		widths[3] = strlen("role");
+		widths[4] = strlen("hospital");
+		
+		for (i=0;i<userCount;i++){
+			if (strlen(users[i].username) > widths[1])
+				widths[1] = strlen(users[i].username);
+			if (strlen(users[i].name) > widths[2])
+				widths[2] = strlen(users[i].name);
+			if (strlen(users[i].role) > widths[3])
+				widths[3] = strlen(users[i].role);
+			if (strlen(users[i].hospital) > widths[4])
+				widths[4] = strlen(users[i].hospital);
+		}
+	}
+	if (type==2){ // Patients
+		char *headers[10] = {"Patient ID","Name","Age","Gender","BMI","CVD","Diabetes","CardioRisk","Diagnosed","Referred"};
+		// only test for name and bmi, others are just 1-3 characters
+		for (i=0;i<10;i++){
+			widths[i] = strlen(headers[i]);
+		}
+		
+		for (i=0;i<count;i++){
+			if (strlen(patients[i].name) > widths[1])
+				widths[1] = strlen(patients[i].name);
+			if (strlen(patients[i].bmiCat) > widths[4])
+				widths[4] = strlen(patients[i].bmiCat);
+		}
+	}
+	if (type==3){ // Referrals
+		widths[0] = strlen("Referral ID");
+		widths[1] = strlen("GP ID");
+		widths[2] = strlen("Patient Name");
+		widths[3] = strlen("Specialist Name");
+		widths[4] = strlen("Status");
+		
+		for (i=0;i<count;i++){
+			if (strlen(referrals[i].patientName)>widths[2])
+				widths[2] = strlen(referrals[i].patientName);
+			index = findUserByID(users,userCount,referrals[i].specialistID);
+			if (strlen(users[index].name)>widths[3])
+				widths[3] = strlen(users[index].name);
+			if (strlen(referrals[i].status)>widths[4])
+				widths[4] = strlen(referrals[i].status);
+		}
+	}
+}
+
+void printUsers (User *currentUser, User *users, Patient *patients, Referral *referrals, int userCount, int referralCount, char *filter){
+	int userWidths[5];
+	int i;
 	
-	// set initial values for all widths/category
+	calculateWidths(1,users,patients,referrals,userCount,userCount,userWidths);
 	
-	// find the longest value in each category
-	// for (i=0;i<userCount;i++)
-		// 
+	if (userCount!=0){
+		clearScreen();
+		printf("%32s","");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("  USERS  ");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("\n");
+		
+		printHeader(1,userWidths);
+		printRows(1,currentUser,users,patients,referrals,userCount,userCount,userWidths,referralCount,filter);
+		printFooter(1,userWidths);
+	}
+	else if (userCount==0){
+		printCentered("No Records Found");
+		waitForInput();
+		clearScreen();
+	}
+}
+
+void printPatients (User *currentUser, User *users, Patient *patients, Referral *referrals, int patientCount, int userCount, int referralCount, char *filter){
+	int patientWidths[10];
+	int i;
+	
+	calculateWidths(2,users,patients,referrals,patientCount,userCount,patientWidths);
+	
+	if (patientCount!=0){
+		clearScreen();
+		printf("%27s","");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("  PATIENT RECORDS  ");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("\n");
+		
+		printHeader(2,patientWidths);
+		printRows(2,currentUser,users,patients,referrals,patientCount,userCount,patientWidths,referralCount,filter);
+		printFooter(2,patientWidths);
+	}
+	else {
+		printCentered("No Records Found");
+		waitForInput();
+		clearScreen();
+	}
+}
+
+void printReferrals (User *currentUser, User *users, Patient *patients, Referral *referrals, int referralCount, int userCount, char *filter){
+	int referralWidths[5];
+	int i;
+	
+	calculateWidths(3,users,patients,referrals,referralCount,userCount,referralWidths);
+	
+	if (referralCount!=0){
+		clearScreen();
+		printf("%30s","");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("  REFERRALS  ");
+		for (i=0;i<WIDTH-100;i++){
+			printf("%c",205);
+		}
+		printf("\n");
+		
+		printHeader(3,referralWidths);
+		printRows(3,currentUser,users,patients,referrals,referralCount,userCount,referralWidths,referralCount,filter);
+		printFooter(3,referralWidths);
+	}
+	else {
+		printCentered("No Records Found");
+		waitForInput();
+		clearScreen();
+	}
 }

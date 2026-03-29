@@ -328,7 +328,7 @@ void showPatientDetails (Patient *currentPatient){
 		printf("%57sBlood Sugar: TBD\n","");
 	}
 	else {
-		printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+		printf("%54sBlood Sugar: %.2f mg/dL\n\n", "", currentPatient->bloodSugar);
 	}
 	
 }
@@ -354,9 +354,19 @@ void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, ne
 	padding = (WIDTH - 12 - strlen(currentPatient->bmiCat)) / 2;
 	printf("%*sBMI: %.2f, %s\n", padding, "", currentPatient->bmi, currentPatient->bmiCat);
 	padding = (WIDTH - 16 - strlen(currentPatient->bp)) / 2;
-	printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	if (strcmp(currentPatient->bp,"0")==0){
+		printf("%55sBlood Pressure: TBD\n", "");
+	}
+	else {
+		printf("%*sBlood Pressure: %s\n", padding, "", currentPatient->bp);
+	}
 	padding = (WIDTH - 22) / 2;
-	printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+	if (currentPatient->bloodSugar==0){
+		printf("%57sBlood Sugar: TBD\n", "");
+	}
+	else {
+		printf("%54sBlood Sugar: %.2f mg/dL\n", "", currentPatient->bloodSugar);
+	}
 	// Will be shown if calculateCardioRisk was done otherwise other details will be shown.
 	// Temporary interpretations Changes might be made once AHA provides proper source code.
 	
@@ -661,52 +671,8 @@ void deletePatient (Patient *patients, int *patientCount, int index){
 	(*patientCount)--;
 }
 
-// Print patient list
-void showPatients (Patient *patient, int count){
-	int i=0;
-	if(count==0)
-		printf("%56sNo patients found\n","");
-	else {
-		printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    	printf("PATIENT LIST\n");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    	printf("|  |   |   |\n"); // categories
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-    
-    	for(i=0; i<count; i++) {
-        	printf("| %03d | %03d | %-25s | %-3d | %3c%3s | %16s |",
-           		i+1,
-           		patient[i].patientID,
-            	patient[i].name,
-            	patient[i].age,
-            	patient[i].gender, "",
-            	patient[i].contact);
-            if (patient[i].cardioRisk!=-1){
-            	printf("   %.2lf%%    |\n", patient[i].cardioRisk * 100);
-			}
-			else {
-				printf("   %-7s    |\n", "N/A");
-			}
-    	}
-    
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------------------------------------");
-    	printf("----------\n");
-	}
-}
-
-void computeAverages(double data[][2], int patientCount){ // param *data - 2D array containing BMI and CRisk data
-	double sumBMI=0, sumRisk=0, valid=0;
+void computeAverages(float data[][2], int patientCount){ // param *data - 2D array containing BMI and CRisk data
+	float sumBMI=0, sumRisk=0, valid=0;
 	int i;
 	
 	if (patientCount == 0){
@@ -828,7 +794,9 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 	int index;
 	char cInput;
 	
-	printCentered("Enter Patient ID to select: ");
+	printPatients(currentUser,users,patients,referrals,*patientCount,userCount,*referralCount,"*");
+	
+	printf("\n\n%52sEnter Patient ID to select","");
 	getValidInput(&input,1,0,100,0,0,0,0);
 	// do while getValidInput==0,,, show patients
 	
@@ -904,7 +872,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    		break;
     	    	case 5:
     	    		clearScreen();
-    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
+    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
 				case 0:
@@ -924,7 +892,9 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 	char input[101];
 	char cInput;
 	
-	printCentered("Enter name of patient to select: ");
+	printPatients(currentUser,users,patients,referrals,*patientCount,userCount,*referralCount,"*");
+	
+	printf("\n\n%49sEnter name of patient to select","");
 	getValidInput(input,4,0,0,0,0,0,0);
 	// do while index==-1 show patients
 	
@@ -1000,7 +970,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
 					break;
     	    	case 5:
     	    		clearScreen();
-    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount);
+    	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
     	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
 					break;
 				case 0:
