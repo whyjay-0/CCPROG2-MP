@@ -140,7 +140,7 @@ Description: Retrieves a user ID, optionally linking it with a patient record.
 @param patients - array of patient records
 returns int user ID
 */
-int getUserID (User *users, Patient *patients);
+int getUserID (User *users, Patient *patients, int userCount, int patientCount);
 
 //=================  Dashboard Printing  ============================
 /*

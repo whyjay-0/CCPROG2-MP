@@ -47,7 +47,7 @@ void test_getValidInput() {
 
 void test_registerUser() {
     User u[4]={{1,"Jess"},{2,"Sab"}};
-    Patient p[2];
+    Patient p[2]={0};
     int c=2;
 
     //test 1 - valid registration: new patient
@@ -57,7 +57,7 @@ void test_registerUser() {
 
     //test 2 - duplicate usn, gp
     setInput("Jess\nok\nB\nBat\nxyz\n2\n3\nCat\n");
-    testInt("registerUser",1,3,registerUser(u,&c,p,0));
+    testInt("registerUser",2,3,registerUser(u,&c,p,0));
     printf("Count: %d (Expected: 4)", c);
 }
 
@@ -137,12 +137,14 @@ void test_getUserID() {
     //test 1 - normal case
     User u[100]={{1},{2}};
     Patient p[100]={{1,5}};
-    testInt("getUserID",1,6,getUserID(u,p));
+    int c=2,pc=1;
+    testInt("getUserID",1,6,getUserID(u,p,c,pc));
 
     //test 2 - empty
     User user[100];
     Patient patient[100];
-    testInt("getUserID",2,1,getUserID(user,patient));
+    int count=0,pcount=0;
+    testInt("getUserID",2,1,getUserID(user,patient,count,pcount));
 }
 
 void test_findUser() {
@@ -534,7 +536,7 @@ int main(){
 
     // USER 
     //test_getValidInput(); 
-    //test_registerUser(); 
+    test_registerUser(); 
     //test_loginUser(); 
     //test_hashPassword(); 
     //test_editUserDetails(); 

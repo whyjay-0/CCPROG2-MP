@@ -49,7 +49,7 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 					case 'N':
 					case 'n':
 						newPatient.patientID = getPatientID(patients, patientCount);
-						newPatient.userID = getUserID(users, patients);
+						newPatient.userID = getUserID(users, patients, userCount, patientCount);
 					break;
 					default:
 						printCentered("Invalid choice.");
@@ -57,7 +57,7 @@ Patient addPatient (User *currentUser, Patient *patients, int patientCount, User
 			}
 			else { // no old user
 				newPatient.patientID = getPatientID(patients, patientCount); // set the userID of new user to old usercount + 1
-				newPatient.userID = getUserID(users, patients); // getting a new userID even if patient does not have account yet
+				newPatient.userID = getUserID(users, patients, userCount, patientCount); // getting a new userID even if patient does not have account yet
 			}
 		}
 		

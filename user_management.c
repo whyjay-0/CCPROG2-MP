@@ -35,6 +35,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 		switch(type){
 			case 1: // int
 				scan = scanf("%d", (int*)input); // (int*)var, transforms the type of var into a pointer to an int
+				
 				if (scan != 1){
 					printCentered("Invalid input. Enter an integer");
 					clearInput();
@@ -43,7 +44,7 @@ int getValidInput(void *input, int type, int min, int max, char limit1, char lim
 					clearScreen();
 					printf("%50sOut of range (%d-%d). Try again", "", min, max);
 				}
-				else 
+				else
 					valid=1;
 				break;
 			case 2: // float
@@ -168,7 +169,7 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 			clearScreen();
 			printf("%55sIndicate your role:\n%59s[1] Patient\n%53s[2] General Practitioner\n%58s[3] Specialist","","","","");
 			getValidInput(&choice,1,1,3,0,0,0,0);
-				
+			
 			switch (choice){
 				case 1: 
 					strcpy(newUser.role, "Patient");
@@ -185,7 +186,7 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 								break;
 							case 'N':
 							case 'n':
-								newUser.userID = getUserID(users,patients);
+								newUser.userID = getUserID(users,patients,*userCount,patientCount);
 								break;
 							default:
 								printCentered("Invalid input.");
@@ -193,21 +194,22 @@ int registerUser (User *users, int *userCount, Patient *patients, int patientCou
 						}
 					}
 					else {
-						newUser.userID = getUserID(users,patients);
+						newUser.userID = getUserID(users,patients,*userCount,patientCount);
 					}
+					printf("newUserID: %d\n", newUser.userID);
 					strcpy(newUser.hospital, "N/A");
 					complete=1; 
 					break;
 				case 2: 
 					strcpy(newUser.role, "GP"); 
-					newUser.userID = getUserID(users,patients); // set the userID of new user to highest userID found + 1
+					newUser.userID = getUserID(users,patients,*userCount,patientCount); // set the userID of new user to highest userID found + 1
 					strcpy(newUser.hospital, "N/A");
 					
 					complete=1; 
 					break;
 				case 3: 
 					strcpy(newUser.role, "Specialist");
-					newUser.userID = getUserID(users,patients);
+					newUser.userID = getUserID(users,patients,*userCount,patientCount);
 					
 					printCentered("Enter the name of the hospital you are affiliated with");
 					getValidInput(newUser.hospital,4,0,0,0,0,0,0);
@@ -563,19 +565,19 @@ int forgotPassword (User *users, int userCount, const char *username){
 }
 
 // Finds max userID and sets new userID to be used
-int getUserID (User *users, Patient *patients){
+int getUserID (User *users, Patient *patients, int userCount, int patientCount){
 	int i,id,max=-1; // -1 since -1 < 0,, avoiding recurring 0 for userID, but will cause userID to start from 1
 	int isEmpty=1;
 	// check if there are no users
 	
-	for (i=0;i<MAX_USERS;i++){
+	for (i=0;i<userCount;i++){
 		if (users[i].userID > max){
 			max = users[i].userID;
 			isEmpty=0;
 		}
 	}
 	
-	for (i=0;i<MAX_USERS;i++){
+	for (i=0;i<patientCount;i++){
 		if (patients[i].userID > max){
 			max = patients[i].userID;
 			isEmpty=0;
