@@ -357,6 +357,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    				waitForInput();
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					loadReferralsFromFile(referrals, "referrals.txt");
 					
 					printf("%47sSuccessfully deleted Referral #%02d","",id);
 					waitForInput();
@@ -417,6 +418,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    				printf("Invalid input.\n");
 					}
 					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+					loadReferralsFromFile(referrals, "referrals.txt");
 					
 					printf("%47sSuccessfully Deleted Referral #%02d","",id);
 					waitForInput();

@@ -860,7 +860,8 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    				printf("Invalid input.\n");
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
-    	    		
+    	    		loadPatientsFromFile(patients, "patients.txt");
+					
     	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
     	    		waitForInput();
@@ -959,6 +960,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    				printf("Invalid input.\n");
 					}
     	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		loadPatientsFromFile(patients, "patients.txt");
     	    		
     	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
