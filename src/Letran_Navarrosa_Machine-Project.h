@@ -1,3 +1,13 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

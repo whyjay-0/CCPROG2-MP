@@ -1,3 +1,13 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Referral management
@@ -356,8 +366,8 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    				printCentered("Invalid input.\n");
     	    				waitForInput();
 					}
-					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
-					loadReferralsFromFile(referrals, "referrals.txt");
+					saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
+					loadReferralsFromFile(referrals, "../data/referrals.txt");
 					
 					printf("%47sSuccessfully deleted Referral #%02d","",id);
 					waitForInput();
@@ -397,7 +407,7 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    	case 1:
    		     		clearScreen();
 					editReferral(&referrals[index]);
-   		     		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+   		     		saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
     	    		break;
     	    	case 2:
     	    		clearScreen();
@@ -417,8 +427,8 @@ void selectReferralID (User *currentUser, Referral *referrals, int *referralCoun
     	    			default:
     	    				printf("Invalid input.\n");
 					}
-					saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
-					loadReferralsFromFile(referrals, "referrals.txt");
+					saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
+					loadReferralsFromFile(referrals, "../data/referrals.txt");
 					
 					printf("%47sSuccessfully Deleted Referral #%02d","",id);
 					waitForInput();

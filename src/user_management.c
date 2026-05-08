@@ -1,3 +1,13 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Utility
@@ -384,7 +394,7 @@ void editUserDetails (User *currentUser, int userCount, User *users){
 				}
 					
 			} while (complete==0);
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		case 2:
 			do {
@@ -406,7 +416,7 @@ void editUserDetails (User *currentUser, int userCount, User *users){
 					waitForInput();
 				}
 			} while (complete==0);
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		case 3:
 			clearScreen();
@@ -414,7 +424,7 @@ void editUserDetails (User *currentUser, int userCount, User *users){
 			getValidInput(&currentUser->questType,1,1,3,0,0,0,0);
 			printCentered("Input answer to security question.");
 			getValidInput(currentUser->answer,4,0,0,0,0,0,0);
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		case 4:
 			printCentered("Enter your new full name");
@@ -425,7 +435,7 @@ void editUserDetails (User *currentUser, int userCount, User *users){
 			clearScreen();
 			printf("%*sAre you sure you want the new name %s", padding, "", currentUser->name);
 			waitForInput();
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		case 5:
 			if (strcmp(currentUser->role, "Specialist")==0){
@@ -442,11 +452,11 @@ void editUserDetails (User *currentUser, int userCount, User *users){
 				printCentered("Invalid role.");
 				waitForInput();
 			}
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		case 0:
 			printCentered("Exiting...");
-			saveAllUsersToFile(users, userCount, "users.txt");
+			saveAllUsersToFile(users, userCount, "../data/users.txt");
 			break;
 		default:
 			printCentered("Invalid input");
@@ -555,7 +565,7 @@ int forgotPassword (User *users, int userCount, const char *username){
 				getValidInput(newPass,4,0,0,0,0,0,0);
 				hashPassword(newPass, &users[i].passwordHash); // Need validity check for passwords
 				printCentered("Successfully Changed Password!");
-				saveAllUsersToFile(users, userCount, "users.txt"); // save new password
+				saveAllUsersToFile(users, userCount, "../data/users.txt"); // save new password
 				waitForInput();
 				flag = 1;
 			}
@@ -638,7 +648,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
                 	printCentered("Reached max patient count");
                 	waitForInput();
 				}
-                saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+                saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
                 break;
 			
             case 2:
@@ -691,7 +701,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				printCentered("Invalid input.");
 					}
 				} while(pchoice!=0);
-				saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+				saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
                 break;
             case 3:
                 do{
@@ -739,7 +749,7 @@ void gpDashboard (User *currentUser, Patient *patients, int *patientCount, User 
             				printCentered("Invalid input.");
 					}
 				} while(rchoice!=0);
-                saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+                saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
                 break;
             case 4:
             	clearScreen();
@@ -844,7 +854,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				printCentered("Invalid input.");
 					}
 				} while(rchoice!=0);
-				saveAllReferralsToFile(referrals,referralCount,"referrals.txt");
+				saveAllReferralsToFile(referrals,referralCount,"../data/referrals.txt");
                 break;
             case 2:
             	do{
@@ -897,7 +907,7 @@ void specialistDashboard(User *currentUser, User *users, int userCount, Referral
             				printCentered("Invalid input.");
 					}
 				} while(pchoice!=0);
-				saveAllPatientsToFile(patients,patientCount,"patients.txt");
+				saveAllPatientsToFile(patients,patientCount,"../data/patients.txt");
             	break;
             case 3:
             	clearScreen();
@@ -1008,7 +1018,7 @@ void patientDashboard(User *currentUser, User *users, int userCount, Patient *pa
                 	printCentered("Reached max patient count");
                 	waitForInput();
 				}
-				saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+				saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
     			break;
     		case 2:
     			clearScreen();

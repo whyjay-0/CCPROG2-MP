@@ -1,14 +1,25 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include "Letran_Navarrosa_Machine-Project.h"
-// gcc -Wall -std=c99 main.c user_management.c patient_logging.c referral_management.c
+// To compile:
+// gcc -Wall -std=c99 main.c user_management.c patient_logging.c referral_management.c -o ../RMS
 int main () {
 	User users[MAX_USERS] = {0}; // init array of struc to 0 in all index
 	User *currentUser; // setup for currentUser
 	Patient patients[MAX_USERS] = {0};
 	Referral referrals[MAX_USERS] = {0};
 	
-	int userCount = loadUsersFromFile(users, "users.txt");
-	int patientCount = loadPatientsFromFile(patients, "patients.txt");
-	int referralCount = loadReferralsFromFile(referrals, "referrals.txt"); // loadReferrals/Patients/Users returns count of successful scans
+	int userCount = loadUsersFromFile(users, "../data/users.txt");
+	int patientCount = loadPatientsFromFile(patients, "../data/patients.txt");
+	int referralCount = loadReferralsFromFile(referrals, "../data/referrals.txt"); // loadReferrals/Patients/Users returns count of successful scans
 	
 	int exit=0, choice=0; // input for main menu/login screen
 	int newUser; // userID of new users
@@ -24,7 +35,7 @@ int main () {
 			case 1: // Registration
 				newUser = registerUser(users, &userCount, patients, patientCount); // registerUser returns -1 if not valid registration
 				if (newUser != -1){
-					saveAllUsersToFile(users, userCount, "users.txt");
+					saveAllUsersToFile(users, userCount, "../data/users.txt");
 					printCentered("User saved successfully!");
 				}
 				break;

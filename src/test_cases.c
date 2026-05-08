@@ -1,3 +1,13 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // PRINT HELPERS 
@@ -18,10 +28,10 @@ void testStr(char *f, int n, char *e, char *a) {
 
 // MOCK INPUT HELPER
 void setInput(const char *data) {
-    FILE *fp = fopen("mock.txt","w");
+    FILE *fp = fopen("../data/mock.txt","w");
     fputs(data,fp);
     fclose(fp);
-    freopen("mock.txt","r",stdin);
+    freopen("../data/mock.txt","r",stdin);
 }
 
 // USER FUNCTIONS
@@ -111,8 +121,8 @@ void test_userFile() {
     User u[3]={{1,"A",1,"GP","Ash",1,"Ad","A"},{2,"B",2,"Specialist","Bat",2,"Blue","B"},{3,"C",3,"Patient","Cat",3,"C","C"}};
 
     //test 1 - valid
-    testInt("saveAllUsersToFile",1,1,saveAllUsersToFile(u,3,"u.txt"));
-    testInt("loadUsersFromFile",1,3,loadUsersFromFile(u,"u.txt"));
+    testInt("saveAllUsersToFile",1,1,saveAllUsersToFile(u,3,"../data/u.txt"));
+    testInt("loadUsersFromFile",1,3,loadUsersFromFile(u,"../data/u.txt"));
 
     //test 2 - invalid
     testInt("saveAllUsersToFile",2,0,saveAllUsersToFile(u,3,""));
@@ -286,8 +296,8 @@ void test_patientFile() {
     Patient p[1]={{1,1,"A",1,'M',"+63",2.0,"h","a",2.0,'N',3.0,2.0,1,'N','N','N','N',2.0,'N','N','N','N',2.0,'N',1}};
     
     //test 1 - valid 
-    testInt("saveAllPatientsToFile",1,1,saveAllPatientsToFile(p,1,"p.txt"));
-    testInt("loadPatientsFromFile",1,1,loadPatientsFromFile(p,"p.txt"));
+    testInt("saveAllPatientsToFile",1,1,saveAllPatientsToFile(p,1,"../data/p.txt"));
+    testInt("loadPatientsFromFile",1,1,loadPatientsFromFile(p,"../data/p.txt"));
 
     //test 1 - valid 
     testInt("saveAllPatientsToFile",2,0,saveAllPatientsToFile(p,1,""));
@@ -465,8 +475,8 @@ void test_referralFile(){
 
     //test 1 - save data and valid file
     Referral r1[2]={{1,1,1,"John",1,"Completed"},{2,2,2,"Jess",2,"Rejected"}};
-    testInt("saveAllReferralsToFile",1,1,saveAllReferralsToFile(r1,2,"r.txt"));
-    testInt("loadAllReferralsFromFile",1,2,loadReferralsFromFile(r1,"r.txt"));
+    testInt("saveAllReferralsToFile",1,1,saveAllReferralsToFile(r1,2,"../data/r.txt"));
+    testInt("loadAllReferralsFromFile",1,2,loadReferralsFromFile(r1,"../data/r.txt"));
 
      //test 1 - invalid path and missing file
     Referral r2[2]={{1,1,1,"John",1,"Completed"},{2,2,2,"Jess",2,"Rejected"}};

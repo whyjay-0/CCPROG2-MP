@@ -1,3 +1,13 @@
+/*
+Authors: Navarrosa, Yerachmiel Jannes C. 	(yj17cayabyab@yahoo.com | https://github.com/whyjay-0)
+		 Letran, Jessica C. 				(jessica_letra@dlsu.edu.ph | https://github.com/jessletran)
+Program Description: This program is a referral management system for patients, general practitioners and specialists, 
+					 where each user is able to log in and register with their details and personal information and 
+					 access a referral, diagnosis, and record system.
+Last updated: May 8, 2026
+@version 1.0
+*/
+
 #include "Letran_Navarrosa_Machine-Project.h"
 
 // Patient logging
@@ -839,7 +849,7 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
 				case 2:
    		     		clearScreen();
 					editPatient(&patients[index]);
-   		     		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+   		     		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
     	    		break;
     	    	case 3:
     	    		clearScreen();
@@ -859,8 +869,8 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    			default:
     	    				printf("Invalid input.\n");
 					}
-    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
-    	    		loadPatientsFromFile(patients, "patients.txt");
+    	    		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
+    	    		loadPatientsFromFile(patients, "../data/patients.txt");
 					
     	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
@@ -871,12 +881,12 @@ void selectPatientID (Patient *patients, int *patientCount, Referral *referrals,
     	    	case 4:
     	    		clearScreen();
     	    		diagnosePatient(&patients[index]);
-    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
     	    		break;
     	    	case 5:
     	    		clearScreen();
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
-    	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+    	    		saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
 					break;
 				case 0:
 					printCentered("Exiting...");
@@ -939,7 +949,7 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    	case 2:
     	    		clearScreen();
    		     		editPatient(&patients[index]);
-    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
 					break;
     	    	case 3:
     	    		clearScreen();
@@ -959,8 +969,8 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    			default:
     	    				printf("Invalid input.\n");
 					}
-    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
-    	    		loadPatientsFromFile(patients, "patients.txt");
+    	    		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
+    	    		loadPatientsFromFile(patients, "../data/patients.txt");
     	    		
     	    		clearScreen();
     	    		printf("%47sSuccessfully deleted Patient #%02d","", id);
@@ -971,12 +981,12 @@ void selectPatientName (Patient *patients, int *patientCount, Referral *referral
     	    	case 4:
     	    		clearScreen();
     	    		diagnosePatient(&patients[index]);
-    	    		saveAllPatientsToFile(patients,*patientCount,"patients.txt");
+    	    		saveAllPatientsToFile(patients,*patientCount,"../data/patients.txt");
 					break;
     	    	case 5:
     	    		clearScreen();
     	    		createReferral(referrals, users, &patients[index], *currentUser, userCount, referralCount, patients);
-    	    		saveAllReferralsToFile(referrals,*referralCount,"referrals.txt");
+    	    		saveAllReferralsToFile(referrals,*referralCount,"../data/referrals.txt");
 					break;
 				case 0:
 					printCentered("Exiting...");
