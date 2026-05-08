@@ -337,6 +337,26 @@ void showPatientDetails (Patient *currentPatient){
 	
 }
 
+// printing contact details
+void showContact (Patient *currentPatient){
+	int i;
+	
+	printf("%25s","");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	printf("  PATIENT DETAILS  ");
+	for (i=0;i<WIDTH-100;i++){
+		printf("%c",205);
+	}
+	printf("\n");
+	// Details
+	int padding = (WIDTH - 9 - strlen(currentPatient->name)) / 2;
+	printf("%*sPatient: %s\n", padding, "", currentPatient->name);
+	printf("%62sAge: %d\n", "", currentPatient->age);
+	printf("%48sContact Details: %s\n", "", currentPatient->contact);
+}
+
 // printing diagnosis report
 void showDiagnosisReport (Patient *currentPatient){ // For specialist only,,, need selectPatient function
 	int i;
@@ -656,6 +676,7 @@ int loadPatientsFromFile (Patient *patients, const char *filename){
 
 // Edit name, age, contact
 void editPatient (Patient *patient){
+	showContact(patient);
 	// input name
 	printCentered("Enter new name");
 	getValidInput(patient->name,4,0,0,0,0,0,0);

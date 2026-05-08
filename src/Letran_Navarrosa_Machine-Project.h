@@ -305,6 +305,11 @@ Description: used for printing the specific details of the patient without the d
 */
 void showPatientDetails (Patient *currentPatient);
 /*
+Description: used for printing the specific contact details of the patient for editing
+@param currentPatient - currentPatient being shown
+*/
+void showContact (Patient *currentPatient);
+/*
 Description: used to print diagnosis report including patient details
 @param currentPatient - current patient being shown
 */
